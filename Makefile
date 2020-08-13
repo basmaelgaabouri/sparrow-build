@@ -23,10 +23,20 @@ include $(ROOTDIR)/build/preamble.mk
 prereqs: $(ROOTDIR)/scripts/install-prereqs.sh
 	sudo $(ROOTDIR)/scripts/install-prereqs.sh
 
+KATA_CMAKE_ARGS := -DCROSS_COMPILER_PREFIX=riscv32-unknown-elf- \
+                   -DCMAKE_BUILD_TYPE=Release \
+                   -DCMAKE_TOOLCHAIN_FILE=$(ROOTDIR)/kata/kernel/gcc.cmake \
+                   -DSEL4_CACHE_DIR=$(OUT)/kata/sel4_cache \
+                   -G Ninja
+
+kata: $(ROOTDIR)/kata | out-dir
+	@mkdir -p $(OUT)/kata
+	pushd $(OUT)/kata; cmake $(KATA_CMAKE_ARGS) $(ROOTDIR)/kata; ninja
+
 out-dir:
 	@mkdir -p $(OUT)
 
 clean::
 	rm -rf $(OUT)
 
-.PHONY:: prereqs clean
+.PHONY:: prereqs clean kata
