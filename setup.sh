@@ -44,7 +44,7 @@ function getrootdir
 
 export ROOTDIR="$(getrootdir)"
 export OUT="${ROOTDIR}/out"
-export PATH="${PATH}:${ROOTDIR}/build:${ROOTDIR}/scripts"
+export PATH="${PATH}:${ROOTDIR}/build:${ROOTDIR}/scripts:${ROOTDIR}/cache/toolchain"
 
 function get-groups
 {
@@ -136,10 +136,17 @@ if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
         complete -F _j j
     fi
 fi
-
 echo ========================================
 echo ROOTDIR="${ROOTDIR}"
 echo OUT="${OUT}"
 echo ========================================
 echo
 echo Type m to build.
+
+if [[ ! -d "${ROOTDIR}/cache/toolchain" ]]; then
+    echo
+    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+    echo There is no toolchain built in cache/toolchain! You need to run
+    echo \'m toolchain\' before you attempt to build any Kata-related targets.
+    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+fi

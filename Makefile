@@ -23,6 +23,7 @@ include $(ROOTDIR)/build/preamble.mk
 prereqs: $(ROOTDIR)/scripts/install-prereqs.sh
 	sudo $(ROOTDIR)/scripts/install-prereqs.sh
 
+include $(ROOTDIR)/build/toolchain.mk
 include $(ROOTDIR)/build/kata.mk
 
 clean::
