@@ -44,7 +44,7 @@ function getrootdir
 
 export ROOTDIR="$(getrootdir)"
 export OUT="${ROOTDIR}/out"
-export PATH="${PATH}:${ROOTDIR}/build:${ROOTDIR}/scripts:${ROOTDIR}/cache/toolchain"
+export PATH="${PATH}:${ROOTDIR}/build:${ROOTDIR}/scripts:${ROOTDIR}/cache/toolchain/bin"
 
 function get-groups
 {
