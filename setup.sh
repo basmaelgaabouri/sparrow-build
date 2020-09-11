@@ -45,6 +45,8 @@ function getrootdir
 export ROOTDIR="$(getrootdir)"
 export OUT="${ROOTDIR}/out"
 export PATH="${PATH}:${ROOTDIR}/build:${ROOTDIR}/scripts:${ROOTDIR}/cache/toolchain/bin"
+export PATH="${PATH}:${ROOTDIR}/cache/renode"
+alias renode="pushd ${ROOTDIR}; mono ${ROOTDIR}/cache/renode/Renode.exe; popd"
 
 function get-groups
 {
@@ -148,5 +150,13 @@ if [[ ! -d "${ROOTDIR}/cache/toolchain" ]]; then
     echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
     echo There is no toolchain built in cache/toolchain! You need to run
     echo \'m toolchain\' before you attempt to build any Kata-related targets.
+    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+fi
+
+if [[ ! -d "${ROOTDIR}/cache/renode" ]]; then
+    echo
+    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+    echo There is no renode simulator built in cache/renode! You need to run
+    echo \'m renode\' before you attempt to launch a simulation.
     echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 fi

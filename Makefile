@@ -21,10 +21,11 @@ endif
 include $(ROOTDIR)/build/preamble.mk
 
 prereqs: $(ROOTDIR)/scripts/install-prereqs.sh
-	sudo $(ROOTDIR)/scripts/install-prereqs.sh
+	$(ROOTDIR)/scripts/install-prereqs.sh
 
 include $(ROOTDIR)/build/toolchain.mk
 include $(ROOTDIR)/build/kata.mk
+include $(ROOTDIR)/build/sim.mk
 
 clean::
 	rm -rf $(OUT)
