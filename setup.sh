@@ -44,9 +44,9 @@ function getrootdir
 
 export ROOTDIR="$(getrootdir)"
 export OUT="${ROOTDIR}/out"
-export PATH="${PATH}:${ROOTDIR}/build:${ROOTDIR}/scripts:${ROOTDIR}/cache/toolchain/bin"
-export PATH="${PATH}:${ROOTDIR}/cache/renode"
-alias renode="pushd ${ROOTDIR}; mono ${ROOTDIR}/cache/renode/Renode.exe; popd"
+export PATH="${PATH}:${ROOTDIR}/build:${ROOTDIR}/scripts:${OUT}/host/toolchain/bin"
+export PATH="${PATH}:${OUT}/host/renode"
+alias renode="pushd ${ROOTDIR}; mono ${OUT}/host/renode/Renode.exe; popd"
 
 function get-groups
 {
@@ -145,7 +145,7 @@ echo ========================================
 echo
 echo Type m to build.
 
-if [[ ! -d "${ROOTDIR}/cache/toolchain" ]]; then
+if [[ ! -d "${ROOTDIR}/out/host/toolchain" ]]; then
     echo
     echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
     echo There is no toolchain built in cache/toolchain! You need to run
@@ -153,7 +153,16 @@ if [[ ! -d "${ROOTDIR}/cache/toolchain" ]]; then
     echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 fi
 
-if [[ ! -d "${ROOTDIR}/cache/renode" ]]; then
+if [[ ! -d "${ROOTDIR}/out/host/toolchain_vp" ]]; then
+    echo
+    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+    echo There is no toolchain for the vector processor built in
+    echo cache/toolchain_vp You need to run \'m toolchain_vp\' before you
+    echo attempt to build any vector processor targets.
+    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+fi
+
+if [[ ! -d "${ROOTDIR}/out/host/renode" ]]; then
     echo
     echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
     echo There is no renode simulator built in cache/renode! You need to run

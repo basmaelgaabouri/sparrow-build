@@ -27,7 +27,9 @@ include $(ROOTDIR)/build/toolchain.mk
 include $(ROOTDIR)/build/kata.mk
 include $(ROOTDIR)/build/sim.mk
 
+tools: toolchain toolchain_vp verilator renode
+
 clean::
 	rm -rf $(OUT)
 
-.PHONY:: prereqs clean kata simulate-kata
+.PHONY:: prereqs clean kata simulate-kata tools
