@@ -26,6 +26,10 @@ prereqs: $(ROOTDIR)/scripts/install-prereqs.sh
 include $(ROOTDIR)/build/toolchain.mk
 include $(ROOTDIR)/build/kata.mk
 include $(ROOTDIR)/build/sim.mk
+include $(ROOTDIR)/build/opentitan_sw.mk
+
+$(OUT):
+	@mkdir -p $(OUT)
 
 tools: toolchain toolchain_vp verilator renode
 
