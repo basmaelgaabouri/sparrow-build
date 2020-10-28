@@ -46,7 +46,13 @@ export ROOTDIR="$(getrootdir)"
 export OUT="${ROOTDIR}/out"
 export PATH="${PATH}:${ROOTDIR}/build:${ROOTDIR}/scripts:${OUT}/host/toolchain/bin"
 export PATH="${PATH}:${OUT}/host/renode"
-alias renode="pushd ${ROOTDIR}; mono ${OUT}/host/renode/Renode.exe; popd"
+
+function renode
+{
+    pushd "${ROOTDIR}" >/dev/null
+    mono "${OUT}/host/renode/Renode.exe" "$@"
+    popd >/dev/null
+}
 
 function get-groups
 {
