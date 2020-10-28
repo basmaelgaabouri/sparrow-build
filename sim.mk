@@ -1,6 +1,7 @@
 RENODE_SRC_DIR := $(ROOTDIR)/sim/renode
 RENODE_OUT_DIR := $(OUT)/host/renode
 
+
 $(RENODE_OUT_DIR): | $(RENODE_SRC_DIR)
 	pushd $(ROOTDIR); mkdir -p $(RENODE_OUT_DIR);
 	pushd $(RENODE_SRC_DIR); \
@@ -13,6 +14,9 @@ $(RENODE_OUT_DIR): | $(RENODE_SRC_DIR)
 	popd
 
 renode: $(RENODE_OUT_DIR)
+
+renode_clean:
+	@rm -rf $(RENODE_OUT_DIR)
 
 VERILATOR_SRC_DIR   := $(ROOTDIR)/sim/verilator
 VERILATOR_BUILD_DIR := $(OUT)/tmp/verilator
