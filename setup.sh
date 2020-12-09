@@ -44,8 +44,13 @@ function getrootdir
 
 export ROOTDIR="$(getrootdir)"
 export OUT="${ROOTDIR}/out"
+export RUSTDIR=${OUT}/host/rust_toolchain
 export PATH="${PATH}:${ROOTDIR}/build:${ROOTDIR}/scripts:${OUT}/host/toolchain/bin"
 export PATH="${PATH}:${OUT}/host/renode"
+export PATH="${PATH}:${RUSTDIR}/bin"
+
+export CARGO_HOME=${RUSTDIR}
+export RUSTUP_HOME=${RUSTDIR}
 
 function renode
 {
