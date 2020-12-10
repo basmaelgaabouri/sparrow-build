@@ -28,6 +28,7 @@ include $(ROOTDIR)/build/kata.mk
 include $(ROOTDIR)/build/sim.mk
 include $(ROOTDIR)/build/opentitan_sw.mk
 include $(ROOTDIR)/build/sparrow_test_sw.mk
+include $(ROOTDIR)/build/tock.mk
 
 $(OUT):
 	@mkdir -p $(OUT)
