@@ -59,6 +59,13 @@ function renode
     popd >/dev/null
 }
 
+function iss
+{
+    pushd "${ROOTDIR}" >/dev/null
+    python "${ROOTDIR}/scripts/launch_renode.py" "$@"
+    popd >/dev/null
+}
+
 function get-groups
 {
     git --git-dir="${ROOTDIR}/.repo/manifests.git" config \
