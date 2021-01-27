@@ -26,7 +26,7 @@ simulate-kata: $(KATA_SIMULATE_SCRIPT_NAME)
 	@echo Press Control-A X to quit qemu!
 	@echo ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	@echo
-	pushd $(OUT)/kata; ./simulate
+	pushd $(OUT)/kata; ./simulate '--extra-qemu-args=-bios none'
 
 kata: $(KATA_ROOTSERVER_IMAGE_NAME)
 .PHONY:: kata
