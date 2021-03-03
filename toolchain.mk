@@ -6,7 +6,11 @@ TOOLCHAIN_OUT_DIR   := $(OUT)/host/toolchain
 TOOLCHAINVP_BUILD_DIR := $(OUT)/tmp/toolchain_vp
 TOOLCHAINVP_OUT_DIR   := $(OUT)/host/toolchain_vp
 
-$(TOOLCHAIN_OUT_DIR): | $(ROOTDIR)/toolchain
+QEMU_SRC_DIR          := $(TOOLCHAIN_SRC_DIR)/riscv-qemu
+QEMU_OUT_DIR          := $(OUT)/host/qemu
+QEMU_BINARY           := $(QEMU_OUT_DIR)/riscv32-softmmu/qemu-system-riscv32
+
+$(TOOLCHAIN_OUT_DIR): | $(TOOLCHAIN_SRC_DIR)
 	mkdir -p $(TOOLCHAIN_BUILD_DIR)
 	cd $(TOOLCHAIN_BUILD_DIR) && $(TOOLCHAIN_SRC_DIR)/configure \
 		--srcdir=$(TOOLCHAIN_SRC_DIR) \
@@ -17,7 +21,7 @@ $(TOOLCHAIN_OUT_DIR): | $(ROOTDIR)/toolchain
 
 toolchain: $(TOOLCHAIN_OUT_DIR)
 
-$(TOOLCHAINVP_OUT_DIR): | $(ROOTDIR)/toolchain
+$(TOOLCHAINVP_OUT_DIR): | $(TOOLCHAIN_SRC_DIR)
 	mkdir -p $(TOOLCHAINVP_BUILD_DIR);
 	cd $(TOOLCHAINVP_BUILD_DIR) && $(TOOLCHAIN_SRC_DIR)/configure \
 		--srcdir=$(TOOLCHAIN_SRC_DIR) \
@@ -28,4 +32,16 @@ $(TOOLCHAINVP_OUT_DIR): | $(ROOTDIR)/toolchain
 
 toolchain_vp: $(TOOLCHAINVP_OUT_DIR)
 
-.PHONY:: toolchain toolchain_vp
+QEMU_DEPS=$(shell find $(QEMU_SRC_DIR) \( -name '*.c' -o -name '*.h' \) -printf "%p ")
+
+$(QEMU_OUT_DIR): | $(QEMU_SRC_DIR)
+	mkdir -p $(QEMU_OUT_DIR);
+
+$(QEMU_BINARY): $(QEMU_DEPS) | $(QEMU_OUT_DIR)
+	cd $(QEMU_OUT_DIR) && $(QEMU_SRC_DIR)/configure \
+		--target-list=riscv32-softmmu
+	make -C $(QEMU_OUT_DIR) -j$(nproc)
+
+qemu: $(QEMU_BINARY)
+
+.PHONY:: toolchain toolchain_vp qemu

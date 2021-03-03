@@ -48,6 +48,7 @@ export RUSTDIR=${OUT}/host/rust_toolchain
 export PATH="${PATH}:${ROOTDIR}/build:${ROOTDIR}/scripts:${OUT}/host/toolchain/bin"
 export PATH="${PATH}:${OUT}/host/renode"
 export PATH="${PATH}:${RUSTDIR}/bin"
+export PATH="${OUT}/host/qemu/riscv32-softmmu:${PATH}"
 
 export CARGO_HOME=${RUSTDIR}
 export RUSTUP_HOME=${RUSTDIR}
