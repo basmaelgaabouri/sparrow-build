@@ -27,8 +27,8 @@ $(TOOLCHAIN_OUT_DIR): | $(TOOLCHAIN_SRC_DIR)
 		--srcdir=$(TOOLCHAIN_SRC_DIR) \
 		--prefix=$(TOOLCHAIN_OUT_DIR) \
 		--with-arch=rv32gc \
-		--with-abi=ilp32
-	make -j$(nproc) -C $(TOOLCHAIN_BUILD_DIR) clean newlib
+		--with-abi=ilp32d
+	make -C $(TOOLCHAIN_BUILD_DIR) clean newlib
 
 toolchain: $(TOOLCHAIN_OUT_DIR)
 
@@ -37,9 +37,9 @@ $(TOOLCHAINVP_OUT_DIR): | $(TOOLCHAIN_SRC_DIR)
 	cd $(TOOLCHAINVP_BUILD_DIR) && $(TOOLCHAIN_SRC_DIR)/configure \
 		--srcdir=$(TOOLCHAIN_SRC_DIR) \
 		--prefix=$(TOOLCHAINVP_OUT_DIR) \
-		--with-arch=rv32iv \
-		--with-abi=ilp32
-	make -j$(nproc) -C $(TOOLCHAINVP_BUILD_DIR) clean newlib
+		--with-arch=rv32gcv \
+		--with-abi=ilp32d
+	make -C $(TOOLCHAINVP_BUILD_DIR) clean newlib
 
 toolchain_vp: $(TOOLCHAINVP_OUT_DIR)
 
@@ -51,8 +51,14 @@ $(QEMU_OUT_DIR): | $(QEMU_SRC_DIR)
 $(QEMU_BINARY): $(QEMU_DEPS) | $(QEMU_OUT_DIR)
 	cd $(QEMU_OUT_DIR) && $(QEMU_SRC_DIR)/configure \
 		--target-list=riscv32-softmmu
-	make -C $(QEMU_OUT_DIR) -j$(nproc)
+	make -C $(QEMU_OUT_DIR) -j$(nproc --ignore 2)
 
 qemu: $(QEMU_BINARY)
 
-.PHONY:: toolchain toolchain_vp qemu
+toolchain_clean:
+	rm -rf $(TOOLCHAIN_OUT_DIR) $(TOOLCHAINVP_OUT_DIR) $(OUT)/tmp
+
+qemu_clean:
+	rm -rf $(QEMU_OUT_DIR)
+
+.PHONY:: toolchain toolchain_vp qemu toolchain_clean qemu_clean
