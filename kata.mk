@@ -4,7 +4,12 @@ KATA_TOPLEVEL_NINJA_SCRIPT := $(OUT)/kata/build.ninja
 KATA_ROOTSERVER_IMAGE_NAME := $(OUT)/kata/images/capdl-loader-image-riscv-spike
 KATA_SIMULATE_SCRIPT_NAME  := $(OUT)/kata/simulate
 
-KATA_SOURCES := $(shell find $(ROOTDIR)/kata -name \*.c -name \*.h -name \*.cpp -type f)
+KATA_SOURCES := $(shell find $(ROOTDIR)/kata \
+						-name \*.rs -or \
+						-name \*.c -or \
+						-name \*.h -or \
+						-name \*.cpp \
+						-type f)
 
 $(KATA_TOPLEVEL_NINJA_SCRIPT): $(KATA_SOURCES) | $(OUT)/kata
 	pushd $(OUT)/kata; cmake -G Ninja $(KATA_INIT_ARGS) $(ROOTDIR)/kata/projects/processmanager

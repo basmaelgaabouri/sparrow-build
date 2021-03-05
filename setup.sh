@@ -164,6 +164,14 @@ echo ========================================
 echo
 echo Type m to build.
 
+if [[ ! -d "${ROOTDIR}/out/host/rust_toolchain" ]]; then
+    echo
+    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+    echo There is no rust toolchain in out/host/rust_toolchain! You need to run
+    echo \'install-prereqs.sh\' to install it.
+    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+fi
+
 if [[ ! -d "${ROOTDIR}/out/host/toolchain" ]]; then
     echo
     echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
