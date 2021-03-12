@@ -44,14 +44,17 @@ function getrootdir
 
 export ROOTDIR="$(getrootdir)"
 export OUT="${ROOTDIR}/out"
-export RUSTDIR=${OUT}/host/rust_toolchain
-export PATH="${PATH}:${ROOTDIR}/build:${ROOTDIR}/scripts:${OUT}/host/toolchain/bin"
-export PATH="${PATH}:${OUT}/host/renode"
-export PATH="${PATH}:${RUSTDIR}/bin"
-export PATH="${OUT}/host/qemu/riscv32-softmmu:${PATH}"
+export CACHE="${ROOTDIR}/cache"
 
-export CARGO_HOME=${RUSTDIR}
-export RUSTUP_HOME=${RUSTDIR}
+export RUSTDIR="${CACHE}/rust_toolchain"
+export CARGO_HOME="${RUSTDIR}"
+export RUSTUP_HOME="${RUSTDIR}"
+
+export PATH="${CACHE}/toolchain/bin:${PATH}"
+export PATH="${RUSTDIR}/bin:${PATH}"
+export PATH="${ROOTDIR}/scripts:${PATH}"
+export PATH="${OUT}/host/renode:${PATH}"
+export PATH="${OUT}/host/qemu/riscv32-softmmu:${PATH}"
 
 function renode
 {
@@ -164,35 +167,13 @@ echo ========================================
 echo
 echo Type m to build.
 
-if [[ ! -d "${ROOTDIR}/out/host/rust_toolchain" ]]; then
+if [[ ! -d "${RUSTDIR}" ]] ||
+   [[ ! -d "${ROOTDIR}/cache/toolchain" ]] ||
+   [[ ! -d "${ROOTDIR}/cache/toolchain_vp" ]] ||
+   [[ ! -d "${ROOTDIR}/out/host/renode" ]]; then
     echo
     echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-    echo There is no rust toolchain in out/host/rust_toolchain! You need to run
-    echo \'install-prereqs.sh\' to install it.
-    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-fi
-
-if [[ ! -d "${ROOTDIR}/out/host/toolchain" ]]; then
-    echo
-    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-    echo There is no toolchain built in cache/toolchain! You need to run
-    echo \'m toolchain\' before you attempt to build any Kata-related targets.
-    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-fi
-
-if [[ ! -d "${ROOTDIR}/out/host/toolchain_vp" ]]; then
-    echo
-    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-    echo There is no toolchain for the vector processor built in
-    echo cache/toolchain_vp You need to run \'m toolchain_vp\' before you
-    echo attempt to build any vector processor targets.
-    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-fi
-
-if [[ ! -d "${ROOTDIR}/out/host/renode" ]]; then
-    echo
-    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-    echo There is no renode simulator built in cache/renode! You need to run
-    echo \'m renode\' before you attempt to launch a simulation.
+    echo You have missing tools. Please run \'m prereqs\' followed
+    echo by \'m tools\' to install them.
     echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
 fi

@@ -1,14 +1,25 @@
 
 TOOLCHAIN_SRC_DIR   := $(ROOTDIR)/toolchain/riscv-gnu-toolchain
 TOOLCHAIN_BUILD_DIR := $(OUT)/tmp/toolchain
-TOOLCHAIN_OUT_DIR   := $(OUT)/host/toolchain
+TOOLCHAIN_OUT_DIR   := $(CACHE)/toolchain
 
 TOOLCHAINVP_BUILD_DIR := $(OUT)/tmp/toolchain_vp
-TOOLCHAINVP_OUT_DIR   := $(OUT)/host/toolchain_vp
+TOOLCHAINVP_OUT_DIR   := $(CACHE)/toolchain_vp
 
 QEMU_SRC_DIR          := $(ROOTDIR)/toolchain/riscv-qemu
 QEMU_OUT_DIR          := $(OUT)/host/qemu
 QEMU_BINARY           := $(QEMU_OUT_DIR)/riscv32-softmmu/qemu-system-riscv32
+
+toolchain_rust: $(RUSTDIR)/bin/rustc
+
+$(RUST_OUT_DIR):
+	mkdir -p $(RUSTDIR)
+
+$(RUSTDIR)/bin/rustup: | $(RUST_OUT_DIR)
+	bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path'
+
+$(RUSTDIR)/bin/rustc: | $(RUST_OUT_DIR) $(RUSTDIR)/bin/rustup
+	$(RUSTDIR)/bin/rustup +nightly target add riscv32imc-unknown-none-elf
 
 $(TOOLCHAIN_OUT_DIR): | $(TOOLCHAIN_SRC_DIR)
 	mkdir -p $(TOOLCHAIN_BUILD_DIR)

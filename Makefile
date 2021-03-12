@@ -33,7 +33,7 @@ include $(ROOTDIR)/build/tock.mk
 $(OUT):
 	@mkdir -p $(OUT)
 
-tools: toolchain toolchain_vp verilator renode
+tools: toolchain_rust toolchain toolchain_vp verilator renode
 
 clean::
 	rm -rf $(OUT)
