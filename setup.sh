@@ -165,7 +165,13 @@ echo ROOTDIR="${ROOTDIR}"
 echo OUT="${OUT}"
 echo ========================================
 echo
-echo Type m to build.
+echo Type \'m \[target\]\' to build, where \[target\] is:
+echo
+echo prereqs tools kata simulate-kata renode verilator
+echo opentitan_sw_all opentitan_sw_helloworld opentitan_sw_bootrom
+echo sparrow_test_sw_all sparrow_test_sw_hellovector sparrow_test_sw_bootrom
+echo earlgrey_tock qemu
+echo
 
 if [[ ! -d "${RUSTDIR}" ]] ||
    [[ ! -d "${ROOTDIR}/cache/toolchain" ]] ||
@@ -176,4 +182,5 @@ if [[ ! -d "${RUSTDIR}" ]] ||
     echo You have missing tools. Please run \'m prereqs\' followed
     echo by \'m tools\' to install them.
     echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+    echo
 fi
