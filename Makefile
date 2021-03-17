@@ -29,6 +29,7 @@ include $(ROOTDIR)/build/sim.mk
 include $(ROOTDIR)/build/opentitan_sw.mk
 include $(ROOTDIR)/build/sparrow_test_sw.mk
 include $(ROOTDIR)/build/tock.mk
+include $(ROOTDIR)/build/iree.mk
 
 $(OUT):
 	@mkdir -p $(OUT)
