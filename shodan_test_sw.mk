@@ -26,6 +26,10 @@ sparrow_test_sw_hellovector: $(SHODAN_BUILD_NINJA_SCRIPT)
 	cd $(ROOTDIR)/hw/opentitan; \
 	    ninja -C $(SHODAN_BUILD_OUT_DIR) sw_sparrow/device/examples/hello_vector/hello_vector_export_sim_verilator;
 
+sparrow_test_sw_vector_executive: $(SHODAN_BUILD_NINJA_SCRIPT)
+	cd $(ROOTDIR)/hw/opentitan; \
+	    ninja -C $(SHODAN_BUILD_OUT_DIR) sw_sparrow/device/examples/vector_executive/vector_executive_export_sim_verilator;
+
 sparrow_test_sw_bootrom: $(SHODAN_BUILD_NINJA_SCRIPT)
 	cd $(ROOTDIR)/hw/opentitan; \
 	    ninja -C $(SHODAN_BUILD_OUT_DIR) sw_sparrow/device/boot_rom/boot_rom_export_sim_verilator
@@ -40,4 +44,4 @@ vector_tests_hellovector: $(SHODAN_BUILD_NINJA_SCRIPT)
 		ninja -C $(SHODAN_BUILD_OUT_DIR) \
 			hello_vector/hello_vector_export_sim_verilator;
 
-.PHONY:: sparrow_test_sw_clean sparrow_test_sw_hellovector sparrow_test_sw_all sparrow_test_sw_bootrom
+.PHONY:: sparrow_test_sw_clean sparrow_test_sw_hellovector sparrow_test_sw_all sparrow_test_sw_bootrom sparrow_test_sw_vector_executive
