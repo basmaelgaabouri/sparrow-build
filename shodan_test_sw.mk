@@ -34,4 +34,10 @@ sparrow_test_sw_clean:
 	@echo "Remove sparrow software build directory $(SHODAN_BUILD_DIR)"
 	@rm -rf $(SHODAN_BUILD_DIR)
 
+vector_tests_hellovector: $(SHODAN_BUILD_NINJA_SCRIPT)
+	cd $(ROOTDIR)/sw/vector_tests; \
+		BUILD_ROOT=$(SHODAN_BUILD_DIR) ./meson_init.sh -f -t "$(SHODAN_BUILD_TOOLCHAIN_CONFIG)"; \
+		ninja -C $(SHODAN_BUILD_OUT_DIR) \
+			hello_vector/hello_vector_export_sim_verilator;
+
 .PHONY:: sparrow_test_sw_clean sparrow_test_sw_hellovector sparrow_test_sw_all sparrow_test_sw_bootrom
