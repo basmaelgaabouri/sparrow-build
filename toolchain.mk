@@ -35,7 +35,7 @@ $(TOOLCHAIN_OUT_DIR): | $(TOOLCHAIN_SRC_DIR)
 		--srcdir=$(TOOLCHAIN_SRC_DIR) \
 		--prefix=$(TOOLCHAIN_OUT_DIR) \
 		--with-arch=rv32gc \
-		--with-abi=ilp32d
+		--with-abi=ilp32
 	make -C $(TOOLCHAIN_BUILD_DIR) clean newlib
 
 toolchain: $(TOOLCHAIN_OUT_DIR)
