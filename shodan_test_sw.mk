@@ -11,7 +11,7 @@ $(SHODAN_BUILD_TOOLCHAIN_CONFIG): | $(SHODAN_BUILD_DIR)
 	cd $(ROOTDIR)/hw/opentitan; \
 	    cp toolchain.txt "$(SHODAN_BUILD_TOOLCHAIN_CONFIG)"
 	cd $(ROOTDIR)/hw/opentitan; \
-	    sed -i "s#/tools/riscv/bin#$(CACHE)/toolchain_vp/bin#g;s#rv32imc#rv32gcv#g" "$(SHODAN_BUILD_TOOLCHAIN_CONFIG)"
+	    sed -i "s#/tools/riscv/bin#$(CACHE)/toolchain_vp/bin#g;s#rv32imc#rv32gcv#g;s#ilp32#ilp32d#g;s#medany#medlow#g" "$(SHODAN_BUILD_TOOLCHAIN_CONFIG)"
 
 $(SHODAN_BUILD_NINJA_SCRIPT): $(SHODAN_BUILD_TOOLCHAIN_CONFIG)
 	@echo "Creating build directories $(SHODAN_BUILD_OUT_DIR)"
