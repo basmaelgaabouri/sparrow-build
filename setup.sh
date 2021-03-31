@@ -160,10 +160,10 @@ if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
         complete -F _j j
     fi
 fi
-echo ========================================
+echo "========================================"
 echo ROOTDIR="${ROOTDIR}"
 echo OUT="${OUT}"
-echo ========================================
+echo "========================================"
 echo
 echo Type \'m \[target\]\' to build, where \[target\] is:
 echo
