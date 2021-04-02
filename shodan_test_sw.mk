@@ -20,13 +20,20 @@ $(SHODAN_BUILD_NINJA_SCRIPT): $(SHODAN_BUILD_TOOLCHAIN_CONFIG)
 	cd $(ROOTDIR)/hw/opentitan; \
 	    BUILD_ROOT=$(SHODAN_BUILD_DIR) ./meson_init.sh -f -t "$(SHODAN_BUILD_TOOLCHAIN_CONFIG)";
 
-sparrow_test_sw_all: $(SHODAN_BUILD_NINJA_SCRIPT)
+sparrow_test_sw_all: $(SHODAN_BUILD_NINJA_SCRIPT) $(SHODAN_BUILD_OUT_DIR)/sw_sparrow/device/rom_exts/manifest.h
 	cd $(ROOTDIR)/hw/opentitan; \
-	    ninja -C $(SHODAN_BUILD_OUT_DIR) all
+		ninja -C $(SHODAN_BUILD_OUT_DIR) all
 
-sparrow_test_sw_bootrom: $(SHODAN_BUILD_NINJA_SCRIPT)
-	cd $(ROOTDIR)/hw/opentitan; \
-	    ninja -C $(SHODAN_BUILD_OUT_DIR) sw_sparrow/device/boot_rom/boot_rom_export_sim_verilator
+sparrow_test_sw_bootrom: $(SHODAN_BUILD_NINJA_SCRIPT) $(SHODAN_BUILD_OUT_DIR)/sw_sparrow/device/rom_exts/manifest.h
+	ninja -C $(SHODAN_BUILD_OUT_DIR) sw_sparrow/device/boot_rom/boot_rom_export_sim_verilator
+
+$(SHODAN_BUILD_OUT_DIR)/sw_sparrow/device/rom_exts/manifest.h: $(SHODAN_BUILD_NINJA_SCRIPT)
+	ninja -C $(SHODAN_BUILD_OUT_DIR) \
+		sw_sparrow/device/rom_exts/manifest.h \
+		sw/device/rom_exts/manifest.h
+
+sparrow_test_sw_ot_tests: $(SHODAN_BUILD_NINJA_SCRIPT) $(SHODAN_BUILD_OUT_DIR)/sw_sparrow/device/rom_exts/manifest.h
+	ninja -C $(SHODAN_BUILD_OUT_DIR) test
 
 sparrow_test_sw_clean:
 	@echo "Remove sparrow software build directory $(SHODAN_BUILD_DIR)"
