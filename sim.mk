@@ -5,12 +5,10 @@ RENODE_OUT_DIR := $(OUT)/host/renode
 $(RENODE_OUT_DIR): | $(RENODE_SRC_DIR)
 	pushd $(ROOTDIR); mkdir -p $(RENODE_OUT_DIR);
 	pushd $(RENODE_SRC_DIR); \
-	    sed -i '/git submodule update/d' build.sh; \
-	    ./build.sh; \
+	    ./build.sh -S; \
 	    cp -rf output/bin/Release/* $(RENODE_OUT_DIR); \
 	    cp -rf scripts $(RENODE_OUT_DIR); \
 	    cp -rf platforms $(RENODE_OUT_DIR); \
-	    git checkout build.sh;\
 	popd
 
 renode: $(RENODE_OUT_DIR)
