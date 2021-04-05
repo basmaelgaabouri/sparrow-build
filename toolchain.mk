@@ -49,7 +49,6 @@ toolchain_llvm_clean:
 	rm -rf $(TOOLCHAINLLVM_BUILD_DIR) $(TOOLCHAINIREE_BUILD_DIR) $(TOOLCHAINIREE_OUT_DIR)
 
 QEMU_DEPS=$(wildcard $(QEMU_SRC_DIR)/**/*.[ch])
-$(warning QEMU_DEPS is $(QEMU_DEPS))
 
 $(QEMU_OUT_DIR): | $(QEMU_SRC_DIR)
 	mkdir -p $(QEMU_OUT_DIR);
@@ -64,11 +63,14 @@ qemu: $(QEMU_BINARY)
 $(OUT)/tmp: | $(OUT)
 	mkdir -p $(OUT)/tmp
 
-$(OUT)/tmp/toolchain_rvv-intrinsic.tar.gz: | $(OUT)/tmp
-	fileutil cp /x20/teams/cerebra-hw/sparrow/toolchain_cache/toolchain_rvv-intrinsic.tar.gz $(OUT)
+$(CACHE):
+	mkdir -p $(CACHE)
 
-$(ROOTDIR)/cache/toolchain: $(OUT)/toolchain_rvv-intrinsic.tar.gz
-	tar -C $(ROOTDIR)/cache -xf $(OUT)/toolchain_rvv-intrinsic.tar.gz
+$(OUT)/tmp/toolchain_rvv-intrinsic.tar.gz: | $(OUT)/tmp
+	fileutil cp /x20/teams/cerebra-hw/sparrow/toolchain_cache/toolchain_rvv-intrinsic.tar.gz $(OUT)/tmp
+
+$(ROOTDIR)/cache/toolchain: | $(OUT)/tmp/toolchain_rvv-intrinsic.tar.gz $(CACHE)
+	tar -C $(ROOTDIR)/cache -xf $(OUT)/tmp/toolchain_rvv-intrinsic.tar.gz
 
 toolchain_clean:
 	rm -rf $(OUT)/tmp $(CACHE)/toolchain $(CACHE)/toolchain_vp
