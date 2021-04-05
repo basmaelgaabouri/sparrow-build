@@ -1,19 +1,3 @@
-
-TOOLCHAIN_SRC_DIR   := $(ROOTDIR)/toolchain/riscv-gnu-toolchain
-TOOLCHAIN_BUILD_DIR := $(OUT)/tmp/toolchain
-TOOLCHAIN_OUT_DIR   := $(CACHE)/toolchain
-
-TOOLCHAINVP_BUILD_DIR := $(OUT)/tmp/toolchain_vp
-TOOLCHAINVP_OUT_DIR   := $(CACHE)/toolchain_vp
-
-# TODO(hcindyl): Use toolchain_vp when 32-bit baremetal target is ready
-TOOLCHAINIREE_BUILD_DIR  := $(OUT)/tmp/toolchain_iree
-TOOLCHAINIREE_OUT_DIR    := $(CACHE)/toolchain_iree
-
-TOOLCHAINLLVM_SRC_DIR        := $(ROOTDIR)/toolchain/llvm-project
-TOOLCHAINLLVM_BUILD_DIR      := $(OUT)/tmp/toolchain_llvm
-
-
 QEMU_SRC_DIR          := $(ROOTDIR)/toolchain/riscv-qemu
 QEMU_OUT_DIR          := $(OUT)/host/qemu
 QEMU_BINARY           := $(QEMU_OUT_DIR)/riscv32-softmmu/qemu-system-riscv32
@@ -28,28 +12,6 @@ $(RUSTDIR)/bin/rustup: | $(RUST_OUT_DIR)
 
 $(RUSTDIR)/bin/rustc: | $(RUST_OUT_DIR) $(RUSTDIR)/bin/rustup
 	$(RUSTDIR)/bin/rustup +nightly target add riscv32imc-unknown-none-elf
-
-$(TOOLCHAIN_OUT_DIR): | $(TOOLCHAIN_SRC_DIR)
-	mkdir -p $(TOOLCHAIN_BUILD_DIR)
-	cd $(TOOLCHAIN_BUILD_DIR) && $(TOOLCHAIN_SRC_DIR)/configure \
-		--srcdir=$(TOOLCHAIN_SRC_DIR) \
-		--prefix=$(TOOLCHAIN_OUT_DIR) \
-		--with-arch=rv32gc \
-		--with-abi=ilp32
-	make -C $(TOOLCHAIN_BUILD_DIR) clean newlib
-
-toolchain: $(TOOLCHAIN_OUT_DIR)
-
-$(TOOLCHAINVP_OUT_DIR): | $(TOOLCHAIN_SRC_DIR)
-	mkdir -p $(TOOLCHAINVP_BUILD_DIR);
-	cd $(TOOLCHAINVP_BUILD_DIR) && $(TOOLCHAIN_SRC_DIR)/configure \
-		--srcdir=$(TOOLCHAIN_SRC_DIR) \
-		--prefix=$(TOOLCHAINVP_OUT_DIR) \
-		--with-arch=rv32gcv \
-		--with-abi=ilp32d
-	make -C $(TOOLCHAINVP_BUILD_DIR) clean newlib
-
-toolchain_vp: $(TOOLCHAINVP_OUT_DIR)
 
 # IREE toolchain
 # TODO(hcindyl): This will eventually be combined with toolchain_vp
@@ -86,7 +48,8 @@ toolchain_llvm: $(TOOLCHAINLLVM_BUILD_DIR)
 toolchain_llvm_clean:
 	rm -rf $(TOOLCHAINLLVM_BUILD_DIR) $(TOOLCHAINIREE_BUILD_DIR) $(TOOLCHAINIREE_OUT_DIR)
 
-QEMU_DEPS=$(shell find $(QEMU_SRC_DIR) \( -name '*.c' -o -name '*.h' \) -printf "%p ")
+QEMU_DEPS=$(wildcard $(QEMU_SRC_DIR)/**/*.[ch])
+$(warning QEMU_DEPS is $(QEMU_DEPS))
 
 $(QEMU_OUT_DIR): | $(QEMU_SRC_DIR)
 	mkdir -p $(QEMU_OUT_DIR);
@@ -98,10 +61,19 @@ $(QEMU_BINARY): $(QEMU_DEPS) | $(QEMU_OUT_DIR)
 
 qemu: $(QEMU_BINARY)
 
+$(OUT)/tmp: | $(OUT)
+	mkdir -p $(OUT)/tmp
+
+$(OUT)/tmp/toolchain_rvv-intrinsic.tar.gz: | $(OUT)/tmp
+	fileutil cp /x20/teams/cerebra-hw/sparrow/toolchain_cache/toolchain_rvv-intrinsic.tar.gz $(OUT)
+
+$(ROOTDIR)/cache/toolchain: $(OUT)/toolchain_rvv-intrinsic.tar.gz
+	tar -C $(ROOTDIR)/cache -xf $(OUT)/toolchain_rvv-intrinsic.tar.gz
+
 toolchain_clean:
-	rm -rf $(TOOLCHAIN_OUT_DIR) $(TOOLCHAINVP_OUT_DIR) $(OUT)/tmp
+	rm -rf $(OUT)/tmp $(CACHE)/toolchain $(CACHE)/toolchain_vp
 
 qemu_clean:
 	rm -rf $(QEMU_OUT_DIR)
 
-.PHONY:: toolchain toolchain_vp qemu toolchain_clean qemu_clean toolchain_llvm
+.PHONY:: qemu toolchain_clean qemu_clean toolchain_llvm

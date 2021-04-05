@@ -34,7 +34,7 @@ include $(ROOTDIR)/build/iree.mk
 $(OUT):
 	@mkdir -p $(OUT)
 
-tools: toolchain_rust toolchain toolchain_vp verilator renode
+tools: toolchain_rust $(ROOTDIR)/cache/toolchain verilator renode
 
 clean::
 	rm -rf $(OUT)
