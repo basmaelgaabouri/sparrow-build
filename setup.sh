@@ -170,7 +170,7 @@ echo
 echo prereqs tools kata simulate-kata renode verilator
 echo opentitan_sw_all opentitan_sw_helloworld opentitan_sw_bootrom
 echo sparrow_test_sw_all sparrow_test_sw_hellovector sparrow_test_sw_bootrom
-echo earlgrey_tock qemu toolcahin_llvm iree
+echo earlgrey_tock qemu install_llvm iree
 echo
 
 if [[ ! -d "${RUSTDIR}" ]] ||

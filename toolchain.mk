@@ -13,41 +13,6 @@ $(RUSTDIR)/bin/rustup: | $(RUST_OUT_DIR)
 $(RUSTDIR)/bin/rustc: | $(RUST_OUT_DIR) $(RUSTDIR)/bin/rustup
 	$(RUSTDIR)/bin/rustup +nightly target add riscv32imc-unknown-none-elf
 
-# IREE toolchain
-# TODO(hcindyl): This will eventually be combined with toolchain_vp
-$(TOOLCHAINIREE_OUT_DIR): | $(TOOLCHAIN_SRC_DIR)
-	mkdir -p $(TOOLCHAINIREE_BUILD_DIR);
-	cd $(TOOLCHAINIREE_BUILD_DIR) && $(TOOLCHAIN_SRC_DIR)/configure \
-		--srcdir=$(TOOLCHAIN_SRC_DIR) \
-		--prefix=$(TOOLCHAINIREE_OUT_DIR) \
-		--with-arch=rv64gc \
-		--with-abi=lp64d \
-		--with-cmodel=medany
-	make -C $(TOOLCHAINIREE_BUILD_DIR) clean linux
-
-toolchain_iree: $(TOOLCHAINIREE_OUT_DIR)
-
-# Build with 64-bit linux config.
-# TODO(hcindyl): Move to 32-bit baremetal config
-$(TOOLCHAINLLVM_BUILD_DIR): | $(TOOLCHAINIREE_OUT_DIR)
-	cmake -B $(TOOLCHAINLLVM_BUILD_DIR) \
-		-DCMAKE_INSTALL_PREFIX=$(TOOLCHAINIREE_OUT_DIR) \
-		-DCMAKE_C_COMPILER=clang  -DCMAKE_CXX_COMPILER=clang++ \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DLLVM_TARGETS_TO_BUILD="RISCV" \
-		-DLLVM_ENABLE_PROJECTS="clang"  \
-		-DLLVM_DEFAULT_TARGET_TRIPLE="riscv64-unknown-linux-gnu" \
-		-DLLVM_INSTALL_TOOLCHAIN_ONLY=On \
-		-DDEFAULT_SYSROOT=../sysroot \
-		-G Ninja \
-		$(TOOLCHAINLLVM_SRC_DIR)/llvm
-	cmake --build $(TOOLCHAINLLVM_BUILD_DIR) --target install
-
-toolchain_llvm: $(TOOLCHAINLLVM_BUILD_DIR)
-
-toolchain_llvm_clean:
-	rm -rf $(TOOLCHAINLLVM_BUILD_DIR) $(TOOLCHAINIREE_BUILD_DIR) $(TOOLCHAINIREE_OUT_DIR)
-
 QEMU_DEPS=$(wildcard $(QEMU_SRC_DIR)/**/*.[ch])
 
 $(QEMU_OUT_DIR): | $(QEMU_SRC_DIR)
@@ -72,10 +37,18 @@ $(OUT)/tmp/toolchain_rvv-intrinsic.tar.gz: | $(OUT)/tmp
 $(ROOTDIR)/cache/toolchain: | $(OUT)/tmp/toolchain_rvv-intrinsic.tar.gz $(CACHE)
 	tar -C $(ROOTDIR)/cache -xf $(OUT)/tmp/toolchain_rvv-intrinsic.tar.gz
 
+$(OUT)/tmp/toolchain_iree_rvv-intrinsic.tar.gz: | $(OUT)/tmp
+	fileutil cp /x20/teams/cerebra-hw/sparrow/toolchain_cache/toolchain_iree_rvv-intrinsic.tar.gz $(OUT)/tmp
+
+$(CACHE)/toolchain_iree: | $(OUT)/tmp/toolchain_iree_rvv-intrinsic.tar.gz $(CACHE)
+	tar -C $(CACHE) -xf $(OUT)/tmp/toolchain_iree_rvv-intrinsic.tar.gz
+
+install_llvm: $(CACHE)/toolchain_iree
+
 toolchain_clean:
 	rm -rf $(OUT)/tmp $(CACHE)/toolchain $(CACHE)/toolchain_vp
 
 qemu_clean:
 	rm -rf $(QEMU_OUT_DIR)
 
-.PHONY:: qemu toolchain_clean qemu_clean toolchain_llvm
+.PHONY:: qemu toolchain_clean qemu_clean install_llvm

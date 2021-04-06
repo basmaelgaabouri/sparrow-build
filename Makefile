@@ -31,6 +31,7 @@ include $(ROOTDIR)/build/sparrow_test_sw.mk
 include $(ROOTDIR)/build/tock.mk
 include $(ROOTDIR)/build/iree.mk
 include $(ROOTDIR)/build/sparrow_boot_rom.mk
+include $(ROOTDIR)/build/riscv_toolchain.mk
 
 $(OUT):
 	@mkdir -p $(OUT)

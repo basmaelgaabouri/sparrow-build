@@ -7,8 +7,8 @@ QEMU_PATH=${OUT}/host/qemu/riscv64-linux-user
 # The following targets are always rebuilt when the iree target is made
 
 iree_check:
-	if [ ! -d "${IREE_TOOLCHAIN}" ]; then \
-		echo "IREE toolchain $(IREE_TOOLCHAIN) doesn't exist, please run 'm toolchain_llvm' first"; \
+	if [[ ! -d "$(IREE_TOOLCHAIN)" ]]; then \
+		echo "IREE toolchain $(IREE_TOOLCHAIN) doesn't exist, please run 'm install_llvm' first"; \
 		exit 1; \
 	fi
 	if [ ! -d "${QEMU_PATH}" ]; then \
