@@ -2,7 +2,7 @@ QEMU_SRC_DIR          := $(ROOTDIR)/toolchain/riscv-qemu
 QEMU_OUT_DIR          := $(OUT)/host/qemu
 QEMU_BINARY           := $(QEMU_OUT_DIR)/riscv32-softmmu/qemu-system-riscv32
 
-toolchain_rust: $(RUSTDIR)/bin/rustc
+toolchain_rust: $(RUSTDIR)/bin/rustc $(RUSTDIR)/bin/elf2tab
 
 $(RUST_OUT_DIR):
 	mkdir -p $(RUSTDIR)
@@ -12,6 +12,9 @@ $(RUSTDIR)/bin/rustup: | $(RUST_OUT_DIR)
 
 $(RUSTDIR)/bin/rustc: | $(RUST_OUT_DIR) $(RUSTDIR)/bin/rustup
 	$(RUSTDIR)/bin/rustup +nightly target add riscv32imc-unknown-none-elf
+
+$(RUSTDIR)/bin/elf2tab: $(RUSTDIR)/bin/rustc
+	cargo install elf2tab --version 0.6.0
 
 QEMU_DEPS=$(wildcard $(QEMU_SRC_DIR)/**/*.[ch])
 
