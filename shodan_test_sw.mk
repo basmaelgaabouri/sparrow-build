@@ -11,7 +11,7 @@ $(SHODAN_BUILD_TOOLCHAIN_CONFIG): | $(SHODAN_BUILD_DIR)
 	cd $(ROOTDIR)/hw/opentitan; \
 	    cp toolchain.txt "$(SHODAN_BUILD_TOOLCHAIN_CONFIG)"
 	cd $(ROOTDIR)/hw/opentitan; \
-	    sed -i "s#/tools/riscv/bin#$(CACHE)/toolchain_vp/bin#g" "$(SHODAN_BUILD_TOOLCHAIN_CONFIG)"; \
+	    sed -i "s#/tools/riscv/bin#$(CACHE)/toolchain/bin#g" "$(SHODAN_BUILD_TOOLCHAIN_CONFIG)"; \
 	    sed -i "s#rv32imc#rv32gcv#g" "$(SHODAN_BUILD_TOOLCHAIN_CONFIG)"; \
 	    sed -i "s#medany#medlow#g" "$(SHODAN_BUILD_TOOLCHAIN_CONFIG)"
 
@@ -24,14 +24,6 @@ sparrow_test_sw_all: $(SHODAN_BUILD_NINJA_SCRIPT)
 	cd $(ROOTDIR)/hw/opentitan; \
 	    ninja -C $(SHODAN_BUILD_OUT_DIR) all
 
-sparrow_test_sw_hellovector: $(SHODAN_BUILD_NINJA_SCRIPT)
-	cd $(ROOTDIR)/hw/opentitan; \
-	    ninja -C $(SHODAN_BUILD_OUT_DIR) sw_sparrow/device/examples/hello_vector/hello_vector_export_sim_verilator;
-
-sparrow_test_sw_vector_executive: $(SHODAN_BUILD_NINJA_SCRIPT)
-	cd $(ROOTDIR)/hw/opentitan; \
-	    ninja -C $(SHODAN_BUILD_OUT_DIR) sw_sparrow/device/examples/vector_executive/vector_executive_export_sim_verilator;
-
 sparrow_test_sw_bootrom: $(SHODAN_BUILD_NINJA_SCRIPT)
 	cd $(ROOTDIR)/hw/opentitan; \
 	    ninja -C $(SHODAN_BUILD_OUT_DIR) sw_sparrow/device/boot_rom/boot_rom_export_sim_verilator
@@ -40,16 +32,4 @@ sparrow_test_sw_clean:
 	@echo "Remove sparrow software build directory $(SHODAN_BUILD_DIR)"
 	@rm -rf $(SHODAN_BUILD_DIR)
 
-vector_tests_hellovector: $(SHODAN_BUILD_NINJA_SCRIPT)
-	cd $(ROOTDIR)/sw/vector_tests; \
-		BUILD_ROOT=$(SHODAN_BUILD_DIR) ./meson_init.sh -f -t "$(SHODAN_BUILD_TOOLCHAIN_CONFIG)"; \
-		ninja -C $(SHODAN_BUILD_OUT_DIR) \
-			hello_vector/hello_vector_export_sim_verilator hello_vector/hello_vector_export_sim_dv hello_vector/hello_vector_export_fpga_nexysvideo;
-
-vector_load_store_tests: $(SHODAN_BUILD_NINJA_SCRIPT)
-	cd $(ROOTDIR)/sw/vector_tests; \
-		BUILD_ROOT=$(SHODAN_BUILD_DIR) ./meson_init.sh -f -t "$(SHODAN_BUILD_TOOLCHAIN_CONFIG)"; \
-		ninja -C $(SHODAN_BUILD_OUT_DIR) \
-			vector_load_store_tests_export_sim_verilator vector_load_store_tests_export_sim_dv vector_load_store_tests_export_fpga_nexysvideo;
-
-.PHONY:: sparrow_test_sw_clean sparrow_test_sw_hellovector sparrow_test_sw_all sparrow_test_sw_bootrom
+.PHONY:: sparrow_test_sw_clean sparrow_test_sw_all sparrow_test_sw_bootrom

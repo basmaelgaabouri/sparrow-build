@@ -6,7 +6,7 @@ $(OPENTITAN_BUILD_OUT_DIR):
 	@echo "Creating output directory $(OPENTITAN_BUILD_DIR)"
 	@mkdir -p "$(OPENTITAN_BUILD_DIR)"
 	cd $(ROOTDIR)/hw/opentitan; \
-	    TOOLCHAIN_PATH=$(CACHE)/toolchain_vp BUILD_ROOT=$(OPENTITAN_BUILD_DIR) ./meson_init.sh -f;
+	    TOOLCHAIN_PATH=$(CACHE)/toolchain BUILD_ROOT=$(OPENTITAN_BUILD_DIR) ./meson_init.sh -f;
 
 opentitan_sw_all: $(OPENTITAN_BUILD_OUT_DIR)
 	cd $(ROOTDIR)/hw/opentitan; \
