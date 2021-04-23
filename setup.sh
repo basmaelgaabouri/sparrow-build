@@ -66,7 +66,7 @@ function renode
 function iss
 {
     pushd "${ROOTDIR}" >/dev/null
-    python "${ROOTDIR}/scripts/launch_renode.py" "$@"
+    python3 "${ROOTDIR}/scripts/quick_sim.py" "$@"
     popd >/dev/null
 }
 
