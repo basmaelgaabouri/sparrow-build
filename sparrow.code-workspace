@@ -1,0 +1,76 @@
+{
+  "folders": [
+    { "path": "../build" },
+    { "path": "../scripts" },
+    { "path": "../sim" },
+    { "path": "../kata" },
+    { "path": "../hw" },
+    { "path": "../sw" },
+  ],
+  "settings": {
+    "files.associations": {
+      ".*/BUILD": "starlark",
+      ".*/METADATA": "starlark",
+      ".*/WORKSPACE": "starlark",
+      "*.gss": "css",
+      "*.inc": "c"
+    }
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "SparrowDebugger",
+        "type": "cppdbg",
+        "request": "launch",
+
+        // This has to be set.
+        "cwd": "${workspaceFolder:build}/..",
+
+        // This has to be set, but it is unused because of our custom launch script.
+        "program": "out/sparrow_boot_rom/build-out/multihart_boot_rom/multihart_boot_rom_sim_verilator.elf",
+
+        "MIMode": "gdb",
+        "miDebuggerPath": "${workspaceFolder:build}/../cache/toolchain/bin/riscv32-unknown-elf-gdb",
+        "miDebuggerServerAddress": "localhost:3333", // If this isn't set, vscode will open another terminal on launch
+        "logging": { "engineLogging": true }, // optional, enable if you want to see the gdb commands that were sent
+
+        // VSCode claims this is deprecated, but if you use "customLaunchSetupCommands" it won't start the debugging session if this isn't here
+        // and valid. It does _not_ appear to matter what it's set to.
+        "targetArchitecture": "x64", // riscv:rv32?
+
+        "customLaunchSetupCommands":[
+          // Set gdb current directory.
+          {"text": "cd ${workspaceFolder:build}/.."},
+
+          // Set app current directory.
+          {"text": "set cwd ${workspaceFolder:build}/.."},
+
+          // Set source file search path.
+          {"text": "directory sw/tock"},
+
+          // Load an executable. This can be any one of the elf files that are loaded into memory, doesn't matter which one.
+          {"text": "file out/sparrow_boot_rom/build-out/multihart_boot_rom/multihart_boot_rom_sim_verilator.elf"},
+
+          // Load additional symbol files. "-file-symbol-file" seems to unload previously loaded symbols, but add-symbol-file works.
+          {"text": "set confirm off"},
+          {"text": "add-symbol-file out/sparrow_boot_rom/build-out/multihart_boot_rom/multihart_boot_rom_sim_verilator.elf"},
+          {"text": "add-symbol-file out/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf"},
+          {"text": "add-symbol-file out/libtock-rs/riscv32imc-unknown-none-elf/tab/opentitan/hello_world/rv32imc.elf"},
+
+          // Connect to the Renode gdb server.
+          {"text": "target remote localhost:3333"},
+        ],
+
+        // This is supposed to stop vscode from issuing an "-exec-continue", but it doesn't seem to work.
+        "launchCompleteCommand": "None"
+      }
+    ],
+  },
+  "extensions": {
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": []
+  }
+}
