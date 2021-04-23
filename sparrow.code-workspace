@@ -57,6 +57,10 @@
           {"text": "add-symbol-file out/sparrow_boot_rom/build-out/multihart_boot_rom/multihart_boot_rom_sim_verilator.elf"},
           {"text": "add-symbol-file out/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf"},
           {"text": "add-symbol-file out/libtock-rs/riscv32imc-unknown-none-elf/tab/opentitan/hello_world/rv32imc.elf"},
+          {"text": "add-symbol-file out/kata/kernel/kernel.elf"},
+          {"text": "add-symbol-file out/kata/bbl/bbl"},
+          {"text": "add-symbol-file out/kata/elfloader/elfloader"},
+
 
           // Connect to the Renode gdb server.
           {"text": "target remote localhost:3333"},
