@@ -27,7 +27,8 @@ $(VERILATOR_BUILD_DIR):
 	mkdir -p $(VERILATOR_BUILD_DIR)
 
 $(VERILATOR_BIN): | $(VERILATOR_SRC_DIR) $(VERILATOR_BUILD_DIR)
-	autoconf -o $(VERILATOR_BUILD_DIR)/configure $(VERILATOR_SRC_DIR)/configure.ac
+	pushd $(VERILATOR_BUILD_DIR) > /dev/null; \
+		autoconf -o $(VERILATOR_BUILD_DIR)/configure $(VERILATOR_SRC_DIR)/configure.ac
 	pushd $(VERILATOR_BUILD_DIR) > /dev/null; sh configure \
 		--srcdir=$(VERILATOR_SRC_DIR) \
 		--prefix=$(VERILATOR_OUT_DIR)
