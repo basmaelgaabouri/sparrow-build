@@ -2,6 +2,8 @@ RENODE_SRC_DIR := $(ROOTDIR)/sim/renode
 RENODE_OUT_DIR := $(OUT)/host/renode
 RENODE_BIN     := $(RENODE_OUT_DIR)/Renode.exe
 
+RENODE_SIM_GENERATOR_SCRIPT := $(ROOTDIR)/scripts/generate_renode_configs.sh
+
 $(RENODE_OUT_DIR):
 	mkdir -p $(RENODE_OUT_DIR)
 
@@ -41,4 +43,7 @@ verilator_clean:
 # To rebuild the phony target, romove $(VERILATOR_BIN) to trigger the rebuild.
 verilator: $(VERILATOR_BIN)
 
-.PHONY:: renode verilator
+sim_configs:
+	$(RENODE_SIM_GENERATOR_SCRIPT)
+
+.PHONY:: renode verilator sim_configs
