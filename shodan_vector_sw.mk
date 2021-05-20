@@ -33,7 +33,7 @@ vector_tests_load_store: $(SHODAN_VECTOR_BUILD_NINJA_SCRIPT) sparrow_test_sw_boo
 		ninja -C $(SHODAN_VECTOR_BUILD_OUT_DIR) \
 			vector_load_store_tests_export_sim_verilator vector_load_store_tests_export_sim_dv vector_load_store_tests_export_fpga_nexysvideo
 
-vector_vadd_vsub_tests: $(SHODAN_BUILD_NINJA_SCRIPT)
+vector_tests_vadd_vsub: $(SHODAN_BUILD_NINJA_SCRIPT) sparrow_test_sw_bootrom
 	cd $(ROOTDIR)/sw/vector_tests; \
 		BUILD_ROOT=$(SHODAN_BUILD_DIR) ./meson_init.sh -f -t "$(SHODAN_BUILD_TOOLCHAIN_CONFIG)"; \
 		ninja --verbose -C $(SHODAN_BUILD_OUT_DIR) \
