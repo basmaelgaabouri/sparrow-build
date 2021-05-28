@@ -46,4 +46,7 @@ verilator: $(VERILATOR_BIN)
 sim_configs:
 	$(RENODE_SIM_GENERATOR_SCRIPT)
 
-.PHONY:: renode verilator sim_configs
+clean_sim_configs:
+	@rm -rf $(OUT)/renode_configs
+
+.PHONY:: renode verilator sim_configs clean_sim_configs
