@@ -46,6 +46,9 @@ verilator: $(VERILATOR_BIN)
 sim_configs:
 	$(RENODE_SIM_GENERATOR_SCRIPT)
 
+simulate_qemu_vector_tests: qemu vector_sw_all opentitan_sw_bootrom
+	bash $(ROOTDIR)/scripts/run-vector-tests.sh
+
 clean_sim_configs:
 	@rm -rf $(OUT)/renode_configs
 

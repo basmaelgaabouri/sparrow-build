@@ -38,6 +38,12 @@ $(SHODAN_BUILD_OUT_DIR)/sw_sparrow/device/rom_exts/manifest.h: $(SHODAN_BUILD_NI
 sparrow_test_sw_ot_tests: $(SHODAN_BUILD_NINJA_SCRIPT) $(SHODAN_BUILD_OUT_DIR)/sw_sparrow/device/rom_exts/manifest.h
 	ninja -C $(SHODAN_BUILD_OUT_DIR) test
 
+sparrow_test_sw_bootrom: $(SHODAN_BUILD_NINJA_SCRIPT) $(SHODAN_BUILD_OUT_DIR)/sw_sparrow/device/rom_exts/manifest.h
+	ninja -C $(SHODAN_BUILD_OUT_DIR) \
+		sw_sparrow/device/boot_rom/boot_rom_export_sim_verilator \
+		sw_sparrow/device/boot_rom/boot_rom_export_sim_dv \
+		sw_sparrow/device/boot_rom/boot_rom_export_fpga_nexysvideo ;
+
 sparrow_test_sw_clean:
 	@echo "Remove sparrow software build directory $(SHODAN_BUILD_DIR)"
 	@rm -rf $(SHODAN_BUILD_DIR)
