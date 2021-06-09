@@ -18,7 +18,10 @@ opentitan_sw_helloworld: $(OPENTITAN_BUILD_OUT_DIR)
 
 opentitan_sw_bootrom: $(OPENTITAN_BUILD_OUT_DIR)
 	cd $(ROOTDIR)/hw/opentitan; \
-	    ninja -C $(OPENTITAN_BUILD_OUT_DIR) sw/device/boot_rom/boot_rom_export_sim_verilator
+	ninja -C $(OPENTITAN_BUILD_OUT_DIR) \
+		sw/device/boot_rom/boot_rom_export_sim_verilator \
+		sw/device/boot_rom/boot_rom_export_sim_dv \
+		sw/device/boot_rom/boot_rom_export_fpga_nexysvideo
 
 opentitan_sw_clean:
 	rm -rf $(OPENTITAN_BUILD_DIR)
