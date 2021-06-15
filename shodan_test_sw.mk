@@ -24,12 +24,6 @@ sparrow_test_sw_all: $(SHODAN_BUILD_NINJA_SCRIPT) $(SHODAN_BUILD_OUT_DIR)/sw_spa
 	cd $(ROOTDIR)/hw/opentitan; \
 		ninja -C $(SHODAN_BUILD_OUT_DIR) all
 
-sparrow_test_sw_bootrom: $(SHODAN_BUILD_NINJA_SCRIPT) $(SHODAN_BUILD_OUT_DIR)/sw_sparrow/device/rom_exts/manifest.h
-	ninja -C $(SHODAN_BUILD_OUT_DIR) \
-		sw_sparrow/device/boot_rom/boot_rom_export_sim_verilator \
-		sw_sparrow/device/boot_rom/boot_rom_export_sim_dv \
-		sw_sparrow/device/boot_rom/boot_rom_export_fpga_nexysvideo
-
 $(SHODAN_BUILD_OUT_DIR)/sw_sparrow/device/rom_exts/manifest.h: $(SHODAN_BUILD_NINJA_SCRIPT)
 	ninja -C $(SHODAN_BUILD_OUT_DIR) \
 		sw_sparrow/device/rom_exts/manifest.h \
