@@ -33,6 +33,7 @@ include $(ROOTDIR)/build/iree.mk
 include $(ROOTDIR)/build/sparrow_boot_rom.mk
 include $(ROOTDIR)/build/riscv_toolchain.mk
 include $(ROOTDIR)/build/sparrow_vector_sw.mk
+include $(ROOTDIR)/build/springbok.mk
 
 $(OUT):
 	@mkdir -p $(OUT)
