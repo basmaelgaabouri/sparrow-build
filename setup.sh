@@ -58,16 +58,12 @@ export PATH="${OUT}/host/qemu/riscv32-softmmu:${PATH}"
 
 function renode
 {
-    pushd "${ROOTDIR}" >/dev/null
-    mono "${OUT}/host/renode/Renode.exe" "$@"
-    popd >/dev/null
+    (cd "${ROOTDIR}" && mono "${OUT}/host/renode/Renode.exe" "$@")
 }
 
 function iss
 {
-    pushd "${ROOTDIR}" >/dev/null
-    python3 "${ROOTDIR}/scripts/quick_sim.py" "$@"
-    popd >/dev/null
+    (cd "${ROOTDIR}" && python3 "${ROOTDIR}/scripts/quick_sim.py" "$@")
 }
 
 function get-groups
@@ -78,11 +74,7 @@ function get-groups
 
 function m
 {
-    local target="build"
-
-    pushd "${ROOTDIR}" >/dev/null
-    make -f "${ROOTDIR}/build/Makefile" "$@"
-    popd >/dev/null
+    (cd "${ROOTDIR}" && make -f "${ROOTDIR}/build/Makefile" "$@")
 }
 
 function safe-abandon
