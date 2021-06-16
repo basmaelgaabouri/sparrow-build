@@ -1,11 +1,6 @@
 {
   "folders": [
-    { "path": "../build" },
-    { "path": "../scripts" },
-    { "path": "../sim" },
-    { "path": "../kata" },
-    { "path": "../hw" },
-    { "path": "../sw" },
+    { "path": ".."}
   ],
   "settings": {
     "files.associations": {
@@ -14,6 +9,23 @@
       ".*/WORKSPACE": "starlark",
       "*.gss": "css",
       "*.inc": "c"
+    },
+    "files.exclude": {
+      ".repo": true,
+      "autom4te.cache": true,
+      "cache": true,
+      "cicd": true,
+      "manifest": true,
+      "out": true,
+      "toolchain": true,
+      "**/arch-arm": true,
+      "**/arch/arm": true,
+      "**/arch/x86": true,
+      "**/x86_64": true,
+      "**/aarch64": true,
+      "**/arch/64": true,
+      "**/plat/64": true,
+      "**/plat/pc99": true,
     }
   },
   "launch": {
@@ -25,13 +37,13 @@
         "request": "launch",
 
         // This has to be set.
-        "cwd": "${workspaceFolder:build}/..",
+        "cwd": "${workspaceFolder}",
 
         // This has to be set, but it is unused because of our custom launch script.
         "program": "out/sparrow_boot_rom/build-out/multihart_boot_rom/multihart_boot_rom_sim_verilator.elf",
 
         "MIMode": "gdb",
-        "miDebuggerPath": "${workspaceFolder:build}/../cache/toolchain/bin/riscv32-unknown-elf-gdb",
+        "miDebuggerPath": "${workspaceFolder}/cache/toolchain/bin/riscv32-unknown-elf-gdb",
         "miDebuggerServerAddress": "localhost:3333", // If this isn't set, vscode will open another terminal on launch
         "logging": { "engineLogging": true }, // optional, enable if you want to see the gdb commands that were sent
 
@@ -41,10 +53,10 @@
 
         "customLaunchSetupCommands":[
           // Set gdb current directory.
-          {"text": "cd ${workspaceFolder:build}/.."},
+          {"text": "cd ${workspaceFolder}"},
 
           // Set app current directory.
-          {"text": "set cwd ${workspaceFolder:build}/.."},
+          {"text": "set cwd ${workspaceFolder}"},
 
           // Set source file search path.
           {"text": "directory sw/tock"},
