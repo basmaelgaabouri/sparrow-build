@@ -62,12 +62,12 @@ $(OUT)/sparrow.dtb: $(ROOTDIR)/sim/config/devicetree/sparrow.dts
 	dtc -I dts -O dtb $< > $@
 
 $(OUT)/ext_flash.tar: $(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf \
-                      $(OUT)/kata/bbl/bbl \
-                      $(OUT)/sparrow.dtb
+                      $(OUT)/kata/kernel/kernel.elf \
+                      $(OUT)/kata/capdl-loader
 	tar -cvf $(OUT)/ext_flash.tar \
 		$(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf \
-		$(OUT)/kata/bbl/bbl \
-		$(OUT)/sparrow.dtb
+		$(OUT)/kata/kernel/kernel.elf \
+		$(OUT)/kata/capdl-loader
 
 simulate: renode multihart_boot_rom libtockrs_helloworld kata $(OUT)/ext_flash.tar $(ROOTDIR)/sim/config/sparrow_all.resc
 	$(ROOTDIR)/sim/renode/renode -e "i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start" --disable-xwt
