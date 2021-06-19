@@ -66,6 +66,18 @@ function iss
     (cd "${ROOTDIR}" && python3 "${ROOTDIR}/scripts/quick_sim.py" "$@")
 }
 
+function qemu_sim_springbok
+{
+    (cd "${ROOTDIR}" && qemu-system-riscv32 -M springbok -nographic -d springbok -device loader,file="$1")
+}
+
+function sim_springbok
+{
+    (cd "${ROOTDIR}" && renode -e "\$bin=@$1; i @sim/config/springbok.resc; start; sysbus.cpu2 IsHalted False" \
+        --disable-xwt --console)
+
+}
+
 function get-groups
 {
     git --git-dir="${ROOTDIR}/.repo/manifests.git" config \
