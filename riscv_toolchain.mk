@@ -43,7 +43,7 @@ $(TOOLCHAINVP_BIN): $(TOOLCHAIN_BIN) | $(TOOLCHAINVP_BUILD_DIR)
 	cd $(TOOLCHAINVP_BUILD_DIR) && $(TOOLCHAIN_SRC_DIR)/configure \
 		--srcdir=$(TOOLCHAIN_SRC_DIR) \
 		--prefix=$(TOOLCHAINVP_OUT_DIR) \
-		--with-arch=rv32imfv \
+		--with-arch=rv32imv \
 		--with-abi=ilp32
 	make -C $(TOOLCHAINVP_BUILD_DIR) clean newlib
 	make -C $(TOOLCHAINVP_BUILD_DIR) clean
