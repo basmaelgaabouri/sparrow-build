@@ -66,8 +66,13 @@ $(OUT)/ext_flash.tar: $(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-
 		$(OUT)/kata/kernel/kernel.elf \
 		$(OUT)/kata/capdl-loader
 
-simulate: renode multihart_boot_rom libtockrs_helloworld kata $(OUT)/ext_flash.tar $(ROOTDIR)/sim/config/sparrow_all.resc
+sim_deps: renode multihart_boot_rom libtockrs_helloworld kata $(OUT)/ext_flash.tar $(ROOTDIR)/sim/config/sparrow_all.resc
+
+simulate: sim_deps
 	$(ROOTDIR)/sim/renode/renode -e "i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start" --disable-xwt
+
+debug-simulation: sim_deps
+	$(ROOTDIR)/sim/renode/renode -e "i @sim/config/sparrow_all.resc; start" --disable-xwt
 
 test_sc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow_all.resc
 	$(ROOTDIR)/sim/renode/renode -e "\$$tar = @$(ROOTDIR)/out/test_sc.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start" --disable-xwt
