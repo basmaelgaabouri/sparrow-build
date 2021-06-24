@@ -58,9 +58,6 @@ simulate_qemu_vector_tests: qemu vector_sw_all opentitan_sw_bootrom
 clean_sim_configs:
 	@rm -rf $(OUT)/renode_configs
 
-$(OUT)/sparrow.dtb: $(ROOTDIR)/sim/config/devicetree/sparrow.dts
-	dtc -I dts -O dtb $< > $@
-
 $(OUT)/ext_flash.tar: $(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf \
                       $(OUT)/kata/kernel/kernel.elf \
                       $(OUT)/kata/capdl-loader
@@ -72,7 +69,13 @@ $(OUT)/ext_flash.tar: $(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-
 simulate: renode multihart_boot_rom libtockrs_helloworld kata $(OUT)/ext_flash.tar $(ROOTDIR)/sim/config/sparrow_all.resc
 	$(ROOTDIR)/sim/renode/renode -e "i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start" --disable-xwt
 
-debug-simulation: renode multihart_boot_rom libtockrs_helloworld kata $(OUT)/ext_flash.tar $(ROOTDIR)/sim/config/sparrow_all.resc
-	$(ROOTDIR)/sim/renode/renode -e "i @sim/config/sparrow_all.resc; start" --disable-xwt
+test_sc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow_all.resc
+	$(ROOTDIR)/sim/renode/renode -e "\$$tar = @$(ROOTDIR)/out/test_sc.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start" --disable-xwt
+
+test_mc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow_all.resc
+	$(ROOTDIR)/sim/renode/renode -e "\$$tar = @$(ROOTDIR)/out/test_mc.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start" --disable-xwt
+
+test_vc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow_all.resc
+	$(ROOTDIR)/sim/renode/renode -e "\$$tar = @$(ROOTDIR)/out/test_vc.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start" --disable-xwt
 
 .PHONY:: renode verilator sim_configs clean_sim_configs
