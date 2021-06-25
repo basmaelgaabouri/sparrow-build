@@ -1,4 +1,6 @@
-KATA_INIT_ARGS := -DCROSS_COMPILER_PREFIX=riscv32-unknown-elf-
+KATA_INIT_ARGS := \
+    -DCROSS_COMPILER_PREFIX=riscv32-unknown-elf- \
+    -DSIMULATION=0
 
 KATA_TOPLEVEL_NINJA_SCRIPT := $(OUT)/kata/build.ninja
 KATA_ROOTSERVER_IMAGE_NAME := $(OUT)/kata/images/capdl-loader-image-riscv-spike

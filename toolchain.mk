@@ -11,7 +11,7 @@ $(RUSTDIR)/bin/rustup: | $(RUST_OUT_DIR)
 	bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path'
 
 $(RUSTDIR)/bin/rustc: | $(RUST_OUT_DIR) $(RUSTDIR)/bin/rustup
-	$(RUSTDIR)/bin/rustup +nightly target add riscv32imc-unknown-none-elf
+	$(RUSTDIR)/bin/rustup +nightly target add riscv32imac-unknown-none-elf
 
 $(RUSTDIR)/bin/elf2tab: $(RUSTDIR)/bin/rustc
 	cargo install elf2tab --version 0.6.0
