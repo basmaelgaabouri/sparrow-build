@@ -18,6 +18,8 @@
       "manifest": true,
       "out": true,
       "toolchain": true,
+      "**/Cargo.lock": true,
+      "**/target": true,
       "**/arch-arm": true,
       "**/arch/arm": true,
       "**/arch/x86": true,
@@ -61,18 +63,22 @@
           // Set source file search path.
           {"text": "directory sw/tock"},
 
-          // Load an executable. This can be any one of the elf files that are loaded into memory, doesn't matter which one.
+          // Load the bootrom executable.
           {"text": "file out/sparrow_boot_rom/build-out/multihart_boot_rom/multihart_boot_rom_sim_verilator.elf"},
 
           // Load additional symbol files. "-file-symbol-file" seems to unload previously loaded symbols, but add-symbol-file works.
           {"text": "set confirm off"},
-          {"text": "add-symbol-file out/sparrow_boot_rom/build-out/multihart_boot_rom/multihart_boot_rom_sim_verilator.elf"},
+
+          // TockOS symbols
           {"text": "add-symbol-file out/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf"},
           {"text": "add-symbol-file out/libtock-rs/riscv32imc-unknown-none-elf/tab/opentitan/hello_world/rv32imc.elf"},
-          {"text": "add-symbol-file out/kata/kernel/kernel.elf"},
-          {"text": "add-symbol-file out/kata/bbl/bbl"},
-          {"text": "add-symbol-file out/kata/elfloader/elfloader"},
 
+          // seL4 symbols
+          {"text": "add-symbol-file out/kata/kernel/kernel.elf"},
+          {"text": "add-symbol-file out/kata/capdl-loader"},
+          {"text": "add-symbol-file out/kata/debug_console.instance.bin"},
+          {"text": "add-symbol-file out/kata/process_manager.instance.bin"},
+          {"text": "add-symbol-file out/kata/sel4debug.instance.bin"},
 
           // Connect to the Renode gdb server.
           {"text": "target remote localhost:3333"},
