@@ -62,9 +62,9 @@ $(OUT)/ext_flash.tar: $(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-
                       $(OUT)/kata/kernel/kernel.elf \
                       $(OUT)/kata/capdl-loader
 	tar -C $(OUT) -cvf $(OUT)/ext_flash.tar \
-		$(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf \
-		$(OUT)/kata/kernel/kernel.elf \
-		$(OUT)/kata/capdl-loader
+		tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf \
+		kata/kernel/kernel.elf \
+		kata/capdl-loader
 
 sim_deps: renode multihart_boot_rom libtockrs_helloworld kata $(OUT)/ext_flash.tar $(ROOTDIR)/sim/config/sparrow_all.resc
 
