@@ -61,7 +61,7 @@ clean_sim_configs:
 $(OUT)/ext_flash.tar: $(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf \
                       $(OUT)/kata/kernel/kernel.elf \
                       $(OUT)/kata/capdl-loader
-	tar -cvf $(OUT)/ext_flash.tar \
+	tar -C $(OUT) -cvf $(OUT)/ext_flash.tar \
 		$(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf \
 		$(OUT)/kata/kernel/kernel.elf \
 		$(OUT)/kata/capdl-loader
