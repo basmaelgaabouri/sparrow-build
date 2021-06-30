@@ -1,11 +1,3 @@
-KATA_INIT_ARGS := \
-    -DCROSS_COMPILER_PREFIX=riscv32-unknown-elf- \
-    -DSIMULATION=0
-
-KATA_TOPLEVEL_NINJA_SCRIPT := $(OUT)/kata/build.ninja
-KATA_ROOTSERVER_IMAGE_NAME := $(OUT)/kata/images/capdl-loader-image-riscv-spike
-KATA_SIMULATE_SCRIPT_NAME  := $(OUT)/kata/simulate
-
 KATA_SOURCES := $(shell find $(ROOTDIR)/kata \
 						-name \*.rs -or \
 						-name \*.c -or \
@@ -13,16 +5,9 @@ KATA_SOURCES := $(shell find $(ROOTDIR)/kata \
 						-name \*.cpp \
 						-type f)
 
-$(KATA_TOPLEVEL_NINJA_SCRIPT): $(KATA_SOURCES) | $(OUT)/kata
-	pushd $(OUT)/kata; cmake -G Ninja $(KATA_INIT_ARGS) $(ROOTDIR)/kata/projects/processmanager
+kata: $(KATA_SOURCES)
+	mkdir -p $(OUT)/kata
+	cd $(OUT)/kata && cmake -G Ninja -DCROSS_COMPILER_PREFIX=riscv32-unknown-elf- -DSIMULATION=0 $(ROOTDIR)/kata/projects/processmanager
+	cd $(OUT)/kata && ninja
 
-$(KATA_ROOTSERVER_IMAGE_NAME): $(KATA_TOPLEVEL_NINJA_SCRIPT) $(KATA_SOURCES) | $(OUT)/kata
-	pushd $(OUT)/kata; ninja
-
-$(KATA_SIMULATE_SCRIPT_NAME): $(KATA_ROOTSERVER_IMAGE_NAME)
-
-$(OUT)/kata:
-	@mkdir -p $(OUT)/kata
-
-kata: $(KATA_ROOTSERVER_IMAGE_NAME)
 .PHONY:: kata

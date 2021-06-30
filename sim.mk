@@ -58,15 +58,13 @@ simulate_qemu_vector_tests: qemu vector_sw_all opentitan_sw_bootrom
 clean_sim_configs:
 	@rm -rf $(OUT)/renode_configs
 
-$(OUT)/ext_flash.tar: $(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf \
-                      $(OUT)/kata/kernel/kernel.elf \
-                      $(OUT)/kata/capdl-loader
+$(OUT)/ext_flash.tar: tock kata
 	tar -C $(OUT) -cvf $(OUT)/ext_flash.tar \
 		tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf \
 		kata/kernel/kernel.elf \
 		kata/capdl-loader
 
-sim_deps: renode multihart_boot_rom libtockrs_helloworld kata $(OUT)/ext_flash.tar $(ROOTDIR)/sim/config/sparrow_all.resc
+sim_deps: renode multihart_boot_rom $(OUT)/ext_flash.tar
 
 simulate: sim_deps
 	$(ROOTDIR)/sim/renode/renode -e "i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start" --disable-xwt
