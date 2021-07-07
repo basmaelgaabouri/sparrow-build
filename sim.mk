@@ -9,7 +9,7 @@ $(RENODE_OUT_DIR):
 
 $(RENODE_BIN): | $(RENODE_SRC_DIR) $(RENODE_OUT_DIR)
 	pushd $(RENODE_SRC_DIR) > /dev/null; \
-	    ./build.sh -d --skip-fetch; \
+	    ./build.sh --skip-fetch; \
 	    cp -rf output/bin/Release/* $(RENODE_OUT_DIR); \
 	    cp -rf scripts $(RENODE_OUT_DIR); \
 	    cp -rf platforms $(RENODE_OUT_DIR)
