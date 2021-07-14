@@ -34,6 +34,7 @@ $(OUT)/tmp: | $(OUT)
 $(CACHE):
 	mkdir -p $(CACHE)
 
+# TODO: Use publically accessible URLs for toolchain tarballs.
 $(OUT)/tmp/toolchain_rvv-intrinsic.tar.gz: | $(OUT)/tmp
 	fileutil cp /x20/teams/cerebra-hw/sparrow/toolchain_cache/toolchain_rvv-intrinsic.tar.gz $(OUT)/tmp
 
@@ -46,7 +47,13 @@ $(OUT)/tmp/toolchain_iree_rvv-intrinsic.tar.gz: | $(OUT)/tmp
 $(CACHE)/toolchain_iree: | $(OUT)/tmp/toolchain_iree_rvv-intrinsic.tar.gz $(CACHE)
 	tar -C $(CACHE) -xf $(OUT)/tmp/toolchain_iree_rvv-intrinsic.tar.gz
 
-install_llvm: $(CACHE)/toolchain_iree
+$(OUT)/tmp/toolchain_iree_rv32.tar.gz: | $(OUT)/tmp
+	wget -P $(OUT)/tmp https://storage.googleapis.com/iree-shared-files/toolchain_iree_rv32.tar.gz
+
+$(CACHE)/toolchain_iree_rv32imf: | $(OUT)/tmp/toolchain_iree_rv32.tar.gz $(CACHE)
+	tar -C $(CACHE) -xf $(OUT)/tmp/toolchain_iree_rv32.tar.gz
+
+install_llvm: $(CACHE)/toolchain_iree $(CACHE)/toolchain_iree_rv32imf
 
 toolchain_clean:
 	rm -rf $(OUT)/tmp $(CACHE)/toolchain $(CACHE)/toolchain_vp

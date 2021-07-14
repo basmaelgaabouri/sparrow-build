@@ -1,8 +1,12 @@
 IREE_TOOLCHAIN=$(CACHE)/toolchain_iree
 IREE_SRC=$(ROOTDIR)/toolchain/iree
 IREE_HOST_OUT=$(OUT)/host/iree-build-host
-IREE_RISCV_OUT=$(OUT)/host/iree-build-riscv
+IREE_RISCV_OUT=$(OUT)/host/iree-build-riscv64
+IREE_RISCV32_OUT=$(OUT)/host/iree-build-riscv32
 QEMU_PATH=${OUT}/host/qemu/riscv64-linux-user
+TOOLCHAINRV32_PATH=$(CACHE)/toolchain_iree_rv32imf
+LINKER_SCRIPT=$(ROOTDIR)/sw/vec/springbok/matcha.ld
+CRT0=$(ROOTDIR)/sw/vec/springbok/crt0.s
 
 # The following targets are always rebuilt when the iree target is made
 
@@ -26,7 +30,7 @@ iree_host_build: | iree_check
 
 iree_riscv_build: | iree_check
 	cmake -G Ninja -B $(IREE_RISCV_OUT) \
-	    -DCMAKE_TOOLCHAIN_FILE="$(IREE_SRC)/build_tools/cmake/riscv.toolchain.cmake" \
+	    -DCMAKE_TOOLCHAIN_FILE="$(ROOTDIR)/build/riscv_iree.cmake" \
 	    -DIREE_HOST_BINARY_ROOT="$(IREE_HOST_OUT)/install" \
 	    -DRISCV_CPU=rv64 -DIREE_BUILD_COMPILER=OFF \
 	    -DIREE_ENABLE_MLIR=OFF -DIREE_BUILD_SAMPLES=OFF \
@@ -34,12 +38,25 @@ iree_riscv_build: | iree_check
 	    $(IREE_SRC)
 	cmake --build $(IREE_RISCV_OUT)
 
+iree_rv32_build:
+	cmake -G Ninja -B $(IREE_RISCV32_OUT) \
+	    -DCMAKE_TOOLCHAIN_FILE="$(ROOTDIR)/build/riscv_iree.cmake" \
+	    -DIREE_HOST_BINARY_ROOT="$(IREE_HOST_OUT)/install" \
+	    -DRISCV_CPU=rv32-baremetal -DIREE_BUILD_COMPILER=OFF \
+	    -DIREE_ENABLE_MLIR=OFF -DIREE_BUILD_SAMPLES=ON \
+	    -DIREE_BUILD_TESTS=OFF \
+	    -DRISCV_TOOLCHAIN_ROOT=$(TOOLCHAINRV32_PATH) \
+	    -DSPRINGBOK_ROOT=$(ROOTDIR)/sw/vec/springbok \
+	    $(IREE_SRC)
+# TODO: Build everything, not just target. Hits 256k limitation on some examples.
+	cmake --build $(IREE_RISCV32_OUT) --target iree/hal/local/elf/elf_module_test_binary
+
 iree_test:
 	bash ${ROOTDIR}/scripts/run-iree.sh
 
 iree: iree_host_build iree_riscv_build iree_test
 
 iree_clean:
-	rm -rf $(IREE_HOST_OUT) $(IREE_RISCV_OUT)
+	rm -rf $(IREE_HOST_OUT) $(IREE_RISCV_OUT) $(IREE_RISCV32_OUT)
 
 .PHONY:: iree iree_check iree_host_build iree_riscv_build iree_test iree_clean
