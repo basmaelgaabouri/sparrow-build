@@ -10,8 +10,8 @@ TOOLCHAINVP_BIN       := $(TOOLCHAINVP_OUT_DIR)/bin/riscv32-unknown-elf-gcc
 # TODO(hcindyl): Use toolchain_vp when 32-bit baremetal target is ready
 TOOLCHAINIREE_SRC_DIR   := $(OUT)/tmp/toolchain/riscv-gnu-toolchain_iree
 TOOLCHAINIREE_BUILD_DIR  := $(OUT)/tmp/toolchain/build_toolchain_iree
-TOOLCHAINIREE_OUT_DIR    := $(CACHE)/toolchain_iree
-TOOLCHAINIREE_BIN        := $(TOOLCHAINIREE_OUT_DIR)/bin/riscv64-unknown-linux-gnu-gcc
+TOOLCHAINIREE_OUT_DIR    := $(CACHE)/toolchain_iree_rv32imf
+TOOLCHAINIREE_BIN        := $(TOOLCHAINIREE_OUT_DIR)/bin/riscv32-unknown-elf-gdb
 TOOLCHAINLLVM_SRC_DIR    := $(OUT)//tmp/toolchain/llvm-project
 TOOLCHAINLLVM_BUILD_DIR  := $(OUT)/tmp/toolchain/build_toolchain_llvm
 TOOLCHAINLLVM_BIN        := $(TOOLCHAINIREE_OUT_DIR)/bin/clang
@@ -72,36 +72,35 @@ $(TOOLCHAINIREE_BIN): | toolchain_src_llvm $(TOOLCHAINIREE_BUILD_DIR)
 	cd $(TOOLCHAINIREE_BUILD_DIR) && $(TOOLCHAINIREE_SRC_DIR)/configure \
 		--srcdir=$(TOOLCHAINIREE_SRC_DIR) \
 		--prefix=$(TOOLCHAINIREE_OUT_DIR) \
-		--with-arch=rv64gc \
-		--with-abi=lp64d \
+		--with-arch=rv32imf \
+		--with-abi=ilp32 \
 		--with-cmodel=medany
-	make -C $(TOOLCHAINIREE_BUILD_DIR) clean linux
+	make -C $(TOOLCHAINIREE_BUILD_DIR) clean newlib
 	make -C $(TOOLCHAINIREE_BUILD_DIR) clean
 
-# Build with 64-bit linux config.
-# TODO(hcindyl): Move to 32-bit baremetal config
+# Build with 32-bit baremetal config.
 $(TOOLCHAINLLVM_BIN): $(TOOLCHAINIREE_BIN)
 	cmake -B $(TOOLCHAINLLVM_BUILD_DIR) \
 		-DCMAKE_INSTALL_PREFIX=$(TOOLCHAINIREE_OUT_DIR) \
 		-DCMAKE_C_COMPILER=clang  -DCMAKE_CXX_COMPILER=clang++ \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DLLVM_TARGETS_TO_BUILD="RISCV" \
-		-DLLVM_ENABLE_PROJECTS="clang"  \
-		-DLLVM_DEFAULT_TARGET_TRIPLE="riscv64-unknown-linux-gnu" \
+		-DLLVM_ENABLE_PROJECTS="clang;lld"  \
+		-DLLVM_DEFAULT_TARGET_TRIPLE="riscv32-unknown-elf" \
 		-DLLVM_INSTALL_TOOLCHAIN_ONLY=On \
-		-DDEFAULT_SYSROOT=../sysroot \
+		-DDEFAULT_SYSROOT=../riscv32-unknown-elf \
 		-G Ninja \
 		$(TOOLCHAINLLVM_SRC_DIR)/llvm
 	cmake --build $(TOOLCHAINLLVM_BUILD_DIR) --target install
 	cmake --build $(TOOLCHAINLLVM_BUILD_DIR) --target clean
 
-$(OUT)/toolchain_iree_rvv-intrinsic.tar.gz: $(TOOLCHAINLLVM_BIN)
-	cd $(CACHE) && tar -czf $(OUT)/toolchain_iree_rvv-intrinsic.tar.gz toolchain_iree
+$(OUT)/toolchain_iree_rv32.tar.gz: $(TOOLCHAINLLVM_BIN)
+	cd $(CACHE) && tar -czf $(OUT)/toolchain_iree_rv32.tar.gz toolchain_iree_rv32imf
 	@echo "==========================================================="
-	@echo "Toolchain tarball ready at $(OUT)/toolchain_iree_rvv-intrinsic.tar.gz"
+	@echo "Toolchain tarball ready at $(OUT)/toolchain_iree_rv32.tar.gz"
 	@echo "==========================================================="
 
-toolchain_llvm: $(OUT)/toolchain_iree_rvv-intrinsic.tar.gz
+toolchain_llvm: $(OUT)/toolchain_iree_rv32.tar.gz
 
 toolchain_llvm_clean:
 	rm -rf $(TOOLCHAINIREE_OUT_DIR) $(OUT)/tmp/toolchain
