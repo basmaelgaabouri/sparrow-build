@@ -53,7 +53,7 @@ $(OUT)/tmp/toolchain_iree_rv32.tar.gz: | $(OUT)/tmp
 $(CACHE)/toolchain_iree_rv32imf: | $(OUT)/tmp/toolchain_iree_rv32.tar.gz $(CACHE)
 	tar -C $(CACHE) -xf $(OUT)/tmp/toolchain_iree_rv32.tar.gz
 
-install_llvm: $(CACHE)/toolchain_iree $(CACHE)/toolchain_iree_rv32imf
+install_llvm: $(CACHE)/toolchain_iree_rv32imf
 
 toolchain_clean:
 	rm -rf $(OUT)/tmp $(CACHE)/toolchain $(CACHE)/toolchain_vp
