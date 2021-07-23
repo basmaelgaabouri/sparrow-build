@@ -3,6 +3,16 @@ IREE_HOST_OUT=$(OUT)/host/iree-build-host
 IREE_RISCV32_OUT=$(OUT)/host/iree-build-riscv32
 QEMU_PATH=$(OUT)/host/qemu/riscv32-softmmu
 TOOLCHAINRV32_PATH=$(CACHE)/toolchain_iree_rv32imf
+SPRINGBOK_ROOT=$(ROOTDIR)/sw/vec/springbok
+
+RV32_EXE_LINKER_FLAGS=-Xlinker --defsym=__itcm_length__=256K \
+    -Wl,--whole-archive \
+    $(OUT)/springbok_iree/springbok/libspringbok_intrinsic.a \
+    -Wl,--no-whole-archive \
+    -T $(SPRINGBOK_ROOT)/matcha.ld \
+    -nostartfiles \
+    -Wl,--print-memory-usage
+
 
 # The following targets are always rebuilt when the iree target is made
 
@@ -32,7 +42,7 @@ iree_rv32_build: | springbok_iree
 	    -DIREE_ENABLE_MLIR=OFF -DIREE_BUILD_SAMPLES=ON \
 	    -DIREE_BUILD_TESTS=OFF \
 	    -DRISCV_TOOLCHAIN_ROOT=$(TOOLCHAINRV32_PATH) \
-	    -DSPRINGBOK_ROOT=$(ROOTDIR)/sw/vec/springbok \
+	    -DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)" \
 	    $(IREE_SRC)
 # TODO: Build everything, not just target. Hits 256k limitation on some examples.
 	cmake --build $(IREE_RISCV32_OUT) --target iree/hal/local/elf/elf_module_test_binary

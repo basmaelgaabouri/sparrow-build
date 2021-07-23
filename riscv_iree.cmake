@@ -14,8 +14,6 @@ elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL Darwin)
   set(RISCV_HOST_TAG darwin)
 endif()
 
-set(SPRINGBOK_ROOT "$ENV{ROOTDIR}/sw/vec/springbok" CACHE PATH "Springbok top-level path")
-
 set(RISCV_TOOLCHAIN_NAME clang)
 
 set(RISCV_TOOLCHAIN_ROOT "$ENV{CACHE}/toolchain_iree" CACHE PATH "RISC-V compiler path")
@@ -52,7 +50,7 @@ elseif(RISCV_CPU STREQUAL "rv32-baremetal")
   set(CMAKE_SYSTEM_LIBRARY_PATH "${RISCV_TOOLCHAIN_ROOT}/riscv32-unknown-elf/lib")
   set(IREE_ENABLE_THREADING OFF CACHE BOOL "" FORCE)
   list(APPEND RISCV_COMPILER_FLAGS "-g3 -menable-experimental-extensions -march=rv32imfv0p10 -mabi=ilp32 -DIREE_PLATFORM_GENERIC=1 -DIREE_SYNCHRONIZATION_DISABLE_UNSAFE=1 -DIREE_FILE_IO_ENABLE=0 -DIREE_TIME_NOW_FN=\"\{ return 0; \}\"")
-  set(RISCV_LINKER_FLAGS "-Xlinker --defsym=__itcm_length__=256000 -Wl,--whole-archive $ENV{OUT}/springbok_iree/springbok/libspringbok_intrinsic.a -Wl,--no-whole-archive -lstdc++ -lm -T${SPRINGBOK_ROOT}/matcha.ld -nostartfiles")
+  set(RISCV_LINKER_FLAGS "-lstdc++ -lm")
 endif()
 
 set(CMAKE_C_FLAGS             "${RISCV_COMPILER_FLAGS} ${CMAKE_C_FLAGS}")
