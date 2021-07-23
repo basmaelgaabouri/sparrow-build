@@ -6,7 +6,18 @@
 
 cmake_minimum_required (VERSION 3.13)
 
+# CMake invokes the toolchain file twice during the first build, but only once
+# during subsequent rebuilds. This was causing the various flags to be added
+# twice on the first build, and on a rebuild ninja would see only one set of the
+# flags and rebuild the world.
+# https://github.com/android-ndk/ndk/issues/323
+if(RISCV_TOOLCHAIN_INCLUDED)
+  return()
+endif(RISCV_TOOLCHAIN_INCLUDED)
+set(RISCV_TOOLCHAIN_INCLUDED true)
+
 set(CMAKE_SYSTEM_PROCESSOR riscv)
+set(CMAKE_CROSSCOMPILING ON CACHE BOOL "")
 
 if(CMAKE_HOST_SYSTEM_NAME STREQUAL Linux)
   set(RISCV_HOST_TAG linux)
@@ -40,7 +51,6 @@ if(RISCV_CPU STREQUAL "rv64")
   set(RISCV_LINKER_FLAGS "${RISCV_LINKER_FLAGS} -lstdc++ -lpthread -lm -ldl")
 elseif(RISCV_CPU STREQUAL "rv32-baremetal")
   set(CMAKE_SYSTEM_NAME Generic)
-  set(CMAKE_CROSSCOMPILING ON CACHE BOOL "")
   set(CMAKE_C_STANDARD 11)
   set(CMAKE_C_EXTENSIONS OFF)     # Force the usage of _ISOC11_SOURCE
   set(IREE_BUILD_BINDINGS_TFLITE OFF CACHE BOOL "" FORCE)
@@ -50,7 +60,6 @@ elseif(RISCV_CPU STREQUAL "rv32-baremetal")
   set(CMAKE_SYSTEM_LIBRARY_PATH "${RISCV_TOOLCHAIN_ROOT}/riscv32-unknown-elf/lib")
   set(IREE_ENABLE_THREADING OFF CACHE BOOL "" FORCE)
   list(APPEND RISCV_COMPILER_FLAGS "-g3 -menable-experimental-extensions -march=rv32imfv0p10 -mabi=ilp32 -DIREE_PLATFORM_GENERIC=1 -DIREE_SYNCHRONIZATION_DISABLE_UNSAFE=1 -DIREE_FILE_IO_ENABLE=0 -DIREE_TIME_NOW_FN=\"\{ return 0; \}\"")
-  set(RISCV_LINKER_FLAGS "-lstdc++ -lm")
 endif()
 
 set(CMAKE_C_FLAGS             "${RISCV_COMPILER_FLAGS} ${CMAKE_C_FLAGS}")
