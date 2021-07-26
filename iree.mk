@@ -6,8 +6,9 @@ TOOLCHAINRV32_PATH=$(CACHE)/toolchain_iree_rv32imf
 SPRINGBOK_ROOT=$(ROOTDIR)/sw/vec/springbok
 
 RV32_EXE_LINKER_FLAGS=-Xlinker --defsym=__itcm_length__=256K \
+    -Xlinker --defsym=__stack_size__=10K \
     -Wl,--whole-archive \
-    $(OUT)/springbok_iree/springbok/libspringbok_intrinsic.a \
+    $(SPRINGBOK_BUILD_DIR)springbok/libspringbok_intrinsic.a \
     -Wl,--no-whole-archive \
     -T $(SPRINGBOK_ROOT)/matcha.ld \
     -nostartfiles \
@@ -34,6 +35,8 @@ iree_host_build: | iree_check
 	    $(IREE_SRC)
 	cmake --build $(IREE_HOST_OUT) --target install
 
+# TODO(b/194710215): Need to figure out why the second cmake config is needed to
+# reduce the artifact size to <256KB.
 iree_rv32_build: | springbok_iree
 	cmake -G Ninja -B $(IREE_RISCV32_OUT) \
 	    -DCMAKE_TOOLCHAIN_FILE="$(ROOTDIR)/build/riscv_iree.cmake" \
@@ -44,8 +47,16 @@ iree_rv32_build: | springbok_iree
 	    -DRISCV_TOOLCHAIN_ROOT=$(TOOLCHAINRV32_PATH) \
 	    -DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)" \
 	    $(IREE_SRC)
-# TODO: Build everything, not just target. Hits 256k limitation on some examples.
-	cmake --build $(IREE_RISCV32_OUT) --target iree/hal/local/elf/elf_module_test_binary
+	cmake -G Ninja -B $(IREE_RISCV32_OUT) \
+	    -DCMAKE_TOOLCHAIN_FILE="$(ROOTDIR)/build/riscv_iree.cmake" \
+	    -DIREE_HOST_BINARY_ROOT="$(IREE_HOST_OUT)/install" \
+	    -DRISCV_CPU=rv32-baremetal -DIREE_BUILD_COMPILER=OFF \
+	    -DIREE_ENABLE_MLIR=OFF -DIREE_BUILD_SAMPLES=ON \
+	    -DIREE_BUILD_TESTS=OFF \
+	    -DRISCV_TOOLCHAIN_ROOT=$(TOOLCHAINRV32_PATH) \
+	    -DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)" \
+	    $(IREE_SRC)
+	cmake --build $(IREE_RISCV32_OUT)
 
 iree: iree_host_build iree_rv32_build
 
