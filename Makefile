@@ -29,16 +29,16 @@ include $(ROOTDIR)/build/sim.mk
 include $(ROOTDIR)/build/opentitan_sw.mk
 include $(ROOTDIR)/build/sparrow_test_sw.mk
 include $(ROOTDIR)/build/tock.mk
+include $(ROOTDIR)/build/springbok.mk
 include $(ROOTDIR)/build/iree.mk
 include $(ROOTDIR)/build/sparrow_boot_rom.mk
 include $(ROOTDIR)/build/riscv_toolchain.mk
 include $(ROOTDIR)/build/sparrow_vector_sw.mk
-include $(ROOTDIR)/build/springbok.mk
 
 $(OUT):
 	@mkdir -p $(OUT)
 
-tools: toolchain_rust $(ROOTDIR)/cache/toolchain verilator renode
+tools: toolchain_rust $(ROOTDIR)/cache/toolchain $(CACHE)/toolchain_iree_rv32imf verilator renode
 
 clean::
 	rm -rf $(OUT)
