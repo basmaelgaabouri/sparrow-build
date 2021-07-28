@@ -68,7 +68,8 @@ function iss
 
 function qemu_sim_springbok
 {
-    (cd "${ROOTDIR}" && qemu-system-riscv32 -M springbok -nographic -d springbok -device loader,file="$1")
+    local file="${1}"; shift
+    (cd "${ROOTDIR}" && qemu-system-riscv32 -M springbok -nographic -d springbok -device loader,file="${file}" "$@")
 }
 
 function sim_springbok
