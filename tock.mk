@@ -1,7 +1,7 @@
 
 TOCK_OUTPUT_DIRECTORY=$(OUT)/tock/
 MATCHA_TARGET_ELF=$(TOCK_OUTPUT_DIRECTORY)/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf
-MATCHA_BOARD_DIRECTORY=$(ROOTDIR)/sw/tock_matcha/boards/opentitan-matcha
+MATCHA_BOARD_DIRECTORY=$(ROOTDIR)/sw/tock/boards/opentitan-matcha
 
 LIBTOCKRS_DIRECTORY=sw/libtock-rs
 LIBTOCKRS_OUT=$(OUT)/libtock-rs/
