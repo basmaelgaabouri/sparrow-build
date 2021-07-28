@@ -74,7 +74,11 @@ function qemu_sim_springbok
 
 function sim_springbok
 {
-    (cd "${ROOTDIR}" && renode -e "\$bin=@$1; i @sim/config/springbok.resc; start; sysbus.cpu2 IsHalted False" \
+    local command="start;"
+    if [[ "$2" == "debug" ]]; then
+        command=""
+    fi
+    (cd "${ROOTDIR}" && renode -e "\$bin=@$1; i @sim/config/springbok.resc; ${command} sysbus.cpu2 IsHalted False" \
         --disable-xwt --console)
 
 }
