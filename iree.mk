@@ -1,19 +1,20 @@
 IREE_SRC=$(ROOTDIR)/toolchain/iree
-IREE_HOST_OUT=$(OUT)/host/iree-build-host
-IREE_RISCV32_OUT=$(OUT)/host/iree-build-riscv32
+IREE_COMPILER_OUT=$(OUT)/host/iree_compiler
 QEMU_PATH=$(OUT)/host/qemu/riscv32-softmmu
 TOOLCHAINRV32_PATH=$(CACHE)/toolchain_iree_rv32imf
 SPRINGBOK_ROOT=$(ROOTDIR)/sw/vec/springbok
+IREE_RUNTIME_ROOT=$(ROOTDIR)/sw/vec_iree
+IREE_RUNTIME_OUT=$(OUT)/springbok_iree
 
-RV32_EXE_LINKER_FLAGS=-Xlinker --defsym=__itcm_length__=256K \
-    -Xlinker --defsym=__stack_size__=10K \
-    -Wl,--whole-archive \
+RV32_EXE_LINKER_FLAGS=-Wl,--whole-archive \
     $(SPRINGBOK_BUILD_DIR)springbok/libspringbok_intrinsic.a \
     -Wl,--no-whole-archive \
     -T $(SPRINGBOK_ROOT)/matcha.ld \
     -nostartfiles \
     -Wl,--print-memory-usage
 
+RV32_COMPILER_FLAGS=-g3 \
+    -ggdb
 
 # The following targets are always rebuilt when the iree target is made
 
@@ -27,40 +28,45 @@ iree_check:
 		exit 1; \
 	fi
 	@echo Update $(IREE_SRC) submodules...
-	pushd $(IREE_SRC) &&	git submodule update --init --jobs=8 --depth=10
+	pushd $(IREE_SRC) > /dev/null &&  git submodule update --init --jobs=8 --depth=10
 
-iree_host_build: | iree_check
-	cmake -G Ninja -B $(IREE_HOST_OUT) -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
-	    -DCMAKE_INSTALL_PREFIX=$(IREE_HOST_OUT)/install \
+$(IREE_COMPILER_OUT)/build.ninja: | iree_check
+	cmake -G Ninja -B $(IREE_COMPILER_OUT) \
+	    -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ \
+	    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+	    -DCMAKE_INSTALL_PREFIX=$(IREE_COMPILER_OUT)/install \
+	    -DIREE_HAL_DRIVERS_TO_BUILD="Dylib;VMVX" \
+	    -DIREE_TARGET_BACKENDS_TO_BUILD="DYLIB-LLVM-AOT;VMVX" \
+	    -DIREE_BUILD_TESTS=OFF \
 	    $(IREE_SRC)
-	cmake --build $(IREE_HOST_OUT) --target install
+
+iree_compiler: $(IREE_COMPILER_OUT)/build.ninja | iree_check
+	cmake --build $(IREE_COMPILER_OUT) --target install
 
 # TODO(b/194710215): Need to figure out why the second cmake config is needed to
 # reduce the artifact size to <256KB.
-iree_rv32_build: | springbok_iree
-	cmake -G Ninja -B $(IREE_RISCV32_OUT) \
-	    -DCMAKE_TOOLCHAIN_FILE="$(ROOTDIR)/build/riscv_iree.cmake" \
-	    -DIREE_HOST_BINARY_ROOT="$(IREE_HOST_OUT)/install" \
-	    -DRISCV_CPU=rv32-baremetal -DIREE_BUILD_COMPILER=OFF \
-	    -DIREE_ENABLE_MLIR=OFF -DIREE_BUILD_SAMPLES=ON \
-	    -DIREE_BUILD_TESTS=OFF \
+$(IREE_RUNTIME_OUT)/build.ninja: | iree_check
+	cmake -G Ninja -B $(IREE_RUNTIME_OUT) \
+	    -DCMAKE_TOOLCHAIN_FILE="$(IREE_RUNTIME_ROOT)/cmake/riscv_iree.cmake" \
+	    -DIREE_HOST_BINARY_ROOT="$(IREE_COMPILER_OUT)/install" \
 	    -DRISCV_TOOLCHAIN_ROOT=$(TOOLCHAINRV32_PATH) \
+	    -DRISCV_COMPILER_FLAGS="$(RV32_COMPILER_FLAGS)" \
 	    -DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)" \
-	    $(IREE_SRC)
-	cmake -G Ninja -B $(IREE_RISCV32_OUT) \
-	    -DCMAKE_TOOLCHAIN_FILE="$(ROOTDIR)/build/riscv_iree.cmake" \
-	    -DIREE_HOST_BINARY_ROOT="$(IREE_HOST_OUT)/install" \
-	    -DRISCV_CPU=rv32-baremetal -DIREE_BUILD_COMPILER=OFF \
-	    -DIREE_ENABLE_MLIR=OFF -DIREE_BUILD_SAMPLES=ON \
-	    -DIREE_BUILD_TESTS=OFF \
+	    $(IREE_RUNTIME_ROOT)
+	cmake -G Ninja -B $(IREE_RUNTIME_OUT) \
+	    -DCMAKE_TOOLCHAIN_FILE="$(IREE_RUNTIME_ROOT)/cmake/riscv_iree.cmake" \
+	    -DIREE_HOST_BINARY_ROOT="$(IREE_COMPILER_OUT)/install" \
 	    -DRISCV_TOOLCHAIN_ROOT=$(TOOLCHAINRV32_PATH) \
+	    -DRISCV_COMPILER_FLAGS="$(RV32_COMPILER_FLAGS)" \
 	    -DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)" \
-	    $(IREE_SRC)
-	cmake --build $(IREE_RISCV32_OUT)
+	    $(IREE_RUNTIME_ROOT)
 
-iree: iree_host_build iree_rv32_build
+iree_runtime: $(IREE_RUNTIME_OUT)/build.ninja springbok_iree | iree_check
+	cmake --build $(IREE_RUNTIME_OUT)
+
+iree: iree_compiler iree_runtime
 
 iree_clean:
-	rm -rf $(IREE_HOST_OUT) $(IREE_RISCV32_OUT)
+	rm -rf $(IREE_COMPILER_OUT) $(IREE_RUNTIME_OUT)
 
-.PHONY:: iree iree_check iree_host_build iree_rv32_build iree_clean
+.PHONY:: iree iree_check iree_compiler iree_runtime iree_clean
