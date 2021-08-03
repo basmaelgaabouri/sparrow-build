@@ -6,12 +6,7 @@ SPRINGBOK_ROOT=$(ROOTDIR)/sw/vec/springbok
 IREE_RUNTIME_ROOT=$(ROOTDIR)/sw/vec_iree
 IREE_RUNTIME_OUT=$(OUT)/springbok_iree
 
-RV32_EXE_LINKER_FLAGS=-Wl,--whole-archive \
-    $(SPRINGBOK_BUILD_DIR)springbok/libspringbok_intrinsic.a \
-    -Wl,--no-whole-archive \
-    -T $(SPRINGBOK_ROOT)/matcha.ld \
-    -nostartfiles \
-    -Wl,--print-memory-usage
+RV32_EXE_LINKER_FLAGS=-Wl,--print-memory-usage
 
 RV32_COMPILER_FLAGS=-g3 \
     -ggdb
@@ -63,7 +58,7 @@ $(IREE_RUNTIME_OUT)/build.ninja: | iree_check
 	    -DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)" \
 	    $(IREE_RUNTIME_ROOT)
 
-iree_runtime: springbok_iree $(IREE_RUNTIME_OUT)/build.ninja | iree_check
+iree_runtime: $(IREE_RUNTIME_OUT)/build.ninja | iree_check
 	cmake --build $(IREE_RUNTIME_OUT)
 
 iree: iree_compiler iree_runtime
