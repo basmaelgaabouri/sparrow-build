@@ -48,6 +48,7 @@ iree_compiler: $(IREE_COMPILER_OUT)/build.ninja | iree_check
 $(IREE_RUNTIME_OUT)/build.ninja: | iree_check
 	cmake -G Ninja -B $(IREE_RUNTIME_OUT) \
 	    -DCMAKE_TOOLCHAIN_FILE="$(IREE_RUNTIME_ROOT)/cmake/riscv_iree.cmake" \
+	    -DCMAKE_BUILD_TYPE=MinSizeRel \
 	    -DIREE_HOST_BINARY_ROOT="$(IREE_COMPILER_OUT)/install" \
 	    -DRISCV_TOOLCHAIN_ROOT=$(TOOLCHAINRV32_PATH) \
 	    -DRISCV_COMPILER_FLAGS="$(RV32_COMPILER_FLAGS)" \
@@ -55,13 +56,14 @@ $(IREE_RUNTIME_OUT)/build.ninja: | iree_check
 	    $(IREE_RUNTIME_ROOT)
 	cmake -G Ninja -B $(IREE_RUNTIME_OUT) \
 	    -DCMAKE_TOOLCHAIN_FILE="$(IREE_RUNTIME_ROOT)/cmake/riscv_iree.cmake" \
+	    -DCMAKE_BUILD_TYPE=MinSizeRel \
 	    -DIREE_HOST_BINARY_ROOT="$(IREE_COMPILER_OUT)/install" \
 	    -DRISCV_TOOLCHAIN_ROOT=$(TOOLCHAINRV32_PATH) \
 	    -DRISCV_COMPILER_FLAGS="$(RV32_COMPILER_FLAGS)" \
 	    -DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)" \
 	    $(IREE_RUNTIME_ROOT)
 
-iree_runtime: $(IREE_RUNTIME_OUT)/build.ninja springbok_iree | iree_check
+iree_runtime: springbok_iree $(IREE_RUNTIME_OUT)/build.ninja | iree_check
 	cmake --build $(IREE_RUNTIME_OUT)
 
 iree: iree_compiler iree_runtime
