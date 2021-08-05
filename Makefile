@@ -38,7 +38,7 @@ include $(ROOTDIR)/build/sparrow_vector_sw.mk
 $(OUT):
 	@mkdir -p $(OUT)
 
-tools: toolchain_rust $(ROOTDIR)/cache/toolchain $(CACHE)/toolchain_iree_rv32imf verilator renode
+tools: toolchain_rust $(ROOTDIR)/cache/toolchain $(CACHE)/toolchain_iree_rv32imf verilator renode qemu
 
 clean::
 	rm -rf $(OUT)
