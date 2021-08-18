@@ -23,7 +23,7 @@ $(QEMU_OUT_DIR): | $(QEMU_SRC_DIR)
 
 $(QEMU_BINARY): $(QEMU_DEPS) | $(QEMU_OUT_DIR)
 	cd $(QEMU_OUT_DIR) && $(QEMU_SRC_DIR)/configure \
-		--target-list=riscv32-softmmu,riscv64-linux-user
+		--target-list=riscv32-softmmu,riscv32-linux-user
 	make -C $(QEMU_OUT_DIR) -j$(nproc --ignore 2)
 
 qemu: $(QEMU_BINARY)
