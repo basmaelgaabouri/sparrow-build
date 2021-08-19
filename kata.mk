@@ -24,7 +24,11 @@ kata-opentitan-headers: kata-clean-opentitan-headers $(OPENTITAN_GEN)
 
 kata: $(KATA_SOURCES) $(OPENTITAN_GEN)
 	mkdir -p $(OUT)/kata
-	cd $(OUT)/kata && cmake -G Ninja -DCROSS_COMPILER_PREFIX=riscv32-unknown-elf- -DSIMULATION=0 $(ROOTDIR)/kata/projects/processmanager
+	cd $(OUT)/kata && cmake -G Ninja \
+		-DCROSS_COMPILER_PREFIX=riscv32-unknown-elf- \
+		-DSIMULATION=0 \
+		-DSEL4_CACHE_DIR=$(CACHE)/sel4 \
+		$(ROOTDIR)/kata/projects/processmanager
 	cd $(OUT)/kata && ninja
 
 .PHONY:: kata kata-opentitan-headers
