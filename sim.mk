@@ -65,8 +65,7 @@ $(OUT)/ext_flash.tar: tock kata
 		kata/kernel/kernel.elf \
 		kata/capdl-loader
 
-# TODO: Switch to springbok_iree when ready.
-sim_deps: renode multihart_boot_rom $(OUT)/ext_flash.tar springbok
+sim_deps: renode multihart_boot_rom $(OUT)/ext_flash.tar iree
 
 simulate: sim_deps
 	$(RENODE_CMD) -e "i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start"
