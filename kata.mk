@@ -27,7 +27,7 @@ $(TIMER_HEADER): JINJA=$(IP_DIR)/util/reg_timer.py
 $(TIMER_HEADER): TEMPLATE=$(IP_DIR)/data/rv_timer.hjson.tpl
 $(TIMER_HEADER): HJSON=$(OPENTITAN_GEN)/rv_timer.hjson
 $(TIMER_HEADER): $(OPENTITAN_GEN) $(JINJA) $(TEMPLATE) $(REGTOOL)
-	$(JINJA) -s 2 -t 2 $(TEMPLATE) > $(HJSON)
+	$(JINJA) -s 2 -t 1 $(TEMPLATE) > $(HJSON)
 	$(REGTOOL) -D -o $(TIMER_HEADER) $(HJSON)
 
 UART_HEADER=$(OPENTITAN_GEN)/uart.h
