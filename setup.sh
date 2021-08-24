@@ -176,7 +176,7 @@ echo "========================================"
 echo
 echo Type \'m \[target\]\' to build, where \[target\] is:
 echo
-echo prereqs tools kata simulate-kata renode verilator
+echo prereqs tools kata simulate renode verilator
 echo opentitan_sw_all opentitan_sw_helloworld opentitan_sw_bootrom
 echo sparrow_test_sw_all sparrow_test_sw_hellovector sparrow_test_sw_bootrom
 echo earlgrey_tock qemu install_llvm iree

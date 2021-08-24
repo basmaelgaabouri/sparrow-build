@@ -18,6 +18,8 @@ ifeq ($(ROOTDIR),)
 $(error $$ROOTDIR IS NOT DEFINED -- don\'t forget to source setup.sh)
 endif
 
+.DEFAULT_GOAL := simulate
+
 include $(ROOTDIR)/build/preamble.mk
 
 prereqs: $(ROOTDIR)/scripts/install-prereqs.sh
@@ -43,4 +45,4 @@ tools: toolchain_rust $(ROOTDIR)/cache/toolchain $(CACHE)/toolchain_iree_rv32imf
 clean::
 	rm -rf $(OUT)
 
-.PHONY:: prereqs clean kata simulate-kata tools
+.PHONY:: prereqs clean kata simulate tools
