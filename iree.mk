@@ -18,10 +18,6 @@ iree_check:
 		echo "IREE toolchain $(TOOLCHAINRV32_PATH) doesn't exist, please run 'm install_llvm' first"; \
 		exit 1; \
 	fi
-	if [ ! -d "${QEMU_PATH}" ]; then \
-		echo "QEMU path $(QEMU_PATH) doesn't exist, please run 'm qemu' first"; \
-		exit 1; \
-	fi
 	@echo Update $(IREE_SRC) submodules...
 	pushd $(IREE_SRC) > /dev/null &&  git submodule update --init --jobs=8 --depth=10
 
