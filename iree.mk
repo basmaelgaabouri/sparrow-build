@@ -20,6 +20,8 @@ iree_check:
 	fi
 	@echo Update $(IREE_SRC) submodules...
 	pushd $(IREE_SRC) > /dev/null &&  git submodule update --init --jobs=8 --depth=10
+  # Download IREE tflite tools with the recent release
+	pip3 install iree-tools-tflite-snapshot -f https://github.com/google/iree/releases --upgrade
 
 $(IREE_COMPILER_OUT)/build.ninja: | iree_check
 	cmake -G Ninja -B $(IREE_COMPILER_OUT) \
