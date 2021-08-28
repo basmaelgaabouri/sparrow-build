@@ -50,6 +50,8 @@ export RUSTDIR="${CACHE}/rust_toolchain"
 export CARGO_HOME="${RUSTDIR}"
 export RUSTUP_HOME="${RUSTDIR}"
 
+export IREE_COMPILER_DIR="${OUT}/host/iree_compiler"
+
 export PATH="${CACHE}/toolchain/bin:${PATH}"
 export PATH="${RUSTDIR}/bin:${PATH}"
 export PATH="${ROOTDIR}/scripts:${PATH}"
