@@ -30,20 +30,27 @@ $(IREE_COMPILER_DIR)/build.ninja: | iree_check
 	    -DIREE_BUILD_TESTS=OFF \
 	    $(IREE_SRC)
 
+# Build IREE compiler from the source and record the HEAD commit for consistency
+# check.
 iree_compiler_src: $(IREE_COMPILER_DIR)/build.ninja | iree_check
 	cmake --build $(IREE_COMPILER_DIR) --target install
+	git -C "$(IREE_SRC)" rev-parse HEAD > $(IREE_COMPILER_DIR)/tag
 
 $(IREE_COMPILER_DIR):
 	mkdir -p $(IREE_COMPILER_DIR)
 
-# Download IREE tflite tools with the recent release
+# Download IREE compiler and tflite tools with the recent release. The release
+# tag and commit are recorded for the consistency check.
 iree_compiler: | $(IREE_COMPILER_DIR)
 	pip3 install iree-tools-tflite-snapshot -f https://github.com/google/iree/releases --upgrade
 	scripts/download_iree_compiler.py
 
+iree_commit_check:
+	scripts/check-iree-commit.sh $(IREE_SRC)
+
 # TODO(b/194710215): Need to figure out why the second cmake config is needed to
 # reduce the artifact size to <256KB.
-$(IREE_RUNTIME_OUT)/build.ninja: | iree_check
+$(IREE_RUNTIME_OUT)/build.ninja: | iree_check iree_commit_check
 	cmake -G Ninja -B $(IREE_RUNTIME_OUT) \
 	    -DCMAKE_TOOLCHAIN_FILE="$(IREE_RUNTIME_ROOT)/cmake/riscv_iree.cmake" \
 	    -DCMAKE_BUILD_TYPE=MinSizeRel \
@@ -61,7 +68,7 @@ $(IREE_RUNTIME_OUT)/build.ninja: | iree_check
 	    -DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)" \
 	    $(IREE_RUNTIME_ROOT)
 
-iree_runtime: $(IREE_RUNTIME_OUT)/build.ninja | iree_check
+iree_runtime: $(IREE_RUNTIME_OUT)/build.ninja | iree_check iree_commit_check
 	cmake --build $(IREE_RUNTIME_OUT)
 
 iree: iree_compiler iree_runtime
@@ -69,4 +76,4 @@ iree: iree_compiler iree_runtime
 iree_clean:
 	rm -rf $(IREE_COMPILER_DIR) $(IREE_RUNTIME_OUT)
 
-.PHONY:: iree iree_check iree_compiler iree_runtime iree_clean
+.PHONY:: iree iree_check iree_compiler iree_runtime iree_clean iree_commit_check iree_compiler_src
