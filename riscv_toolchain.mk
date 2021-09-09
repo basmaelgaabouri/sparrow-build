@@ -93,6 +93,12 @@ $(TOOLCHAINLLVM_BIN): $(TOOLCHAINIREE_BIN)
 		$(TOOLCHAINLLVM_SRC_DIR)/llvm
 	cmake --build $(TOOLCHAINLLVM_BUILD_DIR) --target install
 	cmake --build $(TOOLCHAINLLVM_BUILD_DIR) --target clean
+# Prepare a newlib-nano directory for the default link of -lc, -lgloss, etc.
+	mkdir -p "$(TOOLCHAINIREE_OUT_DIR)/riscv32-unknown-elf/lib/newlib-nano"
+	cd "$(TOOLCHAINIREE_OUT_DIR)/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libc_nano.a libc.a
+	cd "$(TOOLCHAINIREE_OUT_DIR)/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libg_nano.a libg.a
+	cd "$(TOOLCHAINIREE_OUT_DIR)/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libm_nano.a libm.a
+	cd "$(TOOLCHAINIREE_OUT_DIR)/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libgloss_nano.a libgloss.a
 
 $(OUT)/toolchain_iree_rv32.tar.gz: $(TOOLCHAINLLVM_BIN)
 	cd $(CACHE) && tar -czf $(OUT)/toolchain_iree_rv32.tar.gz toolchain_iree_rv32imf

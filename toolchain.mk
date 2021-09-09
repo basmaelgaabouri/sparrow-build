@@ -50,16 +50,15 @@ $(CACHE)/toolchain_iree: | $(OUT)/tmp/toolchain_iree_rvv-intrinsic.tar.gz $(CACH
 $(OUT)/tmp/toolchain_iree_rv32.tar.gz: | $(OUT)/tmp
 	wget -P $(OUT)/tmp https://storage.googleapis.com/iree-shared-files/toolchain_iree_rv32.tar.gz
 
-# Yikes! We really should not bootstap the toolchain like this, but clang doesn't support -spec,
-# and CMake doesn't work well with customized "-nodefaultlibs -lc_nano -lgloss_nano -lm_nano..."
-# TODO(b/194706298): Figure out a better solution than bootstrapping.
+# Prepare a newlib-nano directory for the default link of -lc, -lgloss, etc.
+# TODO(hcindyl): Remove the duped symlink creation once we switched to a toolchain from CI.
 $(CACHE)/toolchain_iree_rv32imf: | $(OUT)/tmp/toolchain_iree_rv32.tar.gz $(CACHE)
 	tar -C $(CACHE) -xf $(OUT)/tmp/toolchain_iree_rv32.tar.gz
-	ln -sf $(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/libc_nano.a $(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/libc.a
-	ln -sf $(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/libg_nano.a $(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/libg.a
-	ln -sf $(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/libm_nano.a $(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/libm.a
-	ln -sf $(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/libgloss_nano.a $(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/libgloss.a
-	ln -sf $(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/include/newlib-nano/newlib.h $(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/include/newlib.h
+	mkdir -p "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano"
+	cd "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libc_nano.a libc.a
+	cd "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libg_nano.a libg.a
+	cd "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libm_nano.a libm.a
+	cd "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libgloss_nano.a libgloss.a
 
 install_llvm: $(CACHE)/toolchain_iree_rv32imf
 
