@@ -18,7 +18,7 @@ iree_check:
 		exit 1; \
 	fi
 	@echo Update $(IREE_SRC) submodules...
-	pushd $(IREE_SRC) > /dev/null &&  git submodule update --init --jobs=8 --depth=10
+	git -C $(IREE_SRC) submodule update --init --jobs=8 --depth=10
 
 $(IREE_COMPILER_DIR)/build.ninja: | iree_check
 	cmake -G Ninja -B $(IREE_COMPILER_DIR) \
