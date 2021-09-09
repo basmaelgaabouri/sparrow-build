@@ -18,7 +18,7 @@ TOOLCHAINLLVM_BIN        := $(TOOLCHAINIREE_OUT_DIR)/bin/clang
 
 
 toolchain_src:
-	if [[ -f "${TOOLCHAINVP_BIN}" ]]; then \
+	if [[ -f "${TOOLCHAIN_BIN}" ]]; then \
 		echo "Toolchain exists, run 'm toolchain_clean' if you really want to rebuild"; \
 	else \
 		$(ROOTDIR)/scripts/download-toolchain.sh $(TOOLCHAIN_SRC_DIR); \
@@ -31,7 +31,7 @@ $(TOOLCHAIN_BIN): | toolchain_src $(TOOLCHAIN_BUILD_DIR)
 	cd $(TOOLCHAIN_BUILD_DIR) && $(TOOLCHAIN_SRC_DIR)/configure \
 		--srcdir=$(TOOLCHAIN_SRC_DIR) \
 		--prefix=$(TOOLCHAIN_OUT_DIR) \
-		--with-arch=rv32gc \
+		--with-arch=rv32imac \
 		--with-abi=ilp32
 	make -C $(TOOLCHAIN_BUILD_DIR) clean newlib
 	make -C $(TOOLCHAIN_BUILD_DIR) clean
@@ -39,7 +39,14 @@ $(TOOLCHAIN_BIN): | toolchain_src $(TOOLCHAIN_BUILD_DIR)
 $(TOOLCHAINVP_BUILD_DIR):
 	mkdir -p $(TOOLCHAINVP_BUILD_DIR)
 
-$(TOOLCHAINVP_BIN): $(TOOLCHAIN_BIN) | $(TOOLCHAINVP_BUILD_DIR)
+toolchain_src_vp:
+	if [[ -f "${TOOLCHAINVP_BIN}" ]]; then \
+		echo "toolchain_vp exists, run 'm toolchain_vp_clean' if you really want to rebuild"; \
+	else \
+		$(ROOTDIR)/scripts/download-toolchain.sh $(TOOLCHAIN_SRC_DIR) "GCC" "RVV"; \
+	fi
+
+$(TOOLCHAINVP_BIN): | toolchain_src_vp $(TOOLCHAINVP_BUILD_DIR)
 	cd $(TOOLCHAINVP_BUILD_DIR) && $(TOOLCHAIN_SRC_DIR)/configure \
 		--srcdir=$(TOOLCHAIN_SRC_DIR) \
 		--prefix=$(TOOLCHAINVP_OUT_DIR) \
@@ -48,13 +55,24 @@ $(TOOLCHAINVP_BIN): $(TOOLCHAIN_BIN) | $(TOOLCHAINVP_BUILD_DIR)
 	make -C $(TOOLCHAINVP_BUILD_DIR) clean newlib
 	make -C $(TOOLCHAINVP_BUILD_DIR) clean
 
-$(OUT)/toolchain_rvv-intrinsic.tar.gz: $(TOOLCHAINVP_BIN)
-	cd $(CACHE) && tar -czf $(OUT)/toolchain_rvv-intrinsic.tar.gz toolchain toolchain_vp
+$(OUT)/toolchain.tar.gz: $(TOOLCHAIN_BIN)
+	cd $(CACHE) && tar -czf $(OUT)/toolchain.tar.gz toolchain
 	@echo "==========================================================="
-	@echo "Toolchain tarball ready at $(OUT)/toolchain_rvv-intrinsic.tar.gz"
+	@echo "Toolchain tarball ready at $(OUT)/toolchain.tar.gz"
 	@echo "==========================================================="
 
-toolchain: $(OUT)/toolchain_rvv-intrinsic.tar.gz
+$(OUT)/toolchain_rvv.tar.gz: $(TOOLCHAINVP_BIN)
+	cd $(CACHE) && tar -czf $(OUT)/toolchain_rvv.tar.gz toolchain_vp
+	@echo "==========================================================="
+	@echo "GCC VP Toolchain tarball ready at $(OUT)/toolchain_rvv.tar.gz"
+	@echo "==========================================================="
+
+toolchain: $(OUT)/toolchain.tar.gz
+
+toolchain_vp: $(OUT)/toolchain_rvv.tar.gz
+
+toolchain_vp_clean:
+	rm -rf $(OUT)/tmp $(CACHE)/toolchain_vp
 
 toolchain_src_llvm:
 	if [[ -f "${TOOLCHAINLLVM_BIN}" ]]; then \
@@ -111,4 +129,4 @@ toolchain_llvm: $(OUT)/toolchain_iree_rv32.tar.gz
 toolchain_llvm_clean:
 	rm -rf $(TOOLCHAINIREE_OUT_DIR) $(OUT)/tmp/toolchain
 
-.PHONY:: toolchain toolchain_llvm
+.PHONY:: toolchain toolchain_llvm toolchain_vp toolchain_src toolchain_src_vp toolchain_src_llvm toolchain_vp_clean toolchain_llvm_clean

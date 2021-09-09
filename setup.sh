@@ -187,7 +187,6 @@ echo
 
 if [[ ! -d "${RUSTDIR}" ]] ||
    [[ ! -d "${ROOTDIR}/cache/toolchain" ]] ||
-   [[ ! -d "${ROOTDIR}/cache/toolchain_vp" ]] ||
    [[ ! -d "${ROOTDIR}/cache/toolchain_iree_rv32imf" ]] ||
    [[ ! -d "${ROOTDIR}/out/host/renode" ]]; then
     echo
