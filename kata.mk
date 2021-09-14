@@ -7,6 +7,7 @@ KATA_SOURCES := $(shell find $(ROOTDIR)/kata \
 
 OPENTITAN_SOURCE=$(ROOTDIR)/hw/opentitan-upstream
 OPENTITAN_GEN=$(OUT)/kata/opentitan-gen/include/opentitan
+VC_TOP_GEN=$(OUT)/kata/vc_top-gen/include/vc_top
 REGTOOL=$(OPENTITAN_SOURCE)/util/regtool.py
 
 $(OPENTITAN_GEN):
@@ -39,12 +40,20 @@ $(UART_HEADER): HJSON=$(IP_DIR)/data/uart.hjson
 $(UART_HEADER): $(OPENTITAN_GEN) $(TEMPLATE) $(REGTOOL)
 	$(REGTOOL) -D -o $(UART_HEADER) $(HJSON)
 
-kata-clean-opentitan-headers:
-	rm -rf $(OPENTITAN_GEN)
+$(VC_TOP_GEN):
+	mkdir -p $(VC_TOP_GEN)
 
-kata-opentitan-headers: $(PLIC_HEADER) $(TIMER_HEADER) $(UART_HEADER)
+VC_TOP_HEADER=$(VC_TOP_GEN)/vc_top.h
+$(VC_TOP_HEADER): HJSON=$(ROOTDIR)/hw/springbok/vc_top/data/vc_top.hjson
+$(VC_TOP_HEADER): $(VC_TOP_GEN) $(TEMPLATE) $(REGTOOL)
+	$(REGTOOL) -D -o $(VC_TOP_HEADER) $(HJSON)
 
-kata: $(KATA_SOURCES) kata-opentitan-headers
+kata-clean-headers:
+	rm -rf $(OPENTITAN_GEN) $(VC_TOP_HEADER)
+
+kata-gen-headers: $(PLIC_HEADER) $(TIMER_HEADER) $(UART_HEADER) $(VC_TOP_HEADER)
+
+kata: $(KATA_SOURCES) kata-gen-headers
 	mkdir -p $(OUT)/kata
 	cd $(OUT)/kata && cmake -G Ninja \
 		-DCROSS_COMPILER_PREFIX=riscv32-unknown-elf- \
@@ -53,4 +62,4 @@ kata: $(KATA_SOURCES) kata-opentitan-headers
 		$(ROOTDIR)/kata/projects/processmanager
 	cd $(OUT)/kata && ninja
 
-.PHONY:: kata kata-clean-opentitan-headers
+.PHONY:: kata kata-clean-headers
