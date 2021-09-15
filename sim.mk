@@ -47,15 +47,6 @@ verilator: $(VERILATOR_BIN)
 sim_configs:
 	$(RENODE_SIM_GENERATOR_SCRIPT)
 
-simulate_qemu_vector_tests: qemu vector_sw_all opentitan_sw_bootrom
-	for elf in $(shell find $(ROOTDIR)/out/sparrow_vector_tests/build-bin -name '*vector*tests_fpga_nexysvideo.elf') ; do \
-		python3 $(ROOTDIR)/scripts/run-vector-simulation.py \
-			--boot-elf-path $(OPENTITAN_BUILD_DIR)/build-bin/sw/device/boot_rom/boot_rom_fpga_nexysvideo.elf \
-			--vector-elf-path $$elf \
-			--simulator qemu \
-			--simulator-path $(QEMU_BINARY); \
-	done
-
 clean_sim_configs:
 	@rm -rf $(OUT)/renode_configs
 
