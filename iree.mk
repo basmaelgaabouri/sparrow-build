@@ -42,7 +42,6 @@ $(IREE_COMPILER_DIR):
 # Download IREE compiler and tflite tools with the recent release. The release
 # tag and commit are recorded for the consistency check.
 iree_compiler: | $(IREE_COMPILER_DIR)
-	pip3 install iree-tools-tflite-snapshot -f https://github.com/google/iree/releases --upgrade
 	scripts/download_iree_compiler.py
 
 iree_commit_check:
