@@ -57,12 +57,14 @@ $(TOOLCHAINVP_BIN): | toolchain_src_vp $(TOOLCHAINVP_BUILD_DIR)
 
 $(OUT)/toolchain.tar.gz: $(TOOLCHAIN_BIN)
 	cd $(CACHE) && tar -czf $(OUT)/toolchain.tar.gz toolchain
+	cd $(OUT) && sha256sum toolchain.tar.gz > toolchain.tar.gz.sha256sum
 	@echo "==========================================================="
 	@echo "Toolchain tarball ready at $(OUT)/toolchain.tar.gz"
 	@echo "==========================================================="
 
 $(OUT)/toolchain_rvv.tar.gz: $(TOOLCHAINVP_BIN)
 	cd $(CACHE) && tar -czf $(OUT)/toolchain_rvv.tar.gz toolchain_vp
+	cd $(OUT) && sha256sum toolchain_rvv.tar.gz > toolchain_rvv.tar.gz.sha256sum
 	@echo "==========================================================="
 	@echo "GCC VP Toolchain tarball ready at $(OUT)/toolchain_rvv.tar.gz"
 	@echo "==========================================================="
@@ -120,6 +122,7 @@ $(TOOLCHAINLLVM_BIN): $(TOOLCHAINIREE_BIN)
 
 $(OUT)/toolchain_iree_rv32.tar.gz: $(TOOLCHAINLLVM_BIN)
 	cd $(CACHE) && tar -czf $(OUT)/toolchain_iree_rv32.tar.gz toolchain_iree_rv32imf
+	cd $(OUT) && sha256sum toolchain_iree_rv32.tar.gz > toolchain_iree_rv32.tar.gz.sha256sum
 	@echo "==========================================================="
 	@echo "Toolchain tarball ready at $(OUT)/toolchain_iree_rv32.tar.gz"
 	@echo "==========================================================="

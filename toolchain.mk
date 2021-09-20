@@ -36,13 +36,17 @@ $(CACHE):
 
 # TODO: Use publically accessible URLs for toolchain tarballs.
 $(OUT)/tmp/toolchain.tar.gz: | $(OUT)/tmp
-	fileutil cp /x20/teams/cerebra-hw/sparrow/toolchain_cache/toolchain.tar.gz $(OUT)/tmp
+	wget -P $(OUT)/tmp https://storage.googleapis.com/sparrow-public-artifacts/toolchain.tar.gz
+	wget -P $(OUT)/tmp https://storage.googleapis.com/sparrow-public-artifacts/toolchain.tar.gz.sha256sum
+	cd "$(OUT)/tmp" && sha256sum -c toolchain.tar.gz.sha256sum
 
 $(ROOTDIR)/cache/toolchain: | $(OUT)/tmp/toolchain.tar.gz $(CACHE)
 	tar -C $(ROOTDIR)/cache -xf $(OUT)/tmp/toolchain.tar.gz
 
 $(OUT)/tmp/toolchain_iree_rv32.tar.gz: | $(OUT)/tmp
-	wget -P $(OUT)/tmp https://storage.googleapis.com/iree-shared-files/toolchain_iree_rv32.tar.gz
+	wget -P $(OUT)/tmp https://storage.googleapis.com/sparrow-public-artifacts/toolchain_iree_rv32.tar.gz
+	wget -P $(OUT)/tmp https://storage.googleapis.com/sparrow-public-artifacts/toolchain_iree_rv32.tar.gz.sha256sum
+	cd "$(OUT)/tmp" && sha256sum -c toolchain_iree_rv32.tar.gz.sha256sum
 
 # Prepare a newlib-nano directory for the default link of -lc, -lgloss, etc.
 # TODO(hcindyl): Remove the duped symlink creation once we switched to a toolchain from CI.
