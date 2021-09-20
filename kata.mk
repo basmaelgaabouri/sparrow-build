@@ -44,7 +44,7 @@ $(VC_TOP_GEN):
 	mkdir -p $(VC_TOP_GEN)
 
 VC_TOP_HEADER=$(VC_TOP_GEN)/vc_top.h
-$(VC_TOP_HEADER): HJSON=$(ROOTDIR)/hw/springbok/vc_top/data/vc_top.hjson
+$(VC_TOP_HEADER): HJSON=$(OPENTITAN_SOURCE)/hw/ip/vc_top/data/vc_top.hjson
 $(VC_TOP_HEADER): $(VC_TOP_GEN) $(TEMPLATE) $(REGTOOL)
 	$(REGTOOL) -D -o $(VC_TOP_HEADER) $(HJSON)
 
