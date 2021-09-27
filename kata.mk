@@ -32,7 +32,7 @@ $(TIMER_HEADER): $(OPENTITAN_GEN) $(JINJA) $(TEMPLATE) $(REGTOOL) $(TIMER_HJSON)
 	$(REGTOOL) -D -o $(TIMER_HEADER) $(TIMER_HJSON)
 
 UART_HEADER=$(OPENTITAN_GEN)/uart.h
-UART_HJSON=$(IP_DIR)/data/uart.hjson
+UART_HJSON=$(ROOTDIR)/hw/opentitan/hw/ip/uart/data/uart.hjson
 # TODO(mattharvey): Migrate UART to opentitan-upstream.
 $(UART_HEADER): OPENTITAN_SOURCE=$(ROOTDIR)/hw/opentitan
 $(UART_HEADER): REGTOOL=$(OPENTITAN_SOURCE)/util/regtool.py
