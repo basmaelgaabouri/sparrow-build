@@ -6,39 +6,41 @@ KATA_SOURCES := $(shell find $(ROOTDIR)/kata \
 						-type f)
 
 OPENTITAN_SOURCE=$(ROOTDIR)/hw/opentitan-upstream
+OPENTITAN_OLD_SOURCE=$(ROOTDIR)/hw/opentitan
+
 OPENTITAN_GEN=$(OUT)/kata/opentitan-gen/include/opentitan
 VC_TOP_GEN=$(OUT)/kata/vc_top-gen/include/vc_top
+
 REGTOOL=$(OPENTITAN_SOURCE)/util/regtool.py
+OLD_REGTOOL=$(OPENTITAN_OLD_SOURCE)/util/regtool.py
 
 $(OPENTITAN_GEN):
 	mkdir -p $(OPENTITAN_GEN)
 
 PLIC_HEADER=$(OPENTITAN_GEN)/plic.h
-PLIC_HJSON=$(OPENTITAN_GEN)/rv_plic.hjson
-$(PLIC_HEADER): IP_DIR=$(OPENTITAN_SOURCE)/hw/ip/rv_plic
-$(PLIC_HEADER): JINJA=$(IP_DIR)/util/reg_rv_plic.py
-$(PLIC_HEADER): TEMPLATE=$(IP_DIR)/data/rv_plic.hjson.tpl
-$(PLIC_HEADER): $(OPENTITAN_GEN) $(JINJA) $(TEMPLATE) $(REGTOOL) $(PLIC_HJSON)
-	$(JINJA) -s 96 -t 2 -p 7 $(TEMPLATE) > $(PLIC_HJSON)
+PLIC_IP_DIR=$(OPENTITAN_SOURCE)/hw/ip/rv_plic
+PLIC_HJSON=$(PLIC_IP_DIR)/data/rv_plic.hjson
+PLIC_JINJA=$(PLIC_IP_DIR)/util/reg_rv_plic.py
+PLIC_TEMPLATE=$(PLIC_IP_DIR)/data/rv_plic.hjson.tpl
+$(PLIC_HEADER): $(OPENTITAN_GEN) $(REGTOOL) $(PLIC_JINJA) $(PLIC_TEMPLATE) $(PLIC_HJSON)
+	$(PLIC_JINJA) -s 96 -t 2 -p 7 $(PLIC_TEMPLATE) > $(PLIC_HJSON)
 	$(REGTOOL) -D -o $(PLIC_HEADER) $(PLIC_HJSON)
 
 TIMER_HEADER=$(OPENTITAN_GEN)/timer.h
-TIMER_HJSON=$(OPENTITAN_GEN)/rv_timer.hjson
-$(TIMER_HEADER): IP_DIR=$(OPENTITAN_SOURCE)/hw/ip/rv_timer
-$(TIMER_HEADER): JINJA=$(IP_DIR)/util/reg_timer.py
-$(TIMER_HEADER): TEMPLATE=$(IP_DIR)/data/rv_timer.hjson.tpl
-$(TIMER_HEADER): $(OPENTITAN_GEN) $(JINJA) $(TEMPLATE) $(REGTOOL) $(TIMER_HJSON)
-	$(JINJA) -s 2 -t 1 $(TEMPLATE) > $(TIMER_HJSON)
+TIMER_IP_DIR=$(OPENTITAN_SOURCE)/hw/ip/rv_timer
+TIMER_HJSON=$(TIMER_IP_DIR)/data/rv_timer.hjson
+TIMER_JINJA=$(TIMER_IP_DIR)/util/reg_timer.py
+TIMER_TEMPLATE=$(TIMER_IP_DIR)/data/rv_timer.hjson.tpl
+$(TIMER_HEADER): $(OPENTITAN_GEN) $(REGTOOL) $(TIMER_JINJA) $(TIMER_TEMPLATE) $(TIMER_HJSON)
+	$(TIMER_JINJA) -s 2 -t 1 $(TIMER_TEMPLATE) > $(TIMER_HJSON)
 	$(REGTOOL) -D -o $(TIMER_HEADER) $(TIMER_HJSON)
 
 UART_HEADER=$(OPENTITAN_GEN)/uart.h
-UART_HJSON=$(ROOTDIR)/hw/opentitan/hw/ip/uart/data/uart.hjson
+UART_IP_DIR=$(OPENTITAN_OLD_SOURCE)/hw/ip/uart
+UART_HJSON=$(UART_IP_DIR)/data/uart.hjson
 # TODO(mattharvey): Migrate UART to opentitan-upstream.
-$(UART_HEADER): OPENTITAN_SOURCE=$(ROOTDIR)/hw/opentitan
-$(UART_HEADER): REGTOOL=$(OPENTITAN_SOURCE)/util/regtool.py
-$(UART_HEADER): IP_DIR=$(ROOTDIR)/hw/opentitan/hw/ip/uart
-$(UART_HEADER): $(OPENTITAN_GEN) $(REGTOOL) $(UART_HJSON)
-	$(REGTOOL) -D -o $(UART_HEADER) $(UART_HJSON)
+$(UART_HEADER): $(OPENTITAN_GEN) $(OLD_REGTOOL) $(UART_HJSON)
+	$(OLD_REGTOOL) -D -o $(UART_HEADER) $(UART_HJSON)
 
 $(VC_TOP_GEN):
 	mkdir -p $(VC_TOP_GEN)
