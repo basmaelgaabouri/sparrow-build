@@ -27,14 +27,16 @@ prereqs: $(ROOTDIR)/scripts/install-prereqs.sh
 
 include $(ROOTDIR)/build/toolchain.mk
 include $(ROOTDIR)/build/kata.mk
-include $(ROOTDIR)/build/sim.mk
+include $(ROOTDIR)/build/tock.mk
 include $(ROOTDIR)/build/opentitan_sw.mk
 include $(ROOTDIR)/build/sparrow_test_sw.mk
-include $(ROOTDIR)/build/tock.mk
 include $(ROOTDIR)/build/springbok.mk
 include $(ROOTDIR)/build/iree.mk
 include $(ROOTDIR)/build/sparrow_boot_rom.mk
 include $(ROOTDIR)/build/riscv_toolchain.mk
+
+# Must be after other makefiles so that we pick up various $(TARGETS)
+include $(ROOTDIR)/build/sim.mk
 
 $(OUT):
 	@mkdir -p $(OUT)

@@ -1,37 +1,58 @@
+# Source directories
+DIR_TOCK_SRC=$(ROOTDIR)/sw/tock/boards/opentitan-matcha/
+DIR_LIBTOCK_SRC=$(ROOTDIR)/sw/libtock-rs/
 
-TOCK_OUTPUT_DIRECTORY=$(OUT)/tock/
-MATCHA_TARGET_ELF=$(TOCK_OUTPUT_DIRECTORY)/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf
-MATCHA_BOARD_DIRECTORY=$(ROOTDIR)/sw/tock/boards/opentitan-matcha
+# Kernel build directories
+DIR_TOCK_OUT_DEBUG = $(OUT)/tock-debug/
+DIR_TOCK_OUT_RELEASE = $(OUT)/tock-release/
 
-LIBTOCKRS_DIRECTORY=sw/libtock-rs
-LIBTOCKRS_OUT=$(OUT)/libtock-rs/
+# TockOS app build directories
+DIR_LIBTOCK_OUT_DEBUG = $(OUT)/libtock-rs-debug/
+DIR_LIBTOCK_OUT_RELEASE = $(OUT)/libtock-rs-relase/
 
+# Kernel binaries
+MATCHA_TOCK_APP_DEBUG = $(DIR_LIBTOCK_OUT_DEBUG)/riscv32imc-unknown-none-elf/tab/opentitan/hello_world/rv32imc.tbf
+MATCHA_TOCK_APP_RELEASE = $(DIR_LIBTOCK_OUT_RELEASE)/riscv32imc-unknown-none-elf/tab/opentitan/hello_world/rv32imc.tbf
 
-matcha_tock:
-	cd $(MATCHA_BOARD_DIRECTORY); \
-	    make BOARD_CONFIGURATION=sim_verilator TARGET_DIRECTORY=$(TOCK_OUTPUT_DIRECTORY)
+# TockOS app binaries
+MATCHA_TOCK_KERNEL_DEBUG = $(DIR_TOCK_OUT_DEBUG)/riscv32imc-unknown-none-elf/debug/opentitan-matcha.elf
+MATCHA_TOCK_KERNEL_RELEASE = $(DIR_TOCK_OUT_RELEASE)/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf
+
+# Bundled kernel+app binaries
+MATCHA_TOCK_BUNDLE_DEBUG = $(OUT)/matcha-tock-bundle-debug.elf
+MATCHA_TOCK_BUNDLE_RELEASE = $(OUT)/matcha-tock-bundle-release.elf
+
+########################################
+
+$(MATCHA_TOCK_KERNEL_DEBUG):
+	cd $(DIR_TOCK_SRC); make BOARD_CONFIGURATION=sim_verilator TARGET_DIRECTORY=$(DIR_TOCK_OUT_DEBUG) debug
+
+$(MATCHA_TOCK_KERNEL_RELEASE):
+	cd $(DIR_TOCK_SRC); make BOARD_CONFIGURATION=sim_verilator TARGET_DIRECTORY=$(DIR_TOCK_OUT_RELEASE) release
+
+$(MATCHA_TOCK_APP_DEBUG):
+	cd $(DIR_LIBTOCK_SRC); PLATFORM=opentitan cargo run --target=riscv32imc-unknown-none-elf --example=hello_world --target-dir=$(DIR_LIBTOCK_OUT_DEBUG)
+
+$(MATCHA_TOCK_APP_RELEASE):
+	cd $(DIR_LIBTOCK_SRC); PLATFORM=opentitan cargo run --target=riscv32imc-unknown-none-elf --example=hello_world --target-dir=$(DIR_LIBTOCK_OUT_RELEASE) --release
+
+$(MATCHA_TOCK_BUNDLE_DEBUG): $(MATCHA_TOCK_KERNEL_DEBUG) $(MATCHA_TOCK_APP_DEBUG)
+	cp $(MATCHA_TOCK_KERNEL_DEBUG) $(MATCHA_TOCK_BUNDLE_DEBUG)
+	riscv32-unknown-elf-objcopy --update-section .apps=$(MATCHA_TOCK_APP_DEBUG) $(MATCHA_TOCK_BUNDLE_DEBUG)
+
+$(MATCHA_TOCK_BUNDLE_RELEASE): $(MATCHA_TOCK_KERNEL_RELEASE) $(MATCHA_TOCK_APP_RELEASE)
+	cp $(MATCHA_TOCK_KERNEL_RELEASE) $(MATCHA_TOCK_BUNDLE_RELEASE)
+	riscv32-unknown-elf-objcopy --update-section .apps=$(MATCHA_TOCK_APP_RELEASE) $(MATCHA_TOCK_BUNDLE_RELEASE)
+
+########################################
+
+matcha_tock_debug: $(MATCHA_TOCK_BUNDLE_DEBUG)
+matcha_tock_release: $(MATCHA_TOCK_BUNDLE_RELEASE)
 
 matcha_tock_clean:
-	cd $(MATCHA_BOARD_DIRECTORY); \
-		make TARGET_DIRECTORY=$(TOCK_OUTPUT_DIRECTORY) clean
+	cd $(DIR_TOCK_SRC); make TARGET_DIRECTORY=$(DIR_TOCK_OUT_DEBUG) clean
+	cd $(DIR_TOCK_SRC); make TARGET_DIRECTORY=$(DIR_TOCK_OUT_RELEASE) clean
+	cd $(DIR_LIBTOCK_SRC); PLATFORM=opentitan cargo clean --target-dir=$(DIR_LIBTOCK_OUT_DEBUG)
+	cd $(DIR_LIBTOCK_SRC); PLATFORM=opentitan cargo clean --target-dir=$(DIR_LIBTOCK_OUT_RELEASE)
 
-libtockrs_helloworld: matcha_tock
-	cd $(LIBTOCKRS_DIRECTORY); \
-		 PLATFORM=opentitan cargo run --release --target=riscv32imc-unknown-none-elf \
-		 	--example=hello_world --target-dir=$(LIBTOCKRS_OUT)
-	 riscv32-unknown-elf-objcopy --update-section .apps=$(LIBTOCKRS_OUT)/riscv32imc-unknown-none-elf/tab/opentitan/hello_world/rv32imc.tbf \
-	 	$(MATCHA_TARGET_ELF)
-
-libtockrs_helloworld_clean:
-	cd $(LIBTOCKRS_DIRECTORY); \
-		 PLATFORM=opentitan cargo clean --release --target=riscv32imc-unknown-none-elf \
-		 	--target-dir=$(LIBTOCKRS_OUT)
-
-tock: libtockrs_helloworld
-
-$(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf: tock
-
-tock_clean: libtockrs_helloworld_clean matcha_tock_clean
-
-
-.PHONY:: matcha_tock matcha_tock_clean libtockrs_helloworld libtockrs_helloworld_clean tock
+.PHONY:: matcha_tock_debug matcha_tock_release matcha_tock_clean

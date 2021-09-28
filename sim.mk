@@ -50,20 +50,26 @@ sim_configs:
 clean_sim_configs:
 	@rm -rf $(OUT)/renode_configs
 
-$(OUT)/ext_flash.tar: $(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf \
-  $(OUT)/kata/kernel/kernel.elf
-	tar -C $(OUT) -cvf $(OUT)/ext_flash.tar \
-		tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf \
-		kata/kernel/kernel.elf \
-		kata/capdl-loader
+$(OUT)/ext_flash_debug.tar: $(MATCHA_TOCK_BUNDLE_DEBUG) kata
+	tar -cvf $(OUT)/ext_flash_debug.tar \
+		$(MATCHA_TOCK_BUNDLE_DEBUG) \
+		$(OUT)/kata/kernel/kernel.elf \
+		$(OUT)/kata/capdl-loader
 
-sim_deps: renode multihart_boot_rom $(OUT)/ext_flash.tar iree
+$(OUT)/ext_flash_release.tar: $(MATCHA_TOCK_BUNDLE_RELEASE) kata
+	tar -cvf $(OUT)/ext_flash_release.tar \
+		$(MATCHA_TOCK_BUNDLE_RELEASE) \
+		$(OUT)/kata/kernel/kernel.elf \
+		$(OUT)/kata/capdl-loader
 
-simulate: sim_deps
-	$(RENODE_CMD) -e "i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start"
+simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; start"
 
-debug-simulation: sim_deps
-	$(RENODE_CMD) -e "i @sim/config/sparrow_all.resc; start"
+simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; start"
+
+debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; i @sim/config/sparrow_all.resc; start"
 
 test_sc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow_all.resc
 	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_sc.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start"
