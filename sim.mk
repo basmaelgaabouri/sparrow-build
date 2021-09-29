@@ -50,7 +50,8 @@ sim_configs:
 clean_sim_configs:
 	@rm -rf $(OUT)/renode_configs
 
-$(OUT)/ext_flash.tar: tock kata
+$(OUT)/ext_flash.tar: $(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf \
+  $(OUT)/kata/kernel/kernel.elf
 	tar -C $(OUT) -cvf $(OUT)/ext_flash.tar \
 		tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf \
 		kata/kernel/kernel.elf \

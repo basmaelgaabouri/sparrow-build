@@ -66,4 +66,6 @@ kata: $(KATA_SOURCES) kata-gen-headers
 		$(ROOTDIR)/kata/projects/processmanager
 	cd $(OUT)/kata && ninja
 
+$(OUT)/kata/kernel/kernel.elf: kata
+
 .PHONY:: kata kata-clean-headers kata-gen-headers

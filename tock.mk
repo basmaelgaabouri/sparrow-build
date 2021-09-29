@@ -29,6 +29,8 @@ libtockrs_helloworld_clean:
 
 tock: libtockrs_helloworld
 
+$(OUT)/tock/riscv32imc-unknown-none-elf/release/opentitan-matcha.elf: tock
+
 tock_clean: libtockrs_helloworld_clean matcha_tock_clean
 
 
