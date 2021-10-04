@@ -63,7 +63,7 @@ $(OUT)/ext_flash_release.tar: $(MATCHA_TOCK_BUNDLE_RELEASE) $(OUT)/kata/kernel/k
 		$(OUT)/kata/capdl-loader
 
 simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; start"
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start"
 
 simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
 	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; start"
