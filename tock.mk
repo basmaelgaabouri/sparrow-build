@@ -8,7 +8,7 @@ DIR_TOCK_OUT_RELEASE = $(OUT)/tock-release/
 
 # TockOS app build directories
 DIR_LIBTOCK_OUT_DEBUG = $(OUT)/libtock-rs-debug/
-DIR_LIBTOCK_OUT_RELEASE = $(OUT)/libtock-rs-relase/
+DIR_LIBTOCK_OUT_RELEASE = $(OUT)/libtock-rs-release/
 
 # Kernel binaries
 MATCHA_TOCK_APP_DEBUG = $(DIR_LIBTOCK_OUT_DEBUG)/riscv32imc-unknown-none-elf/tab/opentitan/hello_world/rv32imc.tbf
@@ -55,4 +55,4 @@ matcha_tock_clean:
 	cd $(DIR_LIBTOCK_SRC); PLATFORM=opentitan cargo clean --target-dir=$(DIR_LIBTOCK_OUT_DEBUG)
 	cd $(DIR_LIBTOCK_SRC); PLATFORM=opentitan cargo clean --target-dir=$(DIR_LIBTOCK_OUT_RELEASE)
 
-.PHONY:: matcha_tock_debug matcha_tock_release matcha_tock_clean
+.PHONY:: matcha_tock_debug matcha_tock_release matcha_tock_clean $(MATCHA_TOCK_KERNEL_DEBUG) $(MATCHA_TOCK_KERNEL_RELEASE) $(MATCHA_TOCK_APP_DEBUG) $(MATCHA_TOCK_APP_RELEASE)

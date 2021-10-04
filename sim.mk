@@ -50,13 +50,13 @@ sim_configs:
 clean_sim_configs:
 	@rm -rf $(OUT)/renode_configs
 
-$(OUT)/ext_flash_debug.tar: $(MATCHA_TOCK_BUNDLE_DEBUG) kata
+$(OUT)/ext_flash_debug.tar: $(MATCHA_TOCK_BUNDLE_DEBUG) $(OUT)/kata/kernel/kernel.elf $(OUT)/kata/capdl-loader
 	tar -cvf $(OUT)/ext_flash_debug.tar \
 		$(MATCHA_TOCK_BUNDLE_DEBUG) \
 		$(OUT)/kata/kernel/kernel.elf \
 		$(OUT)/kata/capdl-loader
 
-$(OUT)/ext_flash_release.tar: $(MATCHA_TOCK_BUNDLE_RELEASE) kata
+$(OUT)/ext_flash_release.tar: $(MATCHA_TOCK_BUNDLE_RELEASE) $(OUT)/kata/kernel/kernel.elf $(OUT)/kata/capdl-loader
 	tar -cvf $(OUT)/ext_flash_release.tar \
 		$(MATCHA_TOCK_BUNDLE_RELEASE) \
 		$(OUT)/kata/kernel/kernel.elf \
