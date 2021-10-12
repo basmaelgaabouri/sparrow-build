@@ -178,12 +178,10 @@ echo ROOTDIR="${ROOTDIR}"
 echo OUT="${OUT}"
 echo "========================================"
 echo
-echo Type \'m \[target\]\' to build, where \[target\] is:
+echo Type \'m \[target\]\' to build, where a typical \[target\] can be:
 echo
-echo prereqs tools kata simulate renode verilator
-echo opentitan_sw_all opentitan_sw_helloworld opentitan_sw_bootrom
-echo sparrow_test_sw_all sparrow_test_sw_hellovector sparrow_test_sw_bootrom
-echo earlgrey_tock qemu install_llvm iree
+echo prereqs tools simulate renode qemu verilator
+echo kata matcha_tock_release multihart_boot_rom iree
 echo
 
 if [[ ! -d "${RUSTDIR}" ]] ||
