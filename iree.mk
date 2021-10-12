@@ -41,8 +41,9 @@ $(IREE_COMPILER_DIR):
 
 # Download IREE compiler and tflite tools with the recent release. The release
 # tag and commit are recorded for the consistency check.
+# TODO(b/202859345): Un-pin the snapshot release
 iree_compiler: | $(IREE_COMPILER_DIR)
-	scripts/download_iree_compiler.py
+	scripts/download_iree_compiler.py --tag snapshot-20211011.579
 
 iree_commit_check:
 	scripts/check-iree-commit.sh $(IREE_SRC)
