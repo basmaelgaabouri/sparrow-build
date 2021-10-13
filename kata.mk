@@ -57,6 +57,10 @@ kata-clean-headers:
 
 kata-gen-headers: $(PLIC_HEADER) $(TIMER_HEADER) $(UART_HEADER) $(VC_TOP_HEADER)
 
+## Builds the Kata operating system
+#
+# Kata is the seL4-based operating system that runs on the SMC in Sparrow. The
+# source is in kata/, while the outputs are placed in out/kata.
 kata: $(KATA_SOURCES) kata-gen-headers
 	mkdir -p $(OUT)/kata
 	cd $(OUT)/kata && cmake -G Ninja \

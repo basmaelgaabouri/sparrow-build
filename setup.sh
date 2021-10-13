@@ -98,6 +98,14 @@ function m
     (cd "${ROOTDIR}" && make -f "${ROOTDIR}/build/Makefile" "$@")
 }
 
+function hmm
+{
+    local targetname="${1}"; shift
+
+    targetname="${targetname}" awk -f "${ROOTDIR}/build/helpmemake.awk" \
+              "${ROOTDIR}/build/Makefile" "${ROOTDIR}"/build/*.mk
+}
+
 function safe-abandon
 {
     local branch="${1}"; shift
@@ -178,11 +186,8 @@ echo ROOTDIR="${ROOTDIR}"
 echo OUT="${OUT}"
 echo "========================================"
 echo
-echo Type \'m \[target\]\' to build, where a typical \[target\] can be:
-echo
-echo prereqs tools simulate renode qemu verilator
-echo kata matcha_tock_release multihart_boot_rom iree
-echo
+echo Type \'m \[target\]\' to build.
+hmm
 
 if [[ ! -d "${RUSTDIR}" ]] ||
    [[ ! -d "${ROOTDIR}/cache/toolchain" ]] ||

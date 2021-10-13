@@ -8,6 +8,7 @@ $(OPENTITAN_BUILD_OUT_DIR):
 	cd $(ROOTDIR)/hw/opentitan; \
 	    TOOLCHAIN_PATH=$(CACHE)/toolchain BUILD_ROOT=$(OPENTITAN_BUILD_DIR) ./meson_init.sh -f;
 
+## Builds the hardware testing binaries from OpenTitan in hw/opentitan
 opentitan_sw_all: $(OPENTITAN_BUILD_OUT_DIR)
 	cd $(ROOTDIR)/hw/opentitan; \
 	    ninja -C $(OPENTITAN_BUILD_OUT_DIR) all
@@ -23,6 +24,7 @@ opentitan_sw_bootrom: $(OPENTITAN_BUILD_OUT_DIR)
 		sw/device/boot_rom/boot_rom_export_sim_dv \
 		sw/device/boot_rom/boot_rom_export_fpga_nexysvideo
 
+## Removes only the OpenTitan build artifacts from out/
 opentitan_sw_clean:
 	rm -rf $(OPENTITAN_BUILD_DIR)
 

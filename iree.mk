@@ -30,8 +30,7 @@ $(IREE_COMPILER_DIR)/build.ninja: | iree_check
 	    -DIREE_BUILD_TESTS=OFF \
 	    $(IREE_SRC)
 
-# Build IREE compiler from the source and record the HEAD commit for consistency
-# check.
+## Builds the IREE compiler from source and records the HEAD commit ID
 iree_compiler_src: $(IREE_COMPILER_DIR)/build.ninja | iree_check
 	cmake --build $(IREE_COMPILER_DIR) --target install
 	git -C "$(IREE_SRC)" rev-parse HEAD > $(IREE_COMPILER_DIR)/tag
@@ -39,8 +38,12 @@ iree_compiler_src: $(IREE_COMPILER_DIR)/build.ninja | iree_check
 $(IREE_COMPILER_DIR):
 	mkdir -p $(IREE_COMPILER_DIR)
 
-# Download IREE compiler and tflite tools with the recent release. The release
-# tag and commit are recorded for the consistency check.
+## Downloads the latest release of the IREE compiler and tflite tools.
+#
+# The release tag and commit are recorded for consistency checks in
+# the `iree_runtime` target. The outputs of this target are placed in
+# out/host/iree_compiler.
+#
 # TODO(b/202859345): Un-pin the snapshot release
 iree_compiler: | $(IREE_COMPILER_DIR)
 	scripts/download_iree_compiler.py --tag snapshot-20211011.579
@@ -68,9 +71,18 @@ $(IREE_RUNTIME_OUT)/build.ninja: | iree_check iree_commit_check
 	    -DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)" \
 	    $(IREE_RUNTIME_ROOT)
 
+## Installs the IREE runtime applications.
+#
+# Unlike the `iree_compiler` target, this target actually builds the runtime
+# from source in toolchain/iree. The results of the build are placed in
+# out/springbok_iree.
+#
+# In general, you probably want the `iree` target instead, which combines
+# `iree_compiler` and `iree_runtime`.
 iree_runtime: $(IREE_RUNTIME_OUT)/build.ninja | iree_check iree_commit_check
 	cmake --build $(IREE_RUNTIME_OUT)
 
+## Installs the IREE compiler and its runtime applications.
 iree: iree_compiler iree_runtime
 
 iree_clean:

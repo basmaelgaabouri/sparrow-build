@@ -69,8 +69,26 @@ $(OUT)/toolchain_rvv.tar.gz: $(TOOLCHAINVP_BIN)
 	@echo "GCC VP Toolchain tarball ready at $(OUT)/toolchain_rvv.tar.gz"
 	@echo "==========================================================="
 
+## Builds the GCC toolchain for the security core and SMC.
+#
+# Note: this actually builds from source, rather than fetching a release
+# tarball, and is most likely not the target you actually want.
+#
+# This target can take hours to build, and results in a tarball and sha256sum
+# called `out/toolchain.tar.gz` and `out/toolchain.tar.gz.sha256sum`, ready for
+# upload.
 toolchain: $(OUT)/toolchain.tar.gz
 
+## Builds the GCC toolchain for the vector core.
+#
+# Note: this actually builds from source, rather than fetching a release
+# tarball, and is most likely not the target you actually want. Additionally,
+# GCC is not typically used for building vector core code -- we use LLVM,
+# instead.
+#
+# This target can take hours to build, and results in a tarball and sha256sum
+# called `out/toolchain_rvv.tar.gz` and `out/toolchain_rvv.tar.gz.sha256sum`,
+# ready for upload.
 toolchain_vp: $(OUT)/toolchain_rvv.tar.gz
 
 toolchain_vp_clean:
@@ -127,8 +145,17 @@ $(OUT)/toolchain_iree_rv32.tar.gz: $(TOOLCHAINLLVM_BIN)
 	@echo "Toolchain tarball ready at $(OUT)/toolchain_iree_rv32.tar.gz"
 	@echo "==========================================================="
 
+## Builds the LLVM toolchain for the vector core.
+#
+# Note: this actually builds from source, rather than fetching a release
+# tarball, and is most likely not the target you actually want.
+#
+# This target can take hours to build, and results in a tarball and sha256sum
+# called `out/toolchain_iree_rv32.tar.gz` and
+# `out/toolchain_iree_rv32.tar.gz.sha256sum`, ready for upload.
 toolchain_llvm: $(OUT)/toolchain_iree_rv32.tar.gz
 
+## Removes the IREE RV32IMF toolchain from cache/, forcing a re-fetch if needed.
 toolchain_llvm_clean:
 	rm -rf $(TOOLCHAINIREE_OUT_DIR) $(OUT)/tmp/toolchain
 

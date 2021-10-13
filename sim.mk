@@ -15,9 +15,15 @@ $(RENODE_BIN): | $(RENODE_SRC_DIR) $(RENODE_OUT_DIR)
 		cp -rf scripts $(RENODE_OUT_DIR); \
 		cp -rf platforms $(RENODE_OUT_DIR)
 
-# To rebuild the phony target, remove $(RENODE_BIN) to trigger the rebuild.
+## Builds the Renode system simulator
+#
+# Using sources in sim/renode, this target builds Renode from source and stores
+# its output in out/host/renode.
+#
+# To rebuild this target, remove $(RENODE_BIN) and re-run.
 renode: $(RENODE_BIN)
 
+## Removes only the Renode build artifacts from out/
 renode_clean:
 	@rm -rf $(RENODE_OUT_DIR)
 
@@ -38,10 +44,16 @@ $(VERILATOR_BIN): | $(VERILATOR_SRC_DIR) $(VERILATOR_BUILD_DIR)
 	make -j$(shell nproc) -C $(VERILATOR_BUILD_DIR)
 	make -C $(VERILATOR_BUILD_DIR) install
 
+## Removes only the Verilator build artifacts from out/
 verilator_clean:
 	rm -rf $(VERILATOR_BUILD_DIR) $(VERILATOR_OUT_DIR)
 
-# To rebuild the phony target, romove $(VERILATOR_BIN) to trigger the rebuild.
+## Builds the Verilator verilog simulation tool.
+#
+# Using sources in sim/verilator, builds the Verilator tooling and places its
+# output in out/host/verilator.
+#
+# To rebuild this target, remove $(VERILATOR_BIN) and re-run.
 verilator: $(VERILATOR_BIN)
 
 sim_configs:
@@ -65,12 +77,31 @@ $(OUT)/ext_flash_release.tar: $(MATCHA_TOCK_BUNDLE_RELEASE) $(SMC_ELF) $(SMC_ROO
 	ln -sf $(SMC_ROOTSERVER) $(OUT)/tmp/capdl-loader
 	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_release.tar matcha-tock-bundle kernel capdl-loader
 
+## Launches an end-to-end build of the Sparrow system and starts Renode
+#
+# This top-level target triggers the `matcha_tock_release`, `kata`, `renode`,
+# `multihart_boot_rom`, and `iree` targets to build the entire system and then
+# finally starts the Renode simulator.
+#
+# This is the default target for the build system, and is generally what you
+# need for day-to-day work on the software side of Sparrow.
 simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree
 	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start"
 
+## Debug version of the `simulate` target
+#
+# This top-level target does the same job as `simulate`, but instead of
+# unhalting the CPUs and starting the system, this alternate target only unhalts
+# cpu0, and uses the debug build of TockOS from the `matcha_tock_debug` target.
 simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
 	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; start"
 
+## Debug version of the `simulate` target
+#
+# This top-level target does the same job as `simulate-debug`, but instead of
+# unhalting the CPUs and starting the system, this alternate target starts
+# renode with no CPUs unhalted, allowing for GDB to be used for early system
+# start.
 debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
 	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; i @sim/config/sparrow_all.resc; start"
 

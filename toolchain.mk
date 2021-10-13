@@ -2,6 +2,7 @@ QEMU_SRC_DIR          := $(ROOTDIR)/toolchain/riscv-qemu
 QEMU_OUT_DIR          := $(OUT)/host/qemu
 QEMU_BINARY           := $(QEMU_OUT_DIR)/riscv32-softmmu/qemu-system-riscv32
 
+## Installs the rust toolchain, including rustc and elf2tab.
 toolchain_rust: $(RUSTDIR)/bin/rustc $(RUSTDIR)/bin/elf2tab
 
 $(RUST_OUT_DIR):
@@ -26,6 +27,10 @@ $(QEMU_BINARY): $(QEMU_DEPS) | $(QEMU_OUT_DIR)
 		--target-list=riscv32-softmmu,riscv32-linux-user
 	make -C $(QEMU_OUT_DIR) -j$(nproc --ignore 2)
 
+## Builds and installs the QEMU RISCV32 simulator.
+#
+# Sources are in toolchain/riscv-qemu, while outputs are stored in
+# out/host/qemu.
 qemu: $(QEMU_BINARY)
 
 $(OUT)/tmp: | $(OUT)
@@ -58,11 +63,20 @@ $(CACHE)/toolchain_iree_rv32imf: | $(OUT)/tmp/toolchain_iree_rv32.tar.gz $(CACHE
 	cd "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libm_nano.a libm.a
 	cd "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libgloss_nano.a libgloss.a
 
+## Installs the LLVM compiler for rv32imf
+#
+# Requires network access. This fetches the toolchain from the upstream
+# repository and extracts it locally to the cache/.
 install_llvm: $(CACHE)/toolchain_iree_rv32imf
 
+## Cleans up the toolchain from the cache directory
+#
+# Generally not needed to be run unless something has changed or broken in the
+# caching mechanisms built into the build system.
 toolchain_clean:
 	rm -rf $(OUT)/tmp $(CACHE)/toolchain
 
+## Removes only the QEMU build artifacts from out/
 qemu_clean:
 	rm -rf $(QEMU_OUT_DIR)
 

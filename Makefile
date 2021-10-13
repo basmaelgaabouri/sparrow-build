@@ -22,6 +22,10 @@ endif
 
 include $(ROOTDIR)/build/preamble.mk
 
+## Installs build prerequisites
+#
+# This installs a series of typical Linux tools needed to build the whole of the
+# sparrow system.
 prereqs: $(ROOTDIR)/scripts/install-prereqs.sh
 	$(ROOTDIR)/scripts/install-prereqs.sh
 
@@ -41,8 +45,16 @@ include $(ROOTDIR)/build/sim.mk
 $(OUT):
 	@mkdir -p $(OUT)
 
+## Installs the RISCV compiler and emulator tooling
+#
+# This includes Rust, GCC, CLANG, verilator, qemu, and renode.
+#
+# Output is placed in cache/ and out/host.
 tools: toolchain_rust $(ROOTDIR)/cache/toolchain $(CACHE)/toolchain_iree_rv32imf verilator renode qemu
 
+## Cleans the entire system
+#
+# This amounts to an `rm -rf out/` and removes all build artifacts.
 clean::
 	rm -rf $(OUT)
 

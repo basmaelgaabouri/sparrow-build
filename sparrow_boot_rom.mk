@@ -27,6 +27,11 @@ $(SHODAN_BOOT_ROM_MANIFEST): $(SHODAN_BOOT_ROM_BUILD_NINJA_SCRIPT)
 			sw_sparrow/device/rom_exts/manifest.h \
 			sw/device/rom_exts/manifest.h
 
+## Builds the Sparrow boot ROM image
+#
+# This builds a simple multi-core boot ROM that can bootstrap the Sparrow system
+# in simulation. Source is in sw/multihart_boot_rom, while output is placed in
+# out/sparrow_boot_rom
 multihart_boot_rom: $(SHODAN_BOOT_ROM_DEPS)
 	cd $(ROOTDIR)/sw/multihart_boot_rom; \
 		BUILD_ROOT=$(SHODAN_BOOT_ROM_BUILD_DIR) ./meson_init.sh -f -t "$(SHODAN_BOOT_ROM_BUILD_TOOLCHAIN_CONFIG)"; \

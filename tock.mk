@@ -46,9 +46,17 @@ $(MATCHA_TOCK_BUNDLE_RELEASE): $(MATCHA_TOCK_KERNEL_RELEASE) $(MATCHA_TOCK_APP_R
 
 ########################################
 
+## Builds TockOS for the security core in debug mode
+#
+# Sparrow-specific source is in sw/tock/boards/opentitan-matcha.
 matcha_tock_debug: $(MATCHA_TOCK_BUNDLE_DEBUG)
+
+## Builds TockOS for the security core in release mode
+#
+# Sparrow-specific source is in sw/tock/boards/opentitan-matcha.
 matcha_tock_release: $(MATCHA_TOCK_BUNDLE_RELEASE)
 
+## Removes the TockOS and libtockrs build artifacts from out/
 matcha_tock_clean:
 	cd $(DIR_TOCK_SRC); make TARGET_DIRECTORY=$(DIR_TOCK_OUT_DEBUG) clean
 	cd $(DIR_TOCK_SRC); make TARGET_DIRECTORY=$(DIR_TOCK_OUT_RELEASE) clean
