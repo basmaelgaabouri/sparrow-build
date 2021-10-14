@@ -96,6 +96,7 @@ function get-groups
 function m
 {
     (cd "${ROOTDIR}" && make -f "${ROOTDIR}/build/Makefile" "$@")
+    return $?
 }
 
 function hmm
