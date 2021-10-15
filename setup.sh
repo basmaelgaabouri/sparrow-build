@@ -59,6 +59,8 @@ export PATH="${ROOTDIR}/scripts:${PATH}"
 export PATH="${OUT}/host/renode:${PATH}"
 export PATH="${OUT}/host/qemu/riscv32-softmmu:${PATH}"
 
+export KATA_RUST_VERSION="nightly-2021-08-05"
+
 function renode
 {
     (cd "${ROOTDIR}" && mono "${OUT}/host/renode/Renode.exe" "$@")

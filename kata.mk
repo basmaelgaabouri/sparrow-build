@@ -52,6 +52,9 @@ VC_TOP_HJSON=$(OPENTITAN_SOURCE)/hw/ip/vc_top/data/vc_top.hjson
 $(VC_TOP_HEADER): $(REGTOOL) $(VC_TOP_HJSON) | $(VC_TOP_GEN)
 	$(REGTOOL) -D -o $(VC_TOP_HEADER) $(VC_TOP_HJSON)
 
+KATA_COMPONENTS=$(ROOTDIR)/kata/projects/processmanager/apps/system/components
+CARGO_TEST := cargo +$(KATA_RUST_VERSION) test
+
 kata-clean-headers:
 	rm -rf $(OPENTITAN_GEN) $(VC_TOP_HEADER)
 
@@ -70,6 +73,21 @@ kata: $(KATA_SOURCES) kata-gen-headers
 		$(ROOTDIR)/kata/projects/processmanager
 	cd $(OUT)/kata && ninja
 
+cargo_test_kata_proc_manager:
+	cd $(KATA_COMPONENTS)/ProcessManager/kata-proc-manager && $(CARGO_TEST)
+
+cargo_test_kata_proc_interface:
+	cd $(KATA_COMPONENTS)/ProcessManager/kata-proc-interface && $(CARGO_TEST)
+
+cargo_test_debugconsole_kata_logger:
+	cd $(KATA_COMPONENTS)/DebugConsole/kata-logger && \
+		$(CARGO_TEST) -- --test-threads=1
+
+cargo_test_debugconsole_zmodem:
+	cd $(KATA_COMPONENTS)/DebugConsole/zmodem && $(CARGO_TEST)
+
+cargo_test_kata: cargo_test_kata_proc_manager cargo_test_kata_proc_interface cargo_test_debugconsole_kata_logger
+
 $(OUT)/kata/kernel/kernel.elf: kata
 
-.PHONY:: kata kata-clean-headers kata-gen-headers
+.PHONY:: kata kata-clean-headers kata-gen-headers cargo_test_kata
