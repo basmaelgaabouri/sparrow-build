@@ -77,6 +77,10 @@ $(OUT)/ext_flash_release.tar: $(MATCHA_TOCK_BUNDLE_RELEASE) $(SMC_ELF) $(SMC_ROO
 	ln -sf $(SMC_ROOTSERVER) $(OUT)/tmp/capdl-loader
 	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_release.tar matcha-tock-bundle kernel capdl-loader
 
+# Renode commands to issue before the initial start of a simulation.
+# This pauses all cores and then sets cpu0 (SC) & cpu1 (SMC) running.
+RENODE_PRESTART_CMDS=pause; cpu0 IsHalted false; cpu1 IsHalted false
+
 ## Launches an end-to-end build of the Sparrow system and starts Renode
 #
 # This top-level target triggers the `matcha_tock_release`, `kata`, `renode`,
@@ -86,7 +90,7 @@ $(OUT)/ext_flash_release.tar: $(MATCHA_TOCK_BUNDLE_RELEASE) $(SMC_ELF) $(SMC_ROO
 # This is the default target for the build system, and is generally what you
 # need for day-to-day work on the software side of Sparrow.
 simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start"
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; i @sim/config/sparrow_all.resc; $(RENODE_PRESTART_CMDS); start"
 
 ## Debug version of the `simulate` target
 #
@@ -94,7 +98,7 @@ simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree
 # unhalting the CPUs and starting the system, this alternate target only unhalts
 # cpu0, and uses the debug build of TockOS from the `matcha_tock_debug` target.
 simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; start"
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; i @sim/config/sparrow_all.resc; $(RENODE_PRESTART_CMDS); start"
 
 ## Debug version of the `simulate` target
 #
