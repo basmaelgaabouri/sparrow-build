@@ -78,7 +78,6 @@
           {"text": "add-symbol-file out/kata/capdl-loader"},
           {"text": "add-symbol-file out/kata/debug_console.instance.bin"},
           {"text": "add-symbol-file out/kata/process_manager.instance.bin"},
-          {"text": "add-symbol-file out/kata/sel4debug.instance.bin"},
 
           // Connect to the Renode gdb server.
           {"text": "target remote localhost:3333"},
