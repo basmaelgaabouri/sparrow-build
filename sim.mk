@@ -65,13 +65,13 @@ clean_sim_configs:
 SMC_ELF=$(OUT)/kata/kernel/kernel.elf
 SMC_ROOTSERVER=$(OUT)/kata/capdl-loader
 
-$(OUT)/ext_flash_debug.tar: $(MATCHA_TOCK_BUNDLE_DEBUG) $(SMC_ELF) $(SMC_ROOTSERVER)
+$(OUT)/ext_flash_debug.tar: $(MATCHA_TOCK_BUNDLE_DEBUG) $(SMC_ELF) $(SMC_ROOTSERVER) | $(OUT)/tmp
 	ln -sf $(MATCHA_TOCK_BUNDLE_DEBUG) $(OUT)/tmp/matcha-tock-bundle
 	ln -sf $(SMC_ELF) $(OUT)/tmp/kernel
 	ln -sf $(SMC_ROOTSERVER) $(OUT)/tmp/capdl-loader
 	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_debug.tar matcha-tock-bundle kernel capdl-loader
 
-$(OUT)/ext_flash_release.tar: $(MATCHA_TOCK_BUNDLE_RELEASE) $(SMC_ELF) $(SMC_ROOTSERVER)
+$(OUT)/ext_flash_release.tar: $(MATCHA_TOCK_BUNDLE_RELEASE) $(SMC_ELF) $(SMC_ROOTSERVER) | $(OUT)/tmp
 	ln -sf $(MATCHA_TOCK_BUNDLE_RELEASE) $(OUT)/tmp/matcha-tock-bundle
 	ln -sf $(SMC_ELF) $(OUT)/tmp/kernel
 	ln -sf $(SMC_ROOTSERVER) $(OUT)/tmp/capdl-loader
