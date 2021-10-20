@@ -50,17 +50,7 @@ iree_compiler: | $(IREE_COMPILER_DIR)
 iree_commit_check:
 	scripts/check-iree-commit.sh $(IREE_SRC)
 
-# TODO(b/194710215): Need to figure out why the second cmake config is needed to
-# reduce the artifact size to <256KB.
 $(IREE_RUNTIME_OUT)/build.ninja: | iree_check iree_commit_check
-	cmake -G Ninja -B $(IREE_RUNTIME_OUT) \
-	    -DCMAKE_TOOLCHAIN_FILE="$(IREE_RUNTIME_ROOT)/cmake/riscv_iree.cmake" \
-	    -DCMAKE_BUILD_TYPE=MinSizeRel \
-	    -DIREE_HOST_BINARY_ROOT="$(IREE_COMPILER_DIR)/install" \
-	    -DRISCV_TOOLCHAIN_ROOT=$(TOOLCHAINRV32_PATH) \
-	    -DRISCV_COMPILER_FLAGS="$(RV32_COMPILER_FLAGS)" \
-	    -DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)" \
-	    $(IREE_RUNTIME_ROOT)
 	cmake -G Ninja -B $(IREE_RUNTIME_OUT) \
 	    -DCMAKE_TOOLCHAIN_FILE="$(IREE_RUNTIME_ROOT)/cmake/riscv_iree.cmake" \
 	    -DCMAKE_BUILD_TYPE=MinSizeRel \
