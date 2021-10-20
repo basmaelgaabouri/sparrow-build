@@ -2,7 +2,7 @@ QEMU_SRC_DIR          := $(ROOTDIR)/toolchain/riscv-qemu
 QEMU_OUT_DIR          := $(OUT)/host/qemu
 QEMU_BINARY           := $(QEMU_OUT_DIR)/riscv32-softmmu/qemu-system-riscv32
 
-## Installs the rust toolchain, including rustc and elf2tab.
+## Installs the rust toolchain to cache/, including rustc and elf2tab.
 toolchain_rust: $(RUSTDIR)/bin/rustc $(RUSTDIR)/bin/elf2tab
 
 $(RUST_OUT_DIR):
@@ -39,14 +39,13 @@ $(OUT)/tmp: | $(OUT)
 $(CACHE):
 	mkdir -p $(CACHE)
 
-# TODO: Use publically accessible URLs for toolchain tarballs.
 $(OUT)/tmp/toolchain.tar.gz: | $(OUT)/tmp
 	wget -P $(OUT)/tmp https://storage.googleapis.com/sparrow-public-artifacts/toolchain.tar.gz
 	wget -P $(OUT)/tmp https://storage.googleapis.com/sparrow-public-artifacts/toolchain.tar.gz.sha256sum
 	cd "$(OUT)/tmp" && sha256sum -c toolchain.tar.gz.sha256sum
 
-$(ROOTDIR)/cache/toolchain: | $(OUT)/tmp/toolchain.tar.gz $(CACHE)
-	tar -C $(ROOTDIR)/cache -xf $(OUT)/tmp/toolchain.tar.gz
+$(CACHE)/toolchain: | $(OUT)/tmp/toolchain.tar.gz $(CACHE)
+	tar -C $(CACHE) -xf $(OUT)/tmp/toolchain.tar.gz
 
 $(OUT)/tmp/toolchain_iree_rv32.tar.gz: | $(OUT)/tmp
 	wget -P $(OUT)/tmp https://storage.googleapis.com/sparrow-public-artifacts/toolchain_iree_rv32.tar.gz
@@ -63,10 +62,16 @@ $(CACHE)/toolchain_iree_rv32imf: | $(OUT)/tmp/toolchain_iree_rv32.tar.gz $(CACHE
 	cd "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libm_nano.a libm.a
 	cd "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libgloss_nano.a libgloss.a
 
+## Installs the GCC compiler for rv32imac
+#
+# Requires network access. This fetches the toolchain from the GCP archive and
+# extracts it locally to the cache/.
+install_gcc: $(CACHE)/toolchain
+
 ## Installs the LLVM compiler for rv32imf
 #
-# Requires network access. This fetches the toolchain from the upstream
-# repository and extracts it locally to the cache/.
+# Requires network access. This fetches the toolchain from the GCP archive and
+# extracts it locally to the cache/.
 install_llvm: $(CACHE)/toolchain_iree_rv32imf
 
 ## Cleans up the toolchain from the cache directory
@@ -80,4 +85,4 @@ toolchain_clean:
 qemu_clean:
 	rm -rf $(QEMU_OUT_DIR)
 
-.PHONY:: qemu toolchain_clean qemu_clean install_llvm
+.PHONY:: qemu toolchain_clean qemu_clean install_llvm install_gcc

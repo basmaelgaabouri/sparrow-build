@@ -50,7 +50,7 @@ $(OUT):
 # This includes Rust, GCC, CLANG, verilator, qemu, and renode.
 #
 # Output is placed in cache/ and out/host.
-tools: toolchain_rust $(ROOTDIR)/cache/toolchain $(CACHE)/toolchain_iree_rv32imf verilator renode qemu
+tools: toolchain_rust install_gcc install_llvm verilator renode qemu
 
 ## Cleans the entire system
 #
