@@ -38,6 +38,8 @@ include $(ROOTDIR)/build/springbok.mk
 include $(ROOTDIR)/build/iree.mk
 include $(ROOTDIR)/build/sparrow_boot_rom.mk
 include $(ROOTDIR)/build/riscv_toolchain.mk
+include $(ROOTDIR)/build/renode.mk
+include $(ROOTDIR)/build/verilator.mk
 
 # Must be after other makefiles so that we pick up various $(TARGETS)
 include $(ROOTDIR)/build/sim.mk
