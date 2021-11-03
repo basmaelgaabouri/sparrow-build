@@ -7,21 +7,21 @@ clean_sim_configs:
 SMC_ELF=$(OUT)/kata/kernel/kernel.elf
 SMC_ROOTSERVER=$(OUT)/kata/capdl-loader
 
-$(OUT)/ext_flash_debug.tar: $(MATCHA_TOCK_BUNDLE_DEBUG) $(SMC_ELF) $(SMC_ROOTSERVER) | $(OUT)/tmp
-	ln -sf $(MATCHA_TOCK_BUNDLE_DEBUG) $(OUT)/tmp/matcha-tock-bundle
+$(OUT)/ext_flash_debug.tar: $(MATCHA_BUNDLE_DEBUG) $(SMC_ELF) $(SMC_ROOTSERVER) | $(OUT)/tmp
+	ln -sf $(MATCHA_BUNDLE_DEBUG) $(OUT)/tmp/matcha-tock-bundle
 	ln -sf $(SMC_ELF) $(OUT)/tmp/kernel
 	ln -sf $(SMC_ROOTSERVER) $(OUT)/tmp/capdl-loader
 	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_debug.tar matcha-tock-bundle kernel capdl-loader
 
-$(OUT)/ext_flash_release.tar: $(MATCHA_TOCK_BUNDLE_RELEASE) $(SMC_ELF) $(SMC_ROOTSERVER) | $(OUT)/tmp
-	ln -sf $(MATCHA_TOCK_BUNDLE_RELEASE) $(OUT)/tmp/matcha-tock-bundle
+$(OUT)/ext_flash_release.tar: $(MATCHA_BUNDLE_RELEASE) $(SMC_ELF) $(SMC_ROOTSERVER) | $(OUT)/tmp
+	ln -sf $(MATCHA_BUNDLE_RELEASE) $(OUT)/tmp/matcha-tock-bundle
 	ln -sf $(SMC_ELF) $(OUT)/tmp/kernel
 	ln -sf $(SMC_ROOTSERVER) $(OUT)/tmp/capdl-loader
 	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_release.tar matcha-tock-bundle kernel capdl-loader
 
 # Renode commands to issue before the initial start of a simulation.
 # This pauses all cores and then sets cpu0 (SC) & cpu1 (SMC) running.
-RENODE_PRESTART_CMDS=pause; cpu0 IsHalted false; cpu1 IsHalted false
+RENODE_PRESTART_CMDS=pause; cpu0 IsHalted false;
 
 ## Launches an end-to-end build of the Sparrow system and starts Renode
 #
@@ -52,13 +52,13 @@ debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
 	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; i @sim/config/sparrow_all.resc; start"
 
 test_sc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow_all.resc
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_sc.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start"
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_sc.tar; i @sim/config/sparrow_all.resc; $(RENODE_PRESTART_CMDS); start"
 
 test_mc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow_all.resc
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_mc.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start"
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_mc.tar; i @sim/config/sparrow_all.resc; $(RENODE_PRESTART_CMDS); start"
 
 test_vc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow_all.resc
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_vc.tar; i @sim/config/sparrow_all.resc; pause; cpu0 IsHalted false; cpu1 IsHalted false; start"
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_vc.tar; i @sim/config/sparrow_all.resc; $(RENODE_PRESTART_CMDS); start"
 
 .PHONY:: sim_configs clean_sim_configs simulate simulate-debug debug-simulation
 .PHONY:: test_sc test_mc test_vc

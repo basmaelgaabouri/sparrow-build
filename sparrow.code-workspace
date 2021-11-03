@@ -69,9 +69,9 @@
           // Load additional symbol files. "-file-symbol-file" seems to unload previously loaded symbols, but add-symbol-file works.
           {"text": "set confirm off"},
 
-          // TockOS symbols
-          {"text": "add-symbol-file out/tock/riscv32imc-unknown-none-elf/debug/opentitan-matcha.elf"},
-          {"text": "add-symbol-file out/matcha/riscv32imc-unknown-none-elf/debug/matcha"},
+          // Matcha+TockOS symbols
+          {"text": "add-symbol-file out/matcha/riscv32imc-unknown-none-elf/debug/matcha_platform"},
+          {"text": "add-symbol-file out/matcha/riscv32imc-unknown-none-elf/debug/matcha_app"},
 
           // seL4 symbols
           {"text": "add-symbol-file out/kata/kernel/kernel.elf"},
