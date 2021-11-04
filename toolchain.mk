@@ -39,28 +39,11 @@ $(OUT)/tmp: | $(OUT)
 $(CACHE):
 	mkdir -p $(CACHE)
 
-$(OUT)/tmp/toolchain.tar.gz: | $(OUT)/tmp
-	wget -P $(OUT)/tmp https://storage.googleapis.com/sparrow-public-artifacts/toolchain.tar.gz
-	wget -P $(OUT)/tmp https://storage.googleapis.com/sparrow-public-artifacts/toolchain.tar.gz.sha256sum
-	cd "$(OUT)/tmp" && sha256sum -c toolchain.tar.gz.sha256sum
+$(CACHE)/toolchain: | $(OUT)/tmp $(CACHE)
+	./scripts/install-toolchain.sh gcc
 
-$(CACHE)/toolchain: | $(OUT)/tmp/toolchain.tar.gz $(CACHE)
-	tar -C $(CACHE) -xf $(OUT)/tmp/toolchain.tar.gz
-
-$(OUT)/tmp/toolchain_iree_rv32.tar.gz: | $(OUT)/tmp
-	wget -P $(OUT)/tmp https://storage.googleapis.com/sparrow-public-artifacts/toolchain_iree_rv32.tar.gz
-	wget -P $(OUT)/tmp https://storage.googleapis.com/sparrow-public-artifacts/toolchain_iree_rv32.tar.gz.sha256sum
-	cd "$(OUT)/tmp" && sha256sum -c toolchain_iree_rv32.tar.gz.sha256sum
-
-# Prepare a newlib-nano directory for the default link of -lc, -lgloss, etc.
-# TODO(hcindyl): Remove the duped symlink creation once we switched to a toolchain from CI.
-$(CACHE)/toolchain_iree_rv32imf: | $(OUT)/tmp/toolchain_iree_rv32.tar.gz $(CACHE)
-	tar -C $(CACHE) -xf $(OUT)/tmp/toolchain_iree_rv32.tar.gz
-	mkdir -p "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano"
-	cd "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libc_nano.a libc.a
-	cd "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libg_nano.a libg.a
-	cd "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libm_nano.a libm.a
-	cd "$(CACHE)/toolchain_iree_rv32imf/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libgloss_nano.a libgloss.a
+$(CACHE)/toolchain_iree_rv32imf: | $(OUT)/tmp $(CACHE)
+	./scripts/install-toolchain.sh llvm
 
 ## Installs the GCC compiler for rv32imac
 #
