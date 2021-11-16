@@ -27,10 +27,12 @@ include $(ROOTDIR)/build/preamble.mk
 # This installs a series of typical Linux tools needed to build the whole of the
 # sparrow system.
 prereqs: $(ROOTDIR)/scripts/install-prereqs.sh \
-         $(ROOTDIR)/hw/opentitan-upstream/python-requirements.txt \
-         $(ROOTDIR)/hw/opentitan-upstream/apt-requirements.txt
+		 $(ROOTDIR)/hw/opentitan-upstream/python-requirements.txt \
+		 $(ROOTDIR)/scripts/python-requirements.txt \
+		 $(ROOTDIR)/hw/opentitan-upstream/apt-requirements.txt
 	$(ROOTDIR)/scripts/install-prereqs.sh \
-		-p "$(ROOTDIR)/hw/opentitan-upstream/python-requirements.txt" \
+		-p "$(ROOTDIR)/hw/opentitan-upstream/python-requirements.txt \
+			$(ROOTDIR)/scripts/python-requirements.txt" \
 		-a "$(ROOTDIR)/hw/opentitan-upstream/apt-requirements.txt"
 
 
