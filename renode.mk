@@ -23,8 +23,11 @@ $(RENODE_BIN): | $(RENODE_SRC_DIR) $(RENODE_OUT_DIR)
 # To rebuild this target, remove $(RENODE_BIN) and re-run.
 renode: $(RENODE_BIN)
 
-## Removes only the Renode build artifacts from out/
+## Removes Renode build artifacts from sim/renode and out/
 renode_clean:
 	@rm -rf $(RENODE_OUT_DIR)
+	@rm -rf $(RENODE_SRC_DIR)/output
+	@cd $(RENODE_SRC_DIR); find . -type d -name bin | xargs rm -rf
+	@cd $(RENODE_SRC_DIR); find . -type d -name obj | xargs rm -rf
 
 .PHONY:: renode renode_clean
