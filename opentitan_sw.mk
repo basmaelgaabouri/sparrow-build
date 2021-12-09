@@ -9,8 +9,8 @@ $(OPENTITAN_BUILD_OUT_DIR):
 	cd $(OPENTITAN_SRC_DIR); \
 		TOOLCHAIN_PATH=$(CACHE)/toolchain \
 		BUILD_ROOT=$(OPENTITAN_BUILD_DIR) \
-		CC_FOR_BUILD=gcc \
-		CXX_FOR_BUILD=g++ ./meson_init.sh -f;
+		CC_FOR_BUILD=gcc-10 \
+		CXX_FOR_BUILD=g++-10 ./meson_init.sh -f;
 
 ## Builds the hardware testing binaries from OpenTitan in hw/opentitan-upstream
 opentitan_sw_all: $(OPENTITAN_BUILD_OUT_DIR)
