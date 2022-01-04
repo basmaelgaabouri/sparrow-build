@@ -1,7 +1,7 @@
 RENODE_SRC_DIR := $(ROOTDIR)/sim/renode
 RENODE_OUT_DIR := $(OUT)/host/renode
-RENODE_BIN     := $(RENODE_OUT_DIR)/Renode.exe
-RENODE_CMD     := cd $(ROOTDIR) && mono $(RENODE_BIN) --disable-xwt
+RENODE_BIN     := $(RENODE_OUT_DIR)/renode.sh
+RENODE_CMD     := cd $(ROOTDIR) && $(RENODE_BIN) --disable-xwt
 
 RENODE_SIM_GENERATOR_SCRIPT := $(ROOTDIR)/scripts/generate_renode_configs.sh
 
@@ -9,11 +9,8 @@ $(RENODE_OUT_DIR):
 	mkdir -p $(RENODE_OUT_DIR)
 
 $(RENODE_BIN): | $(RENODE_SRC_DIR) $(RENODE_OUT_DIR)
-	cd $(RENODE_SRC_DIR) > /dev/null; \
-		./build.sh -d --skip-fetch; \
-		cp -rf output/bin/Debug/* $(RENODE_OUT_DIR); \
-		cp -rf scripts $(RENODE_OUT_DIR); \
-		cp -rf platforms $(RENODE_OUT_DIR)
+	cd $(RENODE_SRC_DIR); \
+		./build.sh -d --skip-fetch -o $(RENODE_OUT_DIR)
 
 ## Builds the Renode system simulator
 #
@@ -29,5 +26,7 @@ renode_clean:
 	@rm -rf $(RENODE_SRC_DIR)/output
 	@cd $(RENODE_SRC_DIR); find . -type d -name bin | xargs rm -rf
 	@cd $(RENODE_SRC_DIR); find . -type d -name obj | xargs rm -rf
+
+clean:: renode_clean
 
 .PHONY:: renode renode_clean

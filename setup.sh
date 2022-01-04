@@ -63,7 +63,7 @@ export KATA_RUST_VERSION="nightly-2021-08-05"
 
 function renode
 {
-    (cd "${ROOTDIR}" && mono "${OUT}/host/renode/Renode.exe" "$@")
+    "${OUT}/host/renode/renode.sh" "$@"
 }
 
 function iss
