@@ -2,7 +2,7 @@ RENODE_SRC_DIR := $(ROOTDIR)/sim/renode
 RENODE_OUT_DIR := $(OUT)/host/renode
 RENODE_BIN     := $(RENODE_OUT_DIR)/renode.sh
 RENODE_CMD     := cd $(ROOTDIR) && $(RENODE_BIN) --disable-xwt
-
+RENODE_COMMIT  := $(shell git -C $(RENODE_SRC_DIR) rev-parse  --short=8 HEAD)
 RENODE_SIM_GENERATOR_SCRIPT := $(ROOTDIR)/scripts/generate_renode_configs.sh
 
 $(RENODE_OUT_DIR):
@@ -11,14 +11,25 @@ $(RENODE_OUT_DIR):
 $(RENODE_BIN): | $(RENODE_SRC_DIR) $(RENODE_OUT_DIR)
 	cd $(RENODE_SRC_DIR); \
 		./build.sh -d --skip-fetch -o $(RENODE_OUT_DIR)
+	echo -e "commit_sha: $(RENODE_COMMIT)\n" > $(RENODE_OUT_DIR)/tag
 
 ## Builds the Renode system simulator
 #
 # Using sources in sim/renode, this target builds Renode from source and stores
 # its output in out/host/renode.
 #
-# To rebuild this target, remove $(RENODE_BIN) and re-run.
-renode: $(RENODE_BIN)
+# To rebuild this target, run `m renode_clean` and re-run.
+#
+# This is for debug purpose only. You probably want to use `m renode` target.
+renode_src: $(RENODE_BIN)
+
+## Download and install the nightly release Renode system simulator
+#
+# From AntMicro's release. If there is a local build from `m renode_src` with
+# the same commit sha as the release build, it will be treated as up-to-date.
+renode: | $(RENODE_OUT_DIR)
+	./scripts/download_renode.py --renode_dir $(RENODE_OUT_DIR)
+
 
 ## Removes Renode build artifacts from sim/renode and out/
 renode_clean:
@@ -29,4 +40,4 @@ renode_clean:
 
 clean:: renode_clean
 
-.PHONY:: renode renode_clean
+.PHONY:: renode renode_src renode_clean
