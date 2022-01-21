@@ -17,16 +17,6 @@ OLD_REGTOOL=$(OPENTITAN_OLD_SOURCE)/util/regtool.py
 $(OPENTITAN_GEN):
 	mkdir -p $(OPENTITAN_GEN)
 
-PLIC_HEADER=$(OPENTITAN_GEN)/plic.h
-PLIC_IP_DIR=$(OPENTITAN_SOURCE)/hw/ip/rv_plic
-PLIC_JINJA=$(PLIC_IP_DIR)/util/reg_rv_plic.py
-PLIC_TEMPLATE=$(PLIC_IP_DIR)/data/rv_plic.hjson.tpl
-PLIC_HJSON=$(OPENTITAN_GEN)/rv_plic.hjson
-$(PLIC_HJSON): $(PLIC_JINJA) $(PLIC_TEMPLATE) | $(OPENTITAN_GEN)
-	$(PLIC_JINJA) -s 183 -t 2 -p 7 $(PLIC_TEMPLATE) > $(PLIC_HJSON)
-$(PLIC_HEADER): $(REGTOOL) $(PLIC_HJSON) | $(OPENTITAN_GEN)
-	$(REGTOOL) -D -o $(PLIC_HEADER) $(PLIC_HJSON)
-
 TIMER_HEADER=$(OPENTITAN_GEN)/timer.h
 TIMER_IP_DIR=$(OPENTITAN_SOURCE)/hw/ip/rv_timer
 TIMER_JINJA=$(TIMER_IP_DIR)/util/reg_timer.py
@@ -58,7 +48,7 @@ CARGO_TEST := cargo +$(KATA_RUST_VERSION) test
 kata-clean-headers:
 	rm -rf $(OPENTITAN_GEN) $(VC_TOP_HEADER)
 
-kata-gen-headers: $(PLIC_HEADER) $(TIMER_HEADER) $(UART_HEADER) $(VC_TOP_HEADER)
+kata-gen-headers: $(TIMER_HEADER) $(UART_HEADER) $(VC_TOP_HEADER)
 
 ## Builds the Kata operating system
 #
