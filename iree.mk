@@ -18,7 +18,8 @@ iree_check:
 		exit 1; \
 	fi
 	@echo Update $(IREE_SRC) submodules...
-	git -C $(IREE_SRC) submodule update --init --jobs=8 --depth=10
+	git -C $(IREE_SRC) submodule sync && \
+	  git -C $(IREE_SRC) submodule update --init --jobs=8 --depth=10
 
 $(IREE_COMPILER_DIR)/build.ninja: | iree_check
 	cmake -G Ninja -B $(IREE_COMPILER_DIR) \
@@ -44,9 +45,8 @@ $(IREE_COMPILER_DIR):
 # the `iree_runtime` target. The outputs of this target are placed in
 # out/host/iree_compiler.
 #
-# TODO: Unpin commit once IREE breakages at head are fixed.
 iree_compiler: | $(IREE_COMPILER_DIR)
-	scripts/download_iree_compiler.py --tag candidate-20220118.21
+	scripts/download_iree_compiler.py
 iree_commit_check:
 	scripts/check-iree-commit.sh $(IREE_SRC)
 
