@@ -27,13 +27,15 @@ toolchain_src:
 $(TOOLCHAIN_BUILD_DIR):
 	mkdir -p $(TOOLCHAIN_BUILD_DIR)
 
+# Note the make is purposely launched with high job counts, so we can build it
+# faster with a powerful machine (e.g. CI).
 $(TOOLCHAIN_BIN): | toolchain_src $(TOOLCHAIN_BUILD_DIR)
 	cd $(TOOLCHAIN_BUILD_DIR) && $(TOOLCHAIN_SRC_DIR)/configure \
 		--srcdir=$(TOOLCHAIN_SRC_DIR) \
 		--prefix=$(TOOLCHAIN_OUT_DIR) \
 		--with-arch=rv32imac \
 		--with-abi=ilp32
-	make -C $(TOOLCHAIN_BUILD_DIR) clean newlib
+	make -C $(TOOLCHAIN_BUILD_DIR) -j$(nproc --ignore 4) clean newlib
 	make -C $(TOOLCHAIN_BUILD_DIR) clean
 
 $(TOOLCHAINVP_BUILD_DIR):
@@ -46,13 +48,15 @@ toolchain_src_vp:
 		$(ROOTDIR)/scripts/download-toolchain.sh $(TOOLCHAIN_SRC_DIR) "GCC" "RVV"; \
 	fi
 
+# Note the make is purposely launched with high job counts, so we can build it
+# faster with a powerful machine (e.g. CI).
 $(TOOLCHAINVP_BIN): | toolchain_src_vp $(TOOLCHAINVP_BUILD_DIR)
 	cd $(TOOLCHAINVP_BUILD_DIR) && $(TOOLCHAIN_SRC_DIR)/configure \
 		--srcdir=$(TOOLCHAIN_SRC_DIR) \
 		--prefix=$(TOOLCHAINVP_OUT_DIR) \
 		--with-arch=rv32imv \
 		--with-abi=ilp32
-	make -C $(TOOLCHAINVP_BUILD_DIR) clean newlib
+	make -C $(TOOLCHAINVP_BUILD_DIR) -j$(nproc --ignore 4) clean newlib
 	make -C $(TOOLCHAINVP_BUILD_DIR) clean
 
 $(OUT)/toolchain.tar.gz: $(TOOLCHAIN_BIN)
@@ -102,18 +106,19 @@ toolchain_src_llvm:
 	fi
 
 # IREE toolchain
-# TODO(hcindyl): This will eventually be combined with toolchain_vp
 $(TOOLCHAINIREE_BUILD_DIR):
 	mkdir -p $(TOOLCHAINIREE_BUILD_DIR)
 
+# Note the make is purposely launched with high job counts, so we can build it
+# faster with a powerful machine (e.g. CI).
 $(TOOLCHAINIREE_BIN): | toolchain_src_llvm $(TOOLCHAINIREE_BUILD_DIR)
 	cd $(TOOLCHAINIREE_BUILD_DIR) && $(TOOLCHAINIREE_SRC_DIR)/configure \
 		--srcdir=$(TOOLCHAINIREE_SRC_DIR) \
 		--prefix=$(TOOLCHAINIREE_OUT_DIR) \
-		--with-arch=rv32imf \
+		--with-arch=rv32i2p0mf2p0 \
 		--with-abi=ilp32 \
 		--with-cmodel=medany
-	make -C $(TOOLCHAINIREE_BUILD_DIR) clean newlib
+	make -C $(TOOLCHAINIREE_BUILD_DIR)  -j$(nproc --ignore 4) clean newlib
 	make -C $(TOOLCHAINIREE_BUILD_DIR) clean
 
 # Build with 32-bit baremetal config.
