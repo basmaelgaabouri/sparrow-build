@@ -39,10 +39,10 @@ $(OUT)/tmp: | $(OUT)
 $(CACHE):
 	mkdir -p $(CACHE)
 
-$(CACHE)/toolchain: | $(OUT)/tmp $(CACHE)
+$(CACHE)/toolchain: | $(CACHE)
 	./scripts/install-toolchain.sh gcc
 
-$(CACHE)/toolchain_iree_rv32imf: | $(OUT)/tmp $(CACHE)
+$(CACHE)/toolchain_iree_rv32imf: | $(CACHE)
 	./scripts/install-toolchain.sh llvm
 
 ## Installs the GCC compiler for rv32imac
