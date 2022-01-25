@@ -1,7 +1,8 @@
 RENODE_SRC_DIR := $(ROOTDIR)/sim/renode
 RENODE_OUT_DIR := $(OUT)/host/renode
 RENODE_BIN     := $(RENODE_OUT_DIR)/renode.sh
-RENODE_CMD     := cd $(ROOTDIR) && $(RENODE_BIN) --disable-xwt
+RENODE_PORT    ?= 1234
+RENODE_CMD     := cd $(ROOTDIR) && $(RENODE_BIN) --disable-xwt --port $(RENODE_PORT)
 RENODE_COMMIT  := $(shell git -C $(RENODE_SRC_DIR) rev-parse  --short=8 HEAD)
 RENODE_SIM_GENERATOR_SCRIPT := $(ROOTDIR)/scripts/generate_renode_configs.sh
 

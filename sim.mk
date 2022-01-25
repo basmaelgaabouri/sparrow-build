@@ -22,6 +22,7 @@ $(OUT)/ext_flash_release.tar: $(MATCHA_BUNDLE_RELEASE) $(SMC_ELF) $(SMC_ROOTSERV
 # Renode commands to issue before the initial start of a simulation.
 # This pauses all cores and then sets cpu0 (SC) & cpu1 (SMC) running.
 RENODE_PRESTART_CMDS=pause; cpu0 IsHalted false;
+PORT_PRESTART_CMDS:=$(shell $(ROOTDIR)/scripts/generate-renode-port-cmd.sh $(RENODE_PORT))
 
 ## Launches an end-to-end build of the Sparrow system and starts Renode
 #
@@ -32,7 +33,8 @@ RENODE_PRESTART_CMDS=pause; cpu0 IsHalted false;
 # This is the default target for the build system, and is generally what you
 # need for day-to-day work on the software side of Sparrow.
 simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS); start"
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; $(PORT_PRESTART_CMDS) \
+	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
 
 ## Debug version of the `simulate` target
 #
@@ -40,7 +42,8 @@ simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree
 # unhalting the CPUs and starting the system, this alternate target only unhalts
 # cpu0, and uses the debug build of TockOS from the `matcha_tock_debug` target.
 simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS); start"
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; $(PORT_PRESTART_CMDS) \
+	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
 
 ## Debug version of the `simulate` target
 #
@@ -49,7 +52,8 @@ simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
 # renode with no CPUs unhalted, allowing for GDB to be used for early system
 # start.
 debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; i @sim/config/sparrow.resc; start"
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; $(PORT_PRESTART_CMDS) \
+	  i @sim/config/sparrow.resc; start"
 
 test_sc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow.resc
 	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_sc.tar; i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS); start"
@@ -62,4 +66,3 @@ test_vc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow.resc
 
 .PHONY:: sim_configs clean_sim_configs simulate simulate-debug debug-simulation
 .PHONY:: test_sc test_mc test_vc
-
