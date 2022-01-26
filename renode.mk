@@ -10,7 +10,7 @@ $(RENODE_OUT_DIR):
 
 $(RENODE_BIN): | $(RENODE_SRC_DIR) $(RENODE_OUT_DIR)
 	cd $(RENODE_SRC_DIR); \
-		./build.sh -d --skip-fetch -o $(RENODE_OUT_DIR)
+		./build.sh -d -o $(RENODE_OUT_DIR)
 	echo -e "commit_sha: $(RENODE_COMMIT)\n" > $(RENODE_OUT_DIR)/tag
 
 ## Builds the Renode system simulator
