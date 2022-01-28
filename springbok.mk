@@ -11,8 +11,8 @@ $(SPRINGBOK_BUILD_DIR)/build.ninja:
 springbok: $(SPRINGBOK_BUILD_DIR)/build.ninja
 	cmake --build $(SPRINGBOK_BUILD_DIR)
 
-test_springbok: $(SPRINGBOK_BUILD_DIR)/build.ninja
-	cmake --build $(SPRINGBOK_BUILD_DIR) --target AllTests
+test_springbok: springbok
+	cd $(SPRINGBOK_BUILD_DIR) && ctest -j 16
 
 clean_springbok:
 	@rm -rf $(SPRINGBOK_BUILD_DIR)

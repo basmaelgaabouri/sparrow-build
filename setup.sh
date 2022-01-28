@@ -82,7 +82,7 @@ function sim_springbok
 {
     local command="start;"
     if [[ "$2" == "debug" ]]; then
-        command=""
+        command="machine StartGdbServer 3333;"
     fi
     (cd "${ROOTDIR}" && renode -e "\$bin=@$1; i @sim/config/springbok.resc; \
     ${command} sysbus.vec_controlblock WriteDoubleWord 0xc 0" \
