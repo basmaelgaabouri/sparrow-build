@@ -2,17 +2,16 @@ QEMU_SRC_DIR          := $(ROOTDIR)/toolchain/riscv-qemu
 QEMU_OUT_DIR          := $(OUT)/host/qemu
 QEMU_BINARY           := $(QEMU_OUT_DIR)/riscv32-softmmu/qemu-system-riscv32
 
-## Installs the rust toolchain to cache/, including rustc and elf2tab.
-toolchain_rust: $(RUSTDIR)/bin/rustc $(RUSTDIR)/bin/elf2tab
+KATA_RUST_TOOLCHAIN   := ${RUSTDIR}/toolchains/$(KATA_RUST_VERSION)-x86_64-unknown-linux-gnu
 
-$(RUST_OUT_DIR):
-	mkdir -p $(RUSTDIR)
+## Installs the rust toolchains for kata and matcha_tock to cache/.
+toolchain_rust:  kata_toolchain matcha_toolchain
 
-$(RUSTDIR)/bin/rustup: | $(RUST_OUT_DIR)
-	bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y --no-modify-path'
+## Installs the kata rust toolchain and elf2tab to cache/.
+kata_toolchain: $(KATA_RUST_TOOLCHAIN) $(RUSTDIR)/bin/elf2tab
 
-$(RUSTDIR)/bin/rustc: | $(RUST_OUT_DIR) $(RUSTDIR)/bin/rustup
-	$(RUSTDIR)/bin/rustup +$(KATA_RUST_VERSION) target add riscv32imac-unknown-none-elf
+$(KATA_RUST_TOOLCHAIN):
+	./scripts/install-rust-toolchain.sh "$(RUSTDIR)" "$(KATA_RUST_VERSION)" riscv32imac-unknown-none-elf
 
 $(RUSTDIR)/bin/elf2tab: $(RUSTDIR)/bin/rustc
 	cargo install elf2tab --version 0.6.0
@@ -68,4 +67,4 @@ toolchain_clean:
 qemu_clean:
 	rm -rf $(QEMU_OUT_DIR)
 
-.PHONY:: qemu toolchain_clean qemu_clean install_llvm install_gcc
+.PHONY:: qemu toolchain_clean qemu_clean install_llvm install_gcc kata_toolchain

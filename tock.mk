@@ -32,8 +32,8 @@ $(MATCHA_BUNDLE_RELEASE): matcha_toolchain
 
 ## Updates the Rust toolchain for matcha's app+platform
 matcha_toolchain:
-	cd $(MATCHA_PLATFORM_SRC_DIR); rustup target add riscv32imc-unknown-none-elf
-	cd $(MATCHA_APP_SRC_DIR); rustup target add riscv32imc-unknown-none-elf
+	./scripts/install-rust-toolchain.sh "$(RUSTDIR)" $(MATCHA_PLATFORM_SRC_DIR)/rust-toolchain riscv32imc-unknown-none-elf
+	./scripts/install-rust-toolchain.sh "${RUSTDIR}" $(MATCHA_APP_SRC_DIR)/rust-toolchain riscv32imc-unknown-none-elf
 
 ## Builds TockOS for the security core in debug mode
 matcha_tock_debug: $(MATCHA_BUNDLE_DEBUG)
