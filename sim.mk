@@ -4,18 +4,19 @@ sim_configs:
 clean_sim_configs:
 	@rm -rf $(OUT)/renode_configs
 
-# NB: $(KATA_ROOTSERVER_*) is built together with $(KATA_KERNEL_*)
+SMC_ELF=$(OUT)/kata/kernel/kernel.elf
+SMC_ROOTSERVER=$(OUT)/kata/capdl-loader
 
-$(OUT)/ext_flash_debug.tar: $(MATCHA_BUNDLE_DEBUG) $(KATA_KERNEL_DEBUG) $(KATA_ROOTSERVER_DEBUG) | $(OUT)/tmp
+$(OUT)/ext_flash_debug.tar: $(MATCHA_BUNDLE_DEBUG) $(SMC_ELF) $(SMC_ROOTSERVER) | $(OUT)/tmp
 	ln -sf $(MATCHA_BUNDLE_DEBUG) $(OUT)/tmp/matcha-tock-bundle
-	ln -sf $(KATA_KERNEL_DEBUG) $(OUT)/tmp/kernel
-	ln -sf $(KATA_ROOTSERVER_DEBUG) $(OUT)/tmp/capdl-loader
+	ln -sf $(SMC_ELF) $(OUT)/tmp/kernel
+	ln -sf $(SMC_ROOTSERVER) $(OUT)/tmp/capdl-loader
 	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_debug.tar matcha-tock-bundle kernel capdl-loader
 
-$(OUT)/ext_flash_release.tar: $(MATCHA_BUNDLE_RELEASE) $(KATA_KERNEL_RELEASE) $(KATA_ROOTSERVER_RELEASE) | $(OUT)/tmp
+$(OUT)/ext_flash_release.tar: $(MATCHA_BUNDLE_RELEASE) $(SMC_ELF) $(SMC_ROOTSERVER) | $(OUT)/tmp
 	ln -sf $(MATCHA_BUNDLE_RELEASE) $(OUT)/tmp/matcha-tock-bundle
-	ln -sf $(KATA_KERNEL_RELEASE) $(OUT)/tmp/kernel
-	ln -sf $(KATA_ROOTSERVER_RELEASE) $(OUT)/tmp/capdl-loader
+	ln -sf $(SMC_ELF) $(OUT)/tmp/kernel
+	ln -sf $(SMC_ROOTSERVER) $(OUT)/tmp/capdl-loader
 	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_release.tar matcha-tock-bundle kernel capdl-loader
 
 # Renode commands to issue before the initial start of a simulation.
