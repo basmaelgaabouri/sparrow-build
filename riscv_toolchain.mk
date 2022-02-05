@@ -35,7 +35,8 @@ $(TOOLCHAIN_BIN): | toolchain_src $(TOOLCHAIN_BUILD_DIR)
 		--prefix=$(TOOLCHAIN_OUT_DIR) \
 		--with-arch=rv32imac \
 		--with-abi=ilp32
-	make -C $(TOOLCHAIN_BUILD_DIR) -j64 clean newlib
+	make -C $(TOOLCHAIN_BUILD_DIR) -j64 newlib \
+	  GDB_TARGET_FLAGS="--with-expat=yes --with-python=python3.8"
 	make -C $(TOOLCHAIN_BUILD_DIR) clean
 
 $(TOOLCHAINVP_BUILD_DIR):
@@ -56,7 +57,8 @@ $(TOOLCHAINVP_BIN): | toolchain_src_vp $(TOOLCHAINVP_BUILD_DIR)
 		--prefix=$(TOOLCHAINVP_OUT_DIR) \
 		--with-arch=rv32imv \
 		--with-abi=ilp32
-	make -C $(TOOLCHAINVP_BUILD_DIR) -j64 clean newlib
+	make -C $(TOOLCHAINVP_BUILD_DIR) -j64 newlib \
+	  GDB_TARGET_FLAGS="--with-expat=yes --with-python=python3.8"
 	make -C $(TOOLCHAINVP_BUILD_DIR) clean
 
 $(OUT)/toolchain.tar.gz: $(TOOLCHAIN_BIN)
@@ -118,7 +120,8 @@ $(TOOLCHAINIREE_BIN): | toolchain_src_llvm $(TOOLCHAINIREE_BUILD_DIR)
 		--with-arch=rv32i2p0mf2p0 \
 		--with-abi=ilp32 \
 		--with-cmodel=medany
-	make -C $(TOOLCHAINIREE_BUILD_DIR)  -j64 clean newlib
+	make -C $(TOOLCHAINIREE_BUILD_DIR) -j64 newlib \
+	  GDB_TARGET_FLAGS="--with-expat=yes --with-python=python3.8"
 	make -C $(TOOLCHAINIREE_BUILD_DIR) clean
 
 # Build with 32-bit baremetal config.
