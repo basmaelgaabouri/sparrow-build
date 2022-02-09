@@ -46,7 +46,7 @@ $(IREE_COMPILER_DIR):
 # out/host/iree_compiler.
 #
 iree_compiler: | $(IREE_COMPILER_DIR)
-	scripts/download_iree_compiler.py --tag candidate-20220128.31
+	scripts/download_iree_compiler.py
 iree_commit_check:
 	scripts/check-iree-commit.sh $(IREE_SRC)
 
