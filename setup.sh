@@ -64,7 +64,7 @@ export RENODE_PORT=1234
 
 function renode
 {
-    "${OUT}/host/renode/renode.sh" "$@"
+    "${OUT}/host/renode/renode" "$@"
 }
 
 function iss
@@ -84,7 +84,8 @@ function sim_springbok
     if [[ "$2" == "debug" ]]; then
         command="machine StartGdbServer 3333;"
     fi
-    (cd "${ROOTDIR}" && renode -e "\$bin=@$1; i @sim/config/springbok.resc; \
+    local bin_file=$(realpath $1)
+    (cd "${ROOTDIR}" && renode -e "\$bin=@${bin_file}; i @sim/config/springbok.resc; \
     ${command} sysbus.vec_controlblock WriteDoubleWord 0xc 0" \
         --disable-xwt --console)
 
