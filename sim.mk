@@ -41,8 +41,8 @@ simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree
 # unhalting the CPUs and starting the system, this alternate target only unhalts
 # cpu0, and uses the debug build of TockOS from the `matcha_tock_debug` target.
 simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; $(PORT_PRESTART_CMDS) \
-	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \$$kernel = @$(KATA_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
+	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) cpu1 CreateseL4; start"
 
 ## Debug version of the `simulate` target
 #
@@ -51,7 +51,7 @@ simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
 # renode with no CPUs unhalted, allowing for GDB to be used for early system
 # start.
 debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; $(PORT_PRESTART_CMDS) \
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \$$kernel = @$(KATA_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
 	  i @sim/config/sparrow.resc; start"
 
 test_sc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow.resc
