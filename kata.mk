@@ -222,8 +222,16 @@ cargo_test_kata_os_common_slot_allocator:
 cargo_test_debugconsole_zmodem:
 	cd $(KATA_COMPONENTS)/DebugConsole/zmodem && $(CARGO_TEST)
 
+kata-flatbuffers: $(OUT)/host/flatbuffers/bin/flatc $(ROOTDIR)/sw/kata/flatbuffers
+	$(MAKE) -C $(ROOTDIR)/sw/kata/flatbuffers \
+		FLATC=$(OUT)/host/flatbuffers/bin/flatc \
+		SRC_DIR=$(ROOTDIR)/sw/kata/flatbuffers \
+		TARGET_BASEDIR=$(ROOTDIR) \
+		all
+
 .PHONY:: kata kata-clean
 .PHONY:: kata-bundle-debug kata-bundle-release
 .PHONY:: kata-builtins-debug kata-builtins-release
 .PHONY:: kata-gen-headers kata-clean-headers
+.PHONY:: kata-flatbuffers
 .PHONY:: cargo_test_kata $(CARGO_TEST_KATA)
