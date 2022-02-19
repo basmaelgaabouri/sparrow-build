@@ -12,8 +12,8 @@ $(VERILATOR_BIN): | $(VERILATOR_SRC_DIR) $(VERILATOR_BUILD_DIR)
 	cd $(VERILATOR_BUILD_DIR) > /dev/null; sh configure \
 		--srcdir=$(VERILATOR_SRC_DIR) \
 		--prefix=$(VERILATOR_OUT_DIR)
-	make -j$(shell nproc) -C $(VERILATOR_BUILD_DIR)
-	make -C $(VERILATOR_BUILD_DIR) install
+	$(MAKE) -C $(VERILATOR_BUILD_DIR)
+	$(MAKE) -C $(VERILATOR_BUILD_DIR) install
 
 ## Removes only the Verilator build artifacts from out/
 verilator_clean:

@@ -24,7 +24,7 @@ $(QEMU_OUT_DIR): | $(QEMU_SRC_DIR)
 $(QEMU_BINARY): $(QEMU_DEPS) | $(QEMU_OUT_DIR)
 	cd $(QEMU_OUT_DIR) && $(QEMU_SRC_DIR)/configure \
 		--target-list=riscv32-softmmu,riscv32-linux-user
-	make -C $(QEMU_OUT_DIR) -j64
+	$(MAKE) -C $(QEMU_OUT_DIR)
 
 ## Builds and installs the QEMU RISCV32 simulator.
 #
