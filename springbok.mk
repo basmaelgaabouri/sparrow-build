@@ -1,5 +1,5 @@
-SPRINGBOK_BUILD_DIR=$(OUT)/springbok/
-SPRINGBOK_SRC_DIR=$(ROOTDIR)/sw/vec
+SPRINGBOK_BUILD_DIR:=$(OUT)/springbok/rvv
+SPRINGBOK_SRC_DIR:=$(ROOTDIR)/sw/vec
 
 $(SPRINGBOK_BUILD_DIR)/build.ninja:
 	cmake -B $(SPRINGBOK_BUILD_DIR) -GNinja $(SPRINGBOK_SRC_DIR)
@@ -7,7 +7,7 @@ $(SPRINGBOK_BUILD_DIR)/build.ninja:
 ## Vector core BSP and RVV test code
 #
 # This target builds the springbok BSP as well as the associated vector test
-# code. Source code is in sw/vec, while output is placed in out/springbok.
+# code. Source code is in sw/vec, while output is placed in out/springbok/rvv.
 springbok: $(SPRINGBOK_BUILD_DIR)/build.ninja
 	cmake --build $(SPRINGBOK_BUILD_DIR)
 

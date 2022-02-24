@@ -49,6 +49,7 @@ include $(ROOTDIR)/build/renode.mk
 include $(ROOTDIR)/build/verilator.mk
 include $(ROOTDIR)/build/flatbuffers.mk
 include $(ROOTDIR)/build/systemc.mk
+include $(ROOTDIR)/build/springbok_systemc.mk
 
 # Must be after other makefiles so that we pick up various $(TARGETS)
 include $(ROOTDIR)/build/sim.mk
