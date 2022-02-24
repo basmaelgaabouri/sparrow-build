@@ -16,10 +16,11 @@ systemc: | $(SYSTEMC_BUILD_DIR)
 	cmake -B $(SYSTEMC_BUILD_DIR) \
 		-DCMAKE_INSTALL_PREFIX=$(SYSTEMC_INSTALL_DIR) \
 		-DCMAKE_BUILD_TYPE=Release \
+		-DBUILD_SHARED_LIBS=False \
+		-DCMAKE_CXX_STANDARD=17 \
 		-G Ninja \
 		$(SYSTEMC_SRC_DIR)
 	cmake --build $(SYSTEMC_BUILD_DIR) --target install
-	cmake --build $(SYSTEMC_BUILD_DIR) --target clean
 
 ## Removes systemc build artifacts and install from out/
 systemc_clean:
