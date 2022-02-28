@@ -46,7 +46,8 @@ $(IREE_COMPILER_DIR):
 # out/host/iree_compiler.
 #
 iree_compiler: | $(IREE_COMPILER_DIR)
-	scripts/download_iree_compiler.py
+# TODO(b/221857706) Temporarily pin to the earlier release 59
+	scripts/download_iree_compiler.py --tag candidate-20220225.59
 iree_commit_check:
 	scripts/check-iree-commit.sh $(IREE_SRC)
 
