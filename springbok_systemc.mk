@@ -7,14 +7,14 @@ SPINGBOK_SYSTEMC_SOURCES := $(shell find $(SPINGBOK_SYSTEMC_SRC_DIR) \
 	-type f)
 
 $(SPINGBOK_SYSTEMC_BUILD_DIR):
-	mkdir -p $(SPRINGBOK_BUILD_DIR)
+	mkdir -p $(SPINGBOK_SYSTEMC_BUILD_DIR)
 
 ## Springbok HW SystemC
 #
 # This target builds the springbok core SystemC module using the libsystemc
 # library. The source code is at hw/springbok/systemc, while the output is
 # at out/springbok/systemc.
-springbok_systemc: systemc $(SPINGBOK_SYSTEMC_SOURCES) | $(SPRINGBOK_BUILD_DIR)
+springbok_systemc: systemc $(SPINGBOK_SYSTEMC_SOURCES) | $(SPINGBOK_SYSTEMC_BUILD_DIR)
 	$(MAKE) -C $(SPINGBOK_SYSTEMC_SRC_DIR) all
 
 springbok_systemc_clean:
