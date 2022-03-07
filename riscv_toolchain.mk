@@ -12,7 +12,7 @@ TOOLCHAINIREE_SRC_DIR   := $(OUT)/tmp/toolchain/riscv-gnu-toolchain_iree
 TOOLCHAINIREE_BUILD_DIR  := $(OUT)/tmp/toolchain/build_toolchain_iree
 TOOLCHAINIREE_OUT_DIR    := $(CACHE)/toolchain_iree_rv32imf
 TOOLCHAINIREE_BIN        := $(TOOLCHAINIREE_OUT_DIR)/bin/riscv32-unknown-elf-gdb
-TOOLCHAINLLVM_SRC_DIR    := $(OUT)//tmp/toolchain/llvm-project
+TOOLCHAINLLVM_SRC_DIR    := $(OUT)/tmp/toolchain/llvm-project
 TOOLCHAINLLVM_BUILD_DIR  := $(OUT)/tmp/toolchain/build_toolchain_llvm
 TOOLCHAINLLVM_BIN        := $(TOOLCHAINIREE_OUT_DIR)/bin/clang
 
@@ -82,7 +82,9 @@ $(OUT)/toolchain_rvv.tar.gz: $(TOOLCHAINVP_BIN)
 #
 # This target can take hours to build, and results in a tarball and sha256sum
 # called `out/toolchain.tar.gz` and `out/toolchain.tar.gz.sha256sum`, ready for
-# upload.
+# upload. In the process of generating this tarball, this target also builds the
+# actual tools in `cache/toolchain`, so untarring this tarball is
+# unneccessary.
 toolchain: $(OUT)/toolchain.tar.gz
 
 ## Builds the GCC toolchain for the vector core.
@@ -94,7 +96,9 @@ toolchain: $(OUT)/toolchain.tar.gz
 #
 # This target can take hours to build, and results in a tarball and sha256sum
 # called `out/toolchain_rvv.tar.gz` and `out/toolchain_rvv.tar.gz.sha256sum`,
-# ready for upload.
+# ready for upload. In the process of generating this tarball, this target also
+# builds the actual tools in `cache/toolchain_vp`, so untarring this tarball
+# is unneccessary.
 toolchain_vp: $(OUT)/toolchain_rvv.tar.gz
 
 toolchain_vp_clean:
@@ -160,7 +164,9 @@ $(OUT)/toolchain_iree_rv32.tar.gz: $(TOOLCHAINLLVM_BIN)
 #
 # This target can take hours to build, and results in a tarball and sha256sum
 # called `out/toolchain_iree_rv32.tar.gz` and
-# `out/toolchain_iree_rv32.tar.gz.sha256sum`, ready for upload.
+# `out/toolchain_iree_rv32.tar.gz.sha256sum`, ready for upload. In the process
+# of generating this tarball, this target also builds the actual tools in
+# `cache/toolchain_iree_rv32imf`, so untarring this tarball is unneccessary.
 toolchain_llvm: $(OUT)/toolchain_iree_rv32.tar.gz
 
 ## Removes the IREE RV32IMF toolchain from cache/, forcing a re-fetch if needed.
