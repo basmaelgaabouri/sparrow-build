@@ -27,6 +27,41 @@ systemc_clean:
 	@rm -rf $(SYSTEMC_BUILD_DIR)
 	@rm -rf $(SYSTEMC_INSTALL_DIR)
 
-clean:: systemc_clean
+SYSTEMCV_SRC_DIR     := $(ROOTDIR)/sim/systemcv
+SYSTEMCV_BUILD_DIR   := $(OUT)/systemcv
+SYSTEMCV_INSTALL_DIR := $(OUT)/host/systemcv
 
-.PHONY:: systemc systemc_clean
+$(SYSTEMCV_BUILD_DIR):
+	mkdir -p $(SYSTEMCV_BUILD_DIR)
+
+## Builds the System C Verification Libraries
+#
+# Using sources in sim/systemcv, this target builds systemcv from source and stores
+# its output in out/host/systemcv.
+#
+# To rebuild this target, run `m systemcv_clean` and re-run.
+#
+
+systemcv: systemc | $(SYSTEMCV_BUILD_DIR)
+	cd $(SYSTEMCV_BUILD_DIR) && \
+		rsync -avHx --exclude=.git $(SYSTEMCV_SRC_DIR)/ $(SYSTEMCV_BUILD_DIR)
+	cd $(SYSTEMCV_BUILD_DIR) && \
+		./config/bootstrap
+	cd $(SYSTEMCV_BUILD_DIR) && $(SYSTEMCV_BUILD_DIR)/configure \
+		--srcdir=$(SYSTEMCV_BUILD_DIR) \
+		--prefix=$(SYSTEMCV_INSTALL_DIR) \
+		--with-systemc=$(SYSTEMC_INSTALL_DIR) \
+		--enable-static=yes \
+		--enable-shared=no
+	$(MAKE) -C $(SYSTEMCV_BUILD_DIR)
+	$(MAKE) -C $(SYSTEMCV_BUILD_DIR) install
+
+
+## Removes systemc verification build artifacts and install from out/
+systemcv_clean:
+	@rm -rf $(SYSTEMCV_BUILD_DIR)
+	@rm -rf $(SYSTEMCV_INSTALL_DIR)
+
+clean:: systemc_clean systemcv_clean
+
+.PHONY:: systemc systemc_clean systemcv systemcv_clean

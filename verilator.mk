@@ -7,9 +7,9 @@ $(VERILATOR_BUILD_DIR):
 	mkdir -p $(VERILATOR_BUILD_DIR)
 
 $(VERILATOR_BIN): | $(VERILATOR_SRC_DIR) $(VERILATOR_BUILD_DIR)
-	cd $(VERILATOR_BUILD_DIR) > /dev/null; \
+	cd $(VERILATOR_BUILD_DIR) && \
 		autoconf -o $(VERILATOR_BUILD_DIR)/configure $(VERILATOR_SRC_DIR)/configure.ac
-	cd $(VERILATOR_BUILD_DIR) > /dev/null; sh configure \
+	cd $(VERILATOR_BUILD_DIR) && sh configure \
 		--srcdir=$(VERILATOR_SRC_DIR) \
 		--prefix=$(VERILATOR_OUT_DIR)
 	$(MAKE) -C $(VERILATOR_BUILD_DIR)
