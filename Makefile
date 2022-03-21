@@ -40,6 +40,7 @@ include $(ROOTDIR)/build/toolchain.mk
 include $(ROOTDIR)/build/kata.mk
 include $(ROOTDIR)/build/tock.mk
 include $(ROOTDIR)/build/opentitan_sw.mk
+
 include $(ROOTDIR)/build/springbok.mk
 
 include $(ROOTDIR)/build/iree.mk

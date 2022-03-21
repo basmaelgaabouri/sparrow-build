@@ -59,6 +59,7 @@ export PATH="${ROOTDIR}/scripts:${PATH}"
 export PATH="${OUT}/host/renode:${PATH}"
 export PATH="${OUT}/host/qemu/riscv32-softmmu:${PATH}"
 export PATH="${OUT}/host/flatbuffers/bin:${PATH}"
+export PATH="${OUT}/host/verilator/bin:${PATH}"
 
 export KATA_RUST_VERSION="nightly-2021-08-05"
 export RENODE_PORT=1234
