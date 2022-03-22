@@ -14,14 +14,14 @@ MATCHA_BUNDLE_RELEASE := $(OUT)/matcha-bundle-release.elf
 
 ########################################
 
-$(MATCHA_BUNDLE_DEBUG): matcha_toolchain
+$(MATCHA_BUNDLE_DEBUG): | rust_presence_check
 	cd $(MATCHA_PLATFORM_SRC_DIR); cargo build
 	cd $(MATCHA_APP_SRC_DIR); PLATFORM=opentitan cargo build
 	elf2tab -n matcha -o $(MATCHA_APP_DEBUG).tab $(MATCHA_APP_DEBUG) --stack 4096 --app-heap 1024 --kernel-heap 1024 --protected-region-size=64
 	cp $(MATCHA_PLATFORM_DEBUG) $(MATCHA_BUNDLE_DEBUG)
 	riscv32-unknown-elf-objcopy --update-section .apps=$(MATCHA_APP_DEBUG).tbf $(MATCHA_BUNDLE_DEBUG)
 
-$(MATCHA_BUNDLE_RELEASE): matcha_toolchain
+$(MATCHA_BUNDLE_RELEASE): | rust_presence_check
 	cd $(MATCHA_PLATFORM_SRC_DIR); cargo build --release
 	cd $(MATCHA_APP_SRC_DIR); PLATFORM=opentitan cargo build --release
 	elf2tab -n matcha -o $(MATCHA_APP_RELEASE).tab $(MATCHA_APP_RELEASE) --stack 4096 --app-heap 1024 --kernel-heap 1024 --protected-region-size=64
@@ -29,11 +29,6 @@ $(MATCHA_BUNDLE_RELEASE): matcha_toolchain
 	riscv32-unknown-elf-objcopy --update-section .apps=$(MATCHA_APP_RELEASE).tbf $(MATCHA_BUNDLE_RELEASE)
 
 ########################################
-
-## Updates the Rust toolchain for matcha's app+platform
-matcha_toolchain:
-	./scripts/install-rust-toolchain.sh "$(RUSTDIR)" $(MATCHA_PLATFORM_SRC_DIR)/rust-toolchain riscv32imc-unknown-none-elf
-	./scripts/install-rust-toolchain.sh "${RUSTDIR}" $(MATCHA_APP_SRC_DIR)/rust-toolchain riscv32imc-unknown-none-elf
 
 ## Builds TockOS for the security core in debug mode
 matcha_tock_debug: $(MATCHA_BUNDLE_DEBUG)
@@ -46,4 +41,4 @@ matcha_tock_clean:
 	cd $(MATCHA_PLATFORM_SRC_DIR); make TARGET_DIRECTORY=$(OUT)/tock clean
 	cd $(MATCHA_APP_SRC_DIR); PLATFORM=opentitan cargo clean --target-dir=$(OUT)/matcha
 
-.PHONY:: matcha_toolchain matcha_tock_debug matcha_tock_release matcha_tock_clean $(MATCHA_BUNDLE_DEBUG) $(MATCHA_BUNDLE_RELEASE)
+.PHONY:: matcha_tock_debug matcha_tock_release matcha_tock_clean

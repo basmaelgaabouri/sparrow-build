@@ -29,7 +29,7 @@ $(SHODAN_BOOT_ROM_MANIFEST): $(SHODAN_BOOT_ROM_BUILD_NINJA_SCRIPT)
 # This builds a simple multi-core boot ROM that can bootstrap the Sparrow system
 # in simulation. Source is in sw/multihart_boot_rom, while output is placed in
 # out/sparrow_boot_rom
-multihart_boot_rom: $(SHODAN_BOOT_ROM_DEPS)
+multihart_boot_rom: $(SHODAN_BOOT_ROM_DEPS) | rust_presence_check
 	ninja -C $(SHODAN_BOOT_ROM_BUILD_OUT_DIR) \
 		multihart_boot_rom/multihart_boot_rom_export_sim_verilator;
 

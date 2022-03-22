@@ -2,16 +2,58 @@ QEMU_SRC_DIR          := $(ROOTDIR)/toolchain/riscv-qemu
 QEMU_OUT_DIR          := $(OUT)/host/qemu
 QEMU_BINARY           := $(QEMU_OUT_DIR)/riscv32-softmmu/qemu-system-riscv32
 
-KATA_RUST_TOOLCHAIN   := ${RUSTDIR}/toolchains/$(KATA_RUST_VERSION)-x86_64-unknown-linux-gnu
+## Installs the rust toolchains for kata and matcha_tock.
+#
+# This fetches the tarball from google cloud storage, verifies the checksums and
+# untars it to cache/. In addition, it ensures that elf2tab is installed into
+# the cache/ toolchain dir.
+install_rust: $(CACHE)/rust_toolchain $(RUSTDIR)/bin/elf2tab
 
-## Installs the rust toolchains for kata and matcha_tock to cache/.
-toolchain_rust:  kata_toolchain matcha_toolchain
+## Checks for the rust compilers presence
+#
+# This target is primarily used as a dependency for other targets that use the
+# Rust toolchain and trampoline into brain-damaged build systems that either
+# fetch their own version of Rust or otherwise produce bad output when the
+# environment is not setup correctly.
+#
+# This target should not be called by the end user, but used as an order-only
+# dependency by other targets.
+rust_presence_check:
+	@if [[ ! -f $(ROOTDIR)/cache/rust_toolchain/bin/rustc ]]; then \
+		echo '!!! Rust is not installed. Please run `m tools`!'; \
+		exit 1; \
+	fi
 
-## Installs the kata rust toolchain and elf2tab to cache/.
-kata_toolchain: $(KATA_RUST_TOOLCHAIN) $(RUSTDIR)/bin/elf2tab
+$(CACHE)/rust_toolchain:
+	$(ROOTDIR)/scripts/fetch-rust-toolchain.sh -d
 
-$(KATA_RUST_TOOLCHAIN):
-	./scripts/install-rust-toolchain.sh "$(RUSTDIR)" "$(KATA_RUST_VERSION)" riscv32imac-unknown-none-elf
+## Collates all of the rust toolchains.
+#
+# This target makes use of the install-rust-toolchain.sh script to prepare the
+# cache/toolchain_rust tree with binaries fetched from upstream Rust builds.
+# 
+# As a general day-to-day developer, you should not need to run this target.
+# This actually pulls down new binaries from upstream Rust servers, and should
+# ultimately NOT BE USED LONG TERM.
+#
+# Again, DO NOT USE THIS TARGET UNLESS YOU HAVE A REALLY GOOD REASON -- it is a
+# security violation!
+#
+# If you find you need to use this, please contact jtgans@ or hcindyl@ FIRST.
+collate_rust_toolchains: install_kata_toolchain install_matcha_toolchain
+
+## Collates the Rust toolchain components for kata's needs.
+#
+# See also `collate_rust_toolchains`.
+collate_kata_rust_toolchain:
+	$(ROOTDIR)/scripts/install-rust-toolchain.sh -v "$(KATA_RUST_VERSION)" riscv32imac-unknown-none-elf
+
+## Collates the Rust toolchain components for matcha's app+platform.
+#
+# See also `collate_rust_toolchains`.
+collate_matcha_rust_toolchain:
+	$(ROOTDIR)/scripts/install-rust-toolchain.sh -p $(MATCHA_PLATFORM_SRC_DIR)/rust-toolchain riscv32imc-unknown-none-elf
+	$(ROOTDIR)/scripts/install-rust-toolchain.sh -p $(MATCHA_APP_SRC_DIR)/rust-toolchain riscv32imc-unknown-none-elf
 
 $(RUSTDIR)/bin/elf2tab: $(RUSTDIR)/bin/rustc
 	cargo install elf2tab --version 0.6.0
@@ -67,4 +109,5 @@ toolchain_clean:
 qemu_clean:
 	rm -rf $(QEMU_OUT_DIR)
 
-.PHONY:: qemu toolchain_clean qemu_clean install_llvm install_gcc kata_toolchain
+.PHONY:: qemu toolchain_clean qemu_clean install_llvm install_gcc install_rust rust_presence_check
+.PHONY:: collate_rust_toolchains collate_kata_rust_toolchain collate_matcha_rust_toolchain
