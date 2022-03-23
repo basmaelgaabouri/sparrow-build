@@ -7,7 +7,7 @@ QEMU_BINARY           := $(QEMU_OUT_DIR)/riscv32-softmmu/qemu-system-riscv32
 # This fetches the tarball from google cloud storage, verifies the checksums and
 # untars it to cache/. In addition, it ensures that elf2tab is installed into
 # the cache/ toolchain dir.
-install_rust: $(CACHE)/rust_toolchain $(RUSTDIR)/bin/elf2tab
+install_rust: $(CACHE)/rust_toolchain
 
 ## Checks for the rust compilers presence
 #
@@ -40,7 +40,7 @@ $(CACHE)/rust_toolchain:
 # security violation!
 #
 # If you find you need to use this, please contact jtgans@ or hcindyl@ FIRST.
-collate_rust_toolchains: install_kata_toolchain install_matcha_toolchain
+collate_rust_toolchains: collate_kata_rust_toolchain collate_matcha_rust_toolchain
 
 ## Collates the Rust toolchain components for kata's needs.
 #
@@ -54,9 +54,6 @@ collate_kata_rust_toolchain:
 collate_matcha_rust_toolchain:
 	$(ROOTDIR)/scripts/install-rust-toolchain.sh -p $(MATCHA_PLATFORM_SRC_DIR)/rust-toolchain riscv32imc-unknown-none-elf
 	$(ROOTDIR)/scripts/install-rust-toolchain.sh -p $(MATCHA_APP_SRC_DIR)/rust-toolchain riscv32imc-unknown-none-elf
-
-$(RUSTDIR)/bin/elf2tab: $(RUSTDIR)/bin/rustc
-	cargo install elf2tab --version 0.6.0
 
 QEMU_DEPS=$(wildcard $(QEMU_SRC_DIR)/**/*.[ch])
 

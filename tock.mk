@@ -14,14 +14,17 @@ MATCHA_BUNDLE_RELEASE := $(OUT)/matcha-bundle-release.elf
 
 ########################################
 
-$(MATCHA_BUNDLE_DEBUG): | rust_presence_check
+$(RUSTDIR)/bin/elf2tab: | rust_presence_check
+	cargo install elf2tab --version 0.6.0
+
+$(MATCHA_BUNDLE_DEBUG): $(RUSTDIR)/bin/elf2tab | rust_presence_check
 	cd $(MATCHA_PLATFORM_SRC_DIR); cargo build
 	cd $(MATCHA_APP_SRC_DIR); PLATFORM=opentitan cargo build
 	elf2tab -n matcha -o $(MATCHA_APP_DEBUG).tab $(MATCHA_APP_DEBUG) --stack 4096 --app-heap 1024 --kernel-heap 1024 --protected-region-size=64
 	cp $(MATCHA_PLATFORM_DEBUG) $(MATCHA_BUNDLE_DEBUG)
 	riscv32-unknown-elf-objcopy --update-section .apps=$(MATCHA_APP_DEBUG).tbf $(MATCHA_BUNDLE_DEBUG)
 
-$(MATCHA_BUNDLE_RELEASE): | rust_presence_check
+$(MATCHA_BUNDLE_RELEASE): $(RUSTDIR)/bin/elf2tab | rust_presence_check
 	cd $(MATCHA_PLATFORM_SRC_DIR); cargo build --release
 	cd $(MATCHA_APP_SRC_DIR); PLATFORM=opentitan cargo build --release
 	elf2tab -n matcha -o $(MATCHA_APP_RELEASE).tab $(MATCHA_APP_RELEASE) --stack 4096 --app-heap 1024 --kernel-heap 1024 --protected-region-size=64
