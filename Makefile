@@ -48,6 +48,7 @@ include $(ROOTDIR)/build/sparrow_boot_rom.mk
 include $(ROOTDIR)/build/riscv_tests.mk
 include $(ROOTDIR)/build/riscv_toolchain.mk
 include $(ROOTDIR)/build/renode.mk
+include $(ROOTDIR)/build/verible.mk
 include $(ROOTDIR)/build/verilator.mk
 include $(ROOTDIR)/build/flatbuffers.mk
 include $(ROOTDIR)/build/systemc.mk
