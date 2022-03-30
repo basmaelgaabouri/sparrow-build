@@ -126,6 +126,19 @@ kata-bundle-release: $(KATA_KERNEL_RELEASE)
 # NB: shorthand for testing (sim targets depend on explicit pathnames)
 kata: kata-bundle-debug kata-bundle-release
 
+# Minisel requires that we've already generated our platform-specific headers
+# in $OUT/.../kernel, so we depend on the Kata kernel here.
+
+$(KATA_OUT_DEBUG)/minisel/minisel.elf: $(ROOTDIR)/kata/projects/minisel/minisel.c $(KATA_KERNEL_DEBUG)
+	$(MAKE) -C $(ROOTDIR)/kata/projects/minisel SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 OUT_KATA=$(KATA_OUT_DEBUG) OUT_MINISEL=$(KATA_OUT_DEBUG)/minisel all
+
+$(KATA_OUT_RELEASE)/minisel/minisel.elf: $(ROOTDIR)/kata/projects/minisel/minisel.c $(KATA_KERNEL_RELEASE)
+	$(MAKE) -C $(ROOTDIR)/kata/projects/minisel OPT=-O3 DBG= SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 OUT_KATA=$(KATA_OUT_RELEASE) OUT_MINISEL=$(KATA_OUT_RELEASE)/minisel all
+
+minisel_debug: $(KATA_OUT_DEBUG)/minisel/minisel.elf
+minisel_release: $(KATA_OUT_RELEASE)/minisel/minisel.elf
+
+
 # NB: cargo_test_debugconsole_zmodem is broken
 NULL=
 CARGO_TEST_KATA=\

@@ -54,6 +54,30 @@ debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
 	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \$$kernel = @$(KATA_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
 	  i @sim/config/sparrow.resc; start"
 
+# Launches Sparrow with Minisel as the rootserver for low-level testing purposes.
+# FIXME(@aappleby) - The Minisel bundle renames "minisel.elf" to "capdl-loader"
+# because we don't currently have any way to specify the rootserver app other
+# than via filename
+$(OUT)/ext_flash_minisel_debug.tar: $(MATCHA_BUNDLE_DEBUG) $(KATA_KERNEL_DEBUG) $(KATA_OUT_DEBUG)/minisel/minisel.elf | $(OUT)/tmp
+	ln -sf $(MATCHA_BUNDLE_DEBUG) $(OUT)/tmp/matcha-tock-bundle
+	ln -sf $(KATA_KERNEL_DEBUG) $(OUT)/tmp/kernel
+	ln -sf $(KATA_OUT_DEBUG)/minisel/minisel.elf $(OUT)/tmp/capdl-loader
+	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_minisel_debug.tar matcha-tock-bundle kernel capdl-loader
+
+$(OUT)/ext_flash_minisel_release.tar: $(MATCHA_BUNDLE_RELEASE) $(KATA_KERNEL_RELEASE) $(KATA_OUT_RELEASE)/minisel/minisel.elf | $(OUT)/tmp
+	ln -sf $(MATCHA_BUNDLE_RELEASE) $(OUT)/tmp/matcha-tock-bundle
+	ln -sf $(KATA_KERNEL_RELEASE) $(OUT)/tmp/kernel
+	ln -sf $(KATA_OUT_RELEASE)/minisel/minisel.elf $(OUT)/tmp/capdl-loader
+	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_minisel_release.tar matcha-tock-bundle kernel capdl-loader
+
+simulate_minisel: renode multihart_boot_rom $(OUT)/ext_flash_minisel_debug.tar iree
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_minisel_debug.tar; \$$kernel = @$(KATA_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
+	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
+
+simulate_minisel_release: renode multihart_boot_rom $(OUT)/ext_flash_minisel_release.tar iree
+	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_minisel_release.tar; $(PORT_PRESTART_CMDS) \
+	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
+
 test_sc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow.resc
 	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/test_sc.tar; i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS); start"
 
