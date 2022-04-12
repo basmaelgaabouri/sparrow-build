@@ -15,11 +15,11 @@ $(RISCV_TEST_SPRINGBOK_BUILD_DIR):
 # them at out/springbok/riscv-tests
 # To run the artifact, please build spike with `m spike` and out/host/spike/bin/spike <elf>
 #
-springbok_riscv_tests: install_gcc | $(RISCV_TEST_SPRINGBOK_BUILD_DIR) $(RISCV_TEST_SPRINGBOK_OUT_DIR)
+springbok_riscv_tests: install_llvm | $(RISCV_TEST_SPRINGBOK_BUILD_DIR) $(RISCV_TEST_SPRINGBOK_OUT_DIR)
 	cd $(RISCV_TEST_SPRINGBOK_BUILD_DIR) && \
 		$(RISCV_TEST_SPRINGBOK_SRC_DIR)/configure \
 			--with-xlen=32 --srcdir=$(RISCV_TEST_SPRINGBOK_SRC_DIR) \
-			--target="${CACHE}/toolchain/bin/riscv32-unknown-elf" \
+			--target="${CACHE}/toolchain_iree_rv32imf/bin/riscv32-unknown-elf" \
 			--prefix=$(RISCV_TEST_SPRINGBOK_OUT_DIR)
 	$(MAKE) -C $(RISCV_TEST_SPRINGBOK_BUILD_DIR) install
 	@echo "To run, please run \`m spike\` and then out/host/spike/bin/spike <elf>"
