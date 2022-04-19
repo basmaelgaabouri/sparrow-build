@@ -144,7 +144,8 @@ NULL=
 CARGO_TEST_KATA=\
 	cargo_test_kata_proc_manager \
 	cargo_test_kata_proc_interface \
-	cargo_test_debugconsole_kata_logger \
+	cargo_test_kata_os_common_logger \
+	cargo_test_kata_os_common_slot_allocator \
 	$(NULL)
 
 ## Runs all cargo unit tests for the Kata operating system
@@ -159,8 +160,13 @@ cargo_test_kata_proc_interface:
 	cd $(KATA_COMPONENTS)/ProcessManager/kata-proc-interface && $(CARGO_TEST)
 
 ## Runs cargo unit tests for the KataLogger service
-cargo_test_debugconsole_kata_logger:
-	cd $(KATA_COMPONENTS)/DebugConsole/kata-logger && \
+cargo_test_kata_os_common_logger:
+	cd $(KATA_COMPONENTS)/kata-os-common/src/logger && \
+		$(CARGO_TEST) -- --test-threads=1
+
+## Runs cargo unit tests for the KataSlotAllocator crate
+cargo_test_kata_os_common_slot_allocator:
+	cd $(KATA_COMPONENTS)/kata-os-common/src/slot-allocator && \
 		$(CARGO_TEST) -- --test-threads=1
 
 ## Runs cargo unit tests for the DebugConsole zmomdem support
