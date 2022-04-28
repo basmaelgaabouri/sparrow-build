@@ -138,15 +138,32 @@ $(KATA_OUT_RELEASE)/minisel/minisel.elf: $(ROOTDIR)/kata/projects/minisel/minise
 minisel_debug: $(KATA_OUT_DEBUG)/minisel/minisel.elf
 minisel_release: $(KATA_OUT_RELEASE)/minisel/minisel.elf
 
+# TODO(sleffler): minsel deps (at least) don't work so need to remove artifacts on src change
+
+KATA_BUNDLE_RELEASE	:= $(KATA_OUT_RELEASE)/minisel/minisel.elf
+KATA_MODEL_RELEASE	:= $(OUT)/springbok_iree/samples/quant_model/mobilenet_v1_emitc_static
+$(OUT)/ext_builtins_release.cpio: $(KATA_BUNDLE_RELEASE) $(KATA_MODEL_RELEASE) | $(OUT)/tmp
+	$(ROOTDIR)/scripts/prepare_bundle_image.sh -o $@ -m $(KATA_MODEL_RELEASE) -a $(KATA_BUNDLE_RELEASE)
+
+KATA_BUNDLE_DEBUG	:= $(KATA_OUT_DEBUG)/minisel/minisel.elf
+KATA_MODEL_DEBUG	:= $(OUT)/springbok_iree/samples/quant_model/mobilenet_v1_emitc_static \
+			   $(OUT)/springbok_iree/samples/quant_model/mobilenet_v1_bytecode_static
+$(OUT)/ext_builtins_debug.cpio: $(KATA_BUNDLE_DEBUG) $(KATA_MODEL_DEBUG) | $(OUT)/tmp
+	$(ROOTDIR)/scripts/prepare_bundle_image.sh -o $@ -m $(KATA_MODEL_DEBUG) -a $(KATA_BUNDLE_DEBUG)
+
+## Generates cpio archive of Kata builtins with debugging suport
+kata-builtins-debug: $(OUT)/ext_builtins_debug.cpio
+## Generates cpio archive of Kata builtins for release
+kata-builtins-release: $(OUT)/ext_builtins_release.cpio
+## Generates both debug & release cpio archives of Kata builtins
+kata-builtins: kata-builtins-debug kata-builtins-release
 
 # NB: cargo_test_debugconsole_zmodem is broken
 #	TODO(b/232928288): temporarily disable cargo_test_kata_proc_manager &
 #   cargo_test_kata_proc_interface &
 #   cargo_test_kata_os_common_slot_allocator; they have dependency issues
-NULL=
 CARGO_TEST_KATA=\
-	cargo_test_kata_os_common_logger \
-	$(NULL)
+	cargo_test_kata_os_common_logger
 
 ## Runs all cargo unit tests for the Kata operating system
 cargo_test_kata: $(CARGO_TEST_KATA)
@@ -175,5 +192,6 @@ cargo_test_debugconsole_zmodem:
 
 .PHONY:: kata kata-clean
 .PHONY:: kata-bundle-debug kata-bundle-release
+.PHONY:: kata-builtins-debug kata-builtins-release
 .PHONY:: kata-gen-headers kata-clean-headers
 .PHONY:: cargo_test_kata $(CARGO_TEST_KATA)

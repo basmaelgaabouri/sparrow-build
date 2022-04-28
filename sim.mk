@@ -31,17 +31,22 @@ PORT_PRESTART_CMDS:=$(shell $(ROOTDIR)/scripts/generate-renode-port-cmd.sh $(REN
 #
 # This is the default target for the build system, and is generally what you
 # need for day-to-day work on the software side of Sparrow.
-simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; $(PORT_PRESTART_CMDS) \
-	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
+simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree $(OUT)/ext_builtins_release.cpio
+	$(RENODE_CMD) -e "\
+    \$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; \
+    \$$cpio = @$(ROOTDIR)/out/ext_builtins_release.cpio; \
+    $(PORT_PRESTART_CMDS) i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
 
 ## Debug version of the `simulate` target
 #
 # This top-level target does the same job as `simulate`, but instead of
 # unhalting the CPUs and starting the system, this alternate target only unhalts
 # cpu0, and uses the debug build of TockOS from the `matcha_tock_debug` target.
-simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \$$kernel = @$(KATA_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
+simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree $(OUT)/ext_builtins_debug.cpio
+	$(RENODE_CMD) -e "\
+    \$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \
+    \$$cpio = @$(ROOTDIR)/out/ext_builtins_debug.cpio; \
+    \$$kernel = @$(KATA_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
 	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) cpu1 CreateSeL4 0xffffffef; start"
 
 ## Debug version of the `simulate` target
@@ -50,8 +55,11 @@ simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
 # unhalting the CPUs and starting the system, this alternate target starts
 # renode with no CPUs unhalted, allowing for GDB to be used for early system
 # start.
-debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree
-	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \$$kernel = @$(KATA_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
+debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree $(OUT)/ext_builtins_debug.cpio
+	$(RENODE_CMD) -e "\
+    \$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \
+    \$$cpio = @$(ROOTDIR)/out/ext_builtins_debug.cpio; \
+    \$$kernel = @$(KATA_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
 	  i @sim/config/sparrow.resc; start"
 
 # Launches Sparrow with Minisel as the rootserver for low-level testing purposes.
