@@ -74,7 +74,16 @@ END {
   print "Targets available are:";
   print "";
   column = 0;
+
+  # Sort the target list keys into a normal array so we can sort 'em.
   for (target in docs) {
+    targets[++j] = target
+  }
+
+  asort(targets)
+
+  for (target in targets) {
+    target = targets[target]
     printf("%s ", target);
     column += length(target) + 1;
     if (column > 75) {
