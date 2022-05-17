@@ -140,12 +140,12 @@ minisel_release: $(KATA_OUT_RELEASE)/minisel/minisel.elf
 
 
 # NB: cargo_test_debugconsole_zmodem is broken
+#	TODO(b/232928288): temporarily disable cargo_test_kata_proc_manager &
+#   cargo_test_kata_proc_interface &
+#   cargo_test_kata_os_common_slot_allocator; they have dependency issues
 NULL=
 CARGO_TEST_KATA=\
-	cargo_test_kata_proc_manager \
-	cargo_test_kata_proc_interface \
 	cargo_test_kata_os_common_logger \
-	cargo_test_kata_os_common_slot_allocator \
 	$(NULL)
 
 ## Runs all cargo unit tests for the Kata operating system
