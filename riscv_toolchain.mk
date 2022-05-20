@@ -3,11 +3,6 @@ TOOLCHAIN_BUILD_DIR := $(OUT)/tmp/toolchain/build_toolchain
 TOOLCHAIN_OUT_DIR   := $(CACHE)/toolchain
 TOOLCHAIN_BIN       := $(TOOLCHAIN_OUT_DIR)/bin/riscv32-unknown-elf-gcc
 
-TOOLCHAINVP_BUILD_DIR := $(OUT)/tmp/toolchain/build_toolchain_vp
-TOOLCHAINVP_OUT_DIR   := $(CACHE)/toolchain_vp
-TOOLCHAINVP_BIN       := $(TOOLCHAINVP_OUT_DIR)/bin/riscv32-unknown-elf-gcc
-
-# TODO(hcindyl): Use toolchain_vp when 32-bit baremetal target is ready
 TOOLCHAINIREE_SRC_DIR   := $(OUT)/tmp/toolchain/riscv-gnu-toolchain_iree
 TOOLCHAINIREE_BUILD_DIR  := $(OUT)/tmp/toolchain/build_toolchain_iree
 TOOLCHAINIREE_OUT_DIR    := $(CACHE)/toolchain_iree_rv32imf
@@ -39,40 +34,11 @@ $(TOOLCHAIN_BIN): | toolchain_src $(TOOLCHAIN_BUILD_DIR)
 	  GDB_TARGET_FLAGS="--with-expat=yes --with-python=python3.9"
 	$(MAKE) -C $(TOOLCHAIN_BUILD_DIR) clean
 
-$(TOOLCHAINVP_BUILD_DIR):
-	mkdir -p $(TOOLCHAINVP_BUILD_DIR)
-
-toolchain_src_vp:
-	if [[ -f "${TOOLCHAINVP_BIN}" ]]; then \
-		echo "toolchain_vp exists, run 'm toolchain_vp_clean' if you really want to rebuild"; \
-	else \
-		$(ROOTDIR)/scripts/download-toolchain.sh $(TOOLCHAIN_SRC_DIR) "GCC" "RVV"; \
-	fi
-
-# Note the make is purposely launched with high job counts, so we can build it
-# faster with a powerful machine (e.g. CI).
-$(TOOLCHAINVP_BIN): | toolchain_src_vp $(TOOLCHAINVP_BUILD_DIR)
-	cd $(TOOLCHAINVP_BUILD_DIR) && $(TOOLCHAIN_SRC_DIR)/configure \
-		--srcdir=$(TOOLCHAIN_SRC_DIR) \
-		--prefix=$(TOOLCHAINVP_OUT_DIR) \
-		--with-arch=rv32imv \
-		--with-abi=ilp32
-	$(MAKE) -C $(TOOLCHAINVP_BUILD_DIR) newlib \
-	  GDB_TARGET_FLAGS="--with-expat=yes --with-python=python3.9"
-	$(MAKE) -C $(TOOLCHAINVP_BUILD_DIR) clean
-
 $(OUT)/toolchain.tar.gz: $(TOOLCHAIN_BIN)
 	cd $(CACHE) && tar -czf $(OUT)/toolchain.tar.gz toolchain
 	cd $(OUT) && sha256sum toolchain.tar.gz > toolchain.tar.gz.sha256sum
 	@echo "==========================================================="
 	@echo "Toolchain tarball ready at $(OUT)/toolchain.tar.gz"
-	@echo "==========================================================="
-
-$(OUT)/toolchain_rvv.tar.gz: $(TOOLCHAINVP_BIN)
-	cd $(CACHE) && tar -czf $(OUT)/toolchain_rvv.tar.gz toolchain_vp
-	cd $(OUT) && sha256sum toolchain_rvv.tar.gz > toolchain_rvv.tar.gz.sha256sum
-	@echo "==========================================================="
-	@echo "GCC VP Toolchain tarball ready at $(OUT)/toolchain_rvv.tar.gz"
 	@echo "==========================================================="
 
 ## Builds the GCC toolchain for the security core and SMC.
@@ -86,23 +52,6 @@ $(OUT)/toolchain_rvv.tar.gz: $(TOOLCHAINVP_BIN)
 # actual tools in `cache/toolchain`, so untarring this tarball is
 # unneccessary.
 toolchain: $(OUT)/toolchain.tar.gz
-
-## Builds the GCC toolchain for the vector core.
-#
-# Note: this actually builds from source, rather than fetching a release
-# tarball, and is most likely not the target you actually want. Additionally,
-# GCC is not typically used for building vector core code -- we use LLVM,
-# instead.
-#
-# This target can take hours to build, and results in a tarball and sha256sum
-# called `out/toolchain_rvv.tar.gz` and `out/toolchain_rvv.tar.gz.sha256sum`,
-# ready for upload. In the process of generating this tarball, this target also
-# builds the actual tools in `cache/toolchain_vp`, so untarring this tarball
-# is unneccessary.
-toolchain_vp: $(OUT)/toolchain_rvv.tar.gz
-
-toolchain_vp_clean:
-	rm -rf $(OUT)/tmp $(CACHE)/toolchain_vp
 
 toolchain_src_llvm:
 	if [[ -f "${TOOLCHAINLLVM_BIN}" ]]; then \
@@ -173,4 +122,4 @@ toolchain_llvm: $(OUT)/toolchain_iree_rv32.tar.gz
 toolchain_llvm_clean:
 	rm -rf $(TOOLCHAINIREE_OUT_DIR) $(OUT)/tmp/toolchain
 
-.PHONY:: toolchain toolchain_llvm toolchain_vp toolchain_src toolchain_src_vp toolchain_src_llvm toolchain_vp_clean toolchain_llvm_clean
+.PHONY:: toolchain toolchain_llvm toolchain_src toolchain_src_llvm toolchain_llvm_clean
