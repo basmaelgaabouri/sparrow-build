@@ -7,7 +7,7 @@ QEMU_BINARY           := $(QEMU_OUT_DIR)/riscv32-softmmu/qemu-system-riscv32
 # This fetches the tarball from google cloud storage, verifies the checksums and
 # untars it to cache/. In addition, it ensures that elf2tab is installed into
 # the cache/ toolchain dir.
-install_rust: $(CACHE)/rust_toolchain
+install_rust: $(CACHE)/rust_toolchain/bin/rustc
 
 ## Checks for the rust compilers presence
 #
@@ -24,14 +24,15 @@ rust_presence_check:
 		exit 1; \
 	fi
 
-$(CACHE)/rust_toolchain:
+# Point to the binary to make sure it is installed.
+$(CACHE)/rust_toolchain/bin/rustc:
 	$(ROOTDIR)/scripts/fetch-rust-toolchain.sh -d
 
 ## Collates all of the rust toolchains.
 #
 # This target makes use of the install-rust-toolchain.sh script to prepare the
 # cache/toolchain_rust tree with binaries fetched from upstream Rust builds.
-# 
+#
 # As a general day-to-day developer, you should not need to run this target.
 # This actually pulls down new binaries from upstream Rust servers, and should
 # ultimately NOT BE USED LONG TERM.
@@ -77,23 +78,25 @@ $(OUT)/tmp: | $(OUT)
 $(CACHE):
 	mkdir -p $(CACHE)
 
-$(CACHE)/toolchain: | $(CACHE)
+# Point to the gcc binary to make sure it is installed.
+$(CACHE)/toolchain/bin/riscv32-unknown-elf-gcc: | $(CACHE)
 	./scripts/install-toolchain.sh gcc
 
-$(CACHE)/toolchain_iree_rv32imf: | $(CACHE)
+# Point to the clang++ target to make sure the binary is installed.
+$(CACHE)/toolchain_iree_rv32imf/bin/clang++: | $(CACHE)
 	./scripts/install-toolchain.sh llvm
 
 ## Installs the GCC compiler for rv32imac
 #
 # Requires network access. This fetches the toolchain from the GCP archive and
 # extracts it locally to the cache/.
-install_gcc: $(CACHE)/toolchain
+install_gcc: $(CACHE)/toolchain/bin/riscv32-unknown-elf-gcc
 
 ## Installs the LLVM compiler for rv32imf
 #
 # Requires network access. This fetches the toolchain from the GCP archive and
 # extracts it locally to the cache/.
-install_llvm: $(CACHE)/toolchain_iree_rv32imf
+install_llvm: $(CACHE)/toolchain_iree_rv32imf/bin/clang++
 
 ## Cleans up the toolchain from the cache directory
 #

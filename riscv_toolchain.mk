@@ -1,7 +1,7 @@
 TOOLCHAIN_SRC_DIR   := $(OUT)/tmp/toolchain/riscv-gnu-toolchain
 TOOLCHAIN_BUILD_DIR := $(OUT)/tmp/toolchain/build_toolchain
 TOOLCHAIN_OUT_DIR   := $(CACHE)/toolchain
-TOOLCHAIN_BIN       := $(TOOLCHAIN_OUT_DIR)/bin/riscv32-unknown-elf-gcc
+TOOLCHAIN_BIN       := $(TOOLCHAIN_OUT_DIR)/bin/riscv32-unknown-elf-gdb
 
 TOOLCHAINIREE_SRC_DIR   := $(OUT)/tmp/toolchain/riscv-gnu-toolchain_iree
 TOOLCHAINIREE_BUILD_DIR  := $(OUT)/tmp/toolchain/build_toolchain_iree
