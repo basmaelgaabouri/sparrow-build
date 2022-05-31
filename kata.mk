@@ -160,10 +160,10 @@ kata-builtins: kata-builtins-debug kata-builtins-release
 
 # NB: cargo_test_debugconsole_zmodem is broken
 #	TODO(b/232928288): temporarily disable cargo_test_kata_proc_manager &
-#   cargo_test_kata_proc_interface &
-#   cargo_test_kata_os_common_slot_allocator; they have dependency issues
+#   cargo_test_kata_proc_interface; they have dependency issues
 CARGO_TEST_KATA=\
-	cargo_test_kata_os_common_logger
+	cargo_test_kata_os_common_logger \
+	cargo_test_kata_os_common_slot_allocator
 
 ## Runs all cargo unit tests for the Kata operating system
 cargo_test_kata: $(CARGO_TEST_KATA)
