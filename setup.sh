@@ -100,7 +100,11 @@ function get-groups
         --get manifest.groups
 }
 
-alias m='make -C "${ROOTDIR}" -f "${ROOTDIR}/build/Makefile"'
+function m
+{
+    (cd "${ROOTDIR}" && make -f "${ROOTDIR}/build/Makefile" "$@")
+    return $?
+}
 
 function hmm
 {
