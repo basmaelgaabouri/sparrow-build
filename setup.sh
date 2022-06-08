@@ -106,12 +106,51 @@ function m
     return $?
 }
 
+function _hmm
+{
+    local targetname="$1"; shift
+    targetname="${targetname}" gawk -f "${ROOTDIR}/build/helpmemake.awk" \
+              "${ROOTDIR}/build/Makefile" "${ROOTDIR}"/build/*.mk
+}
+
 function hmm
 {
+    local usage="Usage: hmm [-h] [-l] <targetname>"
+    local long=""
+    local args=$(getopt hl $*)
+    set -- $args
+
+    for i; do
+        case "$1" in
+            -l)
+                long=1
+                shift 1
+                ;;
+
+            --)
+                shift
+                break
+                ;;
+
+            -h|*)
+                echo $usage >/dev/stderr
+                return 1
+                ;;
+        esac
+    done
+
     local targetname="${1}"; shift
 
-    targetname="${targetname}" awk -f "${ROOTDIR}/build/helpmemake.awk" \
-              "${ROOTDIR}/build/Makefile" "${ROOTDIR}"/build/*.mk
+    if [[ "${targetname}" ]]; then
+        _hmm "${targetname}"
+        return 0
+    fi
+
+    if [[ -z "${long}" ]]; then
+        _hmm | fmt --width=80
+    else
+        _hmm
+    fi
 }
 
 function safe-abandon
@@ -187,6 +226,18 @@ if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
         }
 
         complete -F _j j
+
+        function _complete_build_targets
+        {
+            local cur="${COMP_WORDS[COMP_CWORD]}"
+            COMPREPLY=()
+            if [[ "${COMP_CWORD}" -eq 1 ]]; then
+                COMPREPLY=( $(compgen -W "$(hmm -l)" $cur) )
+            fi
+        }
+
+        complete -F _complete_build_targets m
+        complete -F _complete_build_targets hmm
     fi
 fi
 echo "========================================"
@@ -195,7 +246,13 @@ echo OUT="${OUT}"
 echo "========================================"
 echo
 echo Type \'m \[target\]\' to build.
+echo
+echo "Targets available are:"
+echo
 hmm
+echo
+echo "To get more information on a target, use 'hmm [target]'"
+echo
 
 if [[ ! -d "${RUSTDIR}" ]] ||
    [[ ! -d "${ROOTDIR}/cache/toolchain" ]] ||

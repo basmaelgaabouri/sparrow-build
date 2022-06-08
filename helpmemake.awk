@@ -1,4 +1,4 @@
-#!/bin/env awk
+#!/bin/env gawk
 # Script to extract make-style documentation comments for various targets in the
 # Sparrow build system.
 #
@@ -70,30 +70,10 @@ END {
     exit(0);
   }
 
-  print "";
-  print "Targets available are:";
-  print "";
-  column = 0;
+  # GAWK extension: sort the docs array keys into the sorted_targets array
+  asorti(docs, sorted_targets)
 
-  # Sort the target list keys into a normal array so we can sort 'em.
-  for (target in docs) {
-    targets[++j] = target
+  for (target in sorted_targets) {
+    printf("%s\n", sorted_targets[target]);
   }
-
-  asort(targets)
-
-  for (target in targets) {
-    target = targets[target]
-    printf("%s ", target);
-    column += length(target) + 1;
-    if (column > 75) {
-      print "";
-      column = 0;
-    }
-  }
-  print "";
-
-  print "";
-  print "To get more information on a target, use 'hmm [target]'"
-  print "";
 }
