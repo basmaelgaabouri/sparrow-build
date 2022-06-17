@@ -62,7 +62,7 @@ export PATH="${OUT}/host/flatbuffers/bin:${PATH}"
 export PATH="${OUT}/host/verilator/bin:${PATH}"
 export PATH="${OUT}/host/verible/bin:${PATH}"
 
-export KATA_RUST_VERSION="nightly-2021-08-05"
+export KATA_RUST_VERSION="nightly-2021-11-05"
 export RENODE_PORT=1234
 
 function renode
