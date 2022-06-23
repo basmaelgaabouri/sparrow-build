@@ -45,9 +45,8 @@ $(IREE_COMPILER_DIR):
 # the `iree_runtime` target. The outputs of this target are placed in
 # out/host/iree_compiler.
 #
-# TODO(b/229642620): Remove the temporary pin and come up with a better solution
 iree_compiler: | $(IREE_COMPILER_DIR)
-	scripts/download_iree_compiler.py --tag_name candidate-20220417.110
+	scripts/download_iree_compiler.py
 iree_commit_check:
 	scripts/check-iree-commit.sh $(IREE_SRC)
 
