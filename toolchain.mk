@@ -25,9 +25,8 @@ rust_presence_check:
 	fi
 
 # Point to the binary to make sure it is installed.
-# Temporarily pin to 2022-06-28 version until the GCS flush the latest tarball
 $(CACHE)/rust_toolchain/bin/rustc:
-	$(ROOTDIR)/scripts/fetch-rust-toolchain.sh -d -v 2022-06-28
+	$(ROOTDIR)/scripts/fetch-rust-toolchain.sh -d
 
 ## Collates all of the rust toolchains.
 #
