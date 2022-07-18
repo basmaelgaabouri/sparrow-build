@@ -6,7 +6,7 @@
 # NB: see $(KATA_SRC_DIR)/easy-settings.cmake for config knobs;
 #     but beware you may need to "clean" before building with changes
 
-KATA_SRC_DIR      := $(ROOTDIR)/kata/projects/processmanager
+KATA_SRC_DIR      := $(ROOTDIR)/kata/projects/kata
 KATA_COMPONENTS   := $(KATA_SRC_DIR)/apps/system/components
 CARGO_TEST        := cargo +$(KATA_RUST_VERSION) test
 
