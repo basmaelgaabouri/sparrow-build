@@ -47,7 +47,7 @@ simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree $(OUT)
     \$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \
     \$$cpio = @$(ROOTDIR)/out/ext_builtins_debug.cpio; \
     \$$kernel = @$(KATA_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
-	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) cpu1 CreateSeL4 0xffffffef; start"
+	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) cpu1 CreateSeL4 0xffffffee; start"
 
 ## Debug version of the `simulate` target
 #
