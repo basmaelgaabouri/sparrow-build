@@ -1,9 +1,11 @@
-IREE_SRC=$(ROOTDIR)/toolchain/iree
-QEMU_PATH=$(OUT)/host/qemu/riscv32-softmmu
-TOOLCHAINRV32_PATH=$(CACHE)/toolchain_iree_rv32imf
-SPRINGBOK_ROOT=$(ROOTDIR)/sw/vec/springbok
-IREE_RUNTIME_ROOT=$(ROOTDIR)/sw/vec_iree
+IREE_SRC:=$(ROOTDIR)/toolchain/iree
+TOOLCHAINRV32_PATH:=$(CACHE)/toolchain_iree_rv32imf
+IREE_RUNTIME_ROOT:=$(ROOTDIR)/sw/vec_iree
+MODEL_SRC_DIR:=$(ROOTDIR)/ml/ml-models-public
 IREE_RUNTIME_OUT=$(OUT)/springbok_iree
+
+MODEL_INTERNAL_SRC_DIR:=$(ROOTDIR)/ml/ml-models
+IREE_RUNTIME_INTERNAL_OUT=$(OUT)/springbok_iree_internal
 
 RV32_EXE_LINKER_FLAGS=-Wl,--print-memory-usage
 
@@ -59,7 +61,17 @@ $(IREE_RUNTIME_OUT)/build.ninja: | iree_check iree_commit_check
 	    -DRISCV_TOOLCHAIN_ROOT=$(TOOLCHAINRV32_PATH) \
 	    -DRISCV_COMPILER_FLAGS="$(RV32_COMPILER_FLAGS)" \
 	    -DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)" \
-	    $(IREE_RUNTIME_ROOT)
+	    $(MODEL_SRC_DIR)
+
+$(IREE_RUNTIME_INTERNAL_OUT)/build.ninja: | iree_check iree_commit_check
+	cmake -G Ninja -B $(IREE_RUNTIME_INTERNAL_OUT) \
+	    -DCMAKE_TOOLCHAIN_FILE="$(IREE_RUNTIME_ROOT)/cmake/riscv_iree.cmake" \
+	    -DCMAKE_BUILD_TYPE=MinSizeRel \
+	    -DIREE_HOST_BINARY_ROOT="$(IREE_COMPILER_DIR)/install" \
+	    -DRISCV_TOOLCHAIN_ROOT=$(TOOLCHAINRV32_PATH) \
+	    -DRISCV_COMPILER_FLAGS="$(RV32_COMPILER_FLAGS)" \
+	    -DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)" \
+	    $(MODEL_INTERNAL_SRC_DIR)
 
 ## Installs the IREE runtime applications.
 #
@@ -75,7 +87,31 @@ iree_runtime: $(IREE_RUNTIME_OUT)/build.ninja | iree_check iree_commit_check
 ## Installs the IREE compiler and its runtime applications.
 iree: iree_compiler iree_runtime
 
+## Installs the IREE runtime internal applications.
+#
+# Unlike the `iree_runtime` target, this target builds the runtime application
+# for internal models. The results of the build are placed in
+# out/springbok_iree_internal.
+#
+# In general, you probably want the `iree_runtime` target instead.
+iree_runtime_internal: $(IREE_RUNTIME_INTERNAL_OUT)/build.ninja | \
+		iree_check iree_commit_check
+	cmake --build $(IREE_RUNTIME_INTERNAL_OUT)
+
+## Installs the IREE compiler and internal runtime applications.
+#
+# In general, you probably want to run `iree` target to build the public
+# applications.
+iree_internal: iree_compiler iree_runtime_internal
+
+## Clean IREE compiler and runtime applications.
 iree_clean:
 	rm -rf $(IREE_COMPILER_DIR) $(IREE_RUNTIME_OUT)
 
-.PHONY:: iree iree_check iree_compiler iree_runtime iree_clean iree_commit_check iree_compiler_src
+## Clean IREE compiler and runtime application of internal models
+iree_internal_clean:
+	rm -rf $(IREE_COMPILER_DIR) $(IREE_RUNTIME_INTERNAL_OUT)
+
+.PHONY:: iree iree_check iree_compiler iree_runtime iree_clean
+.PHONY:: iree_commit_check iree_compiler_src
+.PHONY:: iree_runtime_internal iree_internal iree_internal_clean
