@@ -25,8 +25,10 @@ rust_presence_check:
 	fi
 
 # Point to the binary to make sure it is installed.
+# TODO(b/240307148): Unpin release version until the latest release is promoted
+# and updated.
 $(CACHE)/rust_toolchain/bin/rustc:
-	$(ROOTDIR)/scripts/fetch-rust-toolchain.sh -d
+	$(ROOTDIR)/scripts/fetch-rust-toolchain.sh -d -v 2022-07-26
 
 ## Collates all of the rust toolchains.
 #
