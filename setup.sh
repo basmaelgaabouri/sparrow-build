@@ -65,6 +65,8 @@ export PATH="${OUT}/host/verible/bin:${PATH}"
 export KATA_RUST_VERSION="nightly-2021-11-05"
 export RENODE_PORT=1234
 
+export PYTHONPATH="${PYTHONPATH}:${ROOTDIR}/cicd/"
+
 function renode
 {
     "${OUT}/host/renode/renode" "$@"
