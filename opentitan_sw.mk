@@ -7,10 +7,6 @@ OPENTITAN_BUILD_SW_DEVICE_TESTS_DIR := $(OPENTITAN_BUILD_DIR)/build-out/sw/devic
 OPENTITAN_BUILD_LOG_DIR       := $(OPENTITAN_BUILD_DIR)/build-log
 OPENTITAN_BUILD_LOG_SW_DIR    := $(OPENTITAN_BUILD_DIR)/build-log/sw
 
-OPENTITAN_BAZEL_BIN_PATH := $(shell cd $(OPENTITAN_SRC_DIR) && bazel info bazel-bin)
-OPENTITAN_BAZEL_OUTPUT_PATH := $(shell cd $(OPENTITAN_SRC_DIR) && bazel info output_path)
-OPENTITAN_BAZEL_LOG_PATH := $(shell cd $(OPENTITAN_SRC_DIR) && bazel info bazel-testlogs)
-
 $(OPENTITAN_BUILD_OUT_DIR):
 	@echo "Creating output directory $(OPENTITAN_BUILD_DIR)"
 	@mkdir -p "$(OPENTITAN_BUILD_DIR)"
@@ -38,7 +34,8 @@ $(OPENTITAN_BUILD_SW_DEVICE_DIR)/examples/hello_world: | $(OPENTITAN_BUILD_OUT_D
 opentitan_sw_helloworld: | $(OPENTITAN_BUILD_SW_DEVICE_DIR)/examples/hello_world
 	cd $(OPENTITAN_SRC_DIR) && \
 		bazel build //sw/device/examples/hello_world:hello_world
-	find $(OPENTITAN_BAZEL_OUTPUT_PATH) -name "hello_world*.elf" \
+	cd $(OPENTITAN_SRC_DIR) && \
+		find "bazel-out/" -name "hello_world*.elf" \
 		-exec cp -f '{}' "$(OPENTITAN_BUILD_SW_DEVICE_DIR)/examples/hello_world" \;
 
 $(OPENTITAN_BUILD_SW_DEVICE_DIR)/boot_rom: | $(OPENTITAN_BUILD_OUT_DIR)
@@ -50,7 +47,8 @@ $(OPENTITAN_BUILD_SW_DEVICE_DIR)/boot_rom: | $(OPENTITAN_BUILD_OUT_DIR)
 opentitan_sw_bootrom: | $(OPENTITAN_BUILD_SW_DEVICE_DIR)/boot_rom
 	cd $(OPENTITAN_SRC_DIR) && \
 		bazel build //sw/device/lib/testing/test_rom:test_rom
-	find $(OPENTITAN_BAZEL_OUTPUT_PATH) -name "test_rom_sim_verilator.scr.39.vmem" \
+	cd $(OPENTITAN_SRC_DIR) && \
+		find "bazel-out/" -name "test_rom_sim_verilator.scr.39.vmem" \
 		-exec cp -f '{}' "$(OPENTITAN_BUILD_SW_DEVICE_DIR)/boot_rom/boot_rom_sim_verilator.scr.39.vmem" \;
 
 $(OPENTITAN_BUILD_SW_DEVICE_DIR)/otp_img: | $(OPENTITAN_BUILD_OUT_DIR)
@@ -61,7 +59,8 @@ $(OPENTITAN_BUILD_SW_DEVICE_DIR)/otp_img: | $(OPENTITAN_BUILD_OUT_DIR)
 opentitan_opt_img: | $(OPENTITAN_BUILD_SW_DEVICE_DIR)/otp_img
 	cd $(OPENTITAN_SRC_DIR) && \
 		bazel build //hw/ip/otp_ctrl/data:img_dev
-	find $(OPENTITAN_BAZEL_BIN_PATH) -name "img_dev*.vmem" \
+	cd $(OPENTITAN_SRC_DIR) && \
+		find "bazel-bin/" -name "img_dev*.vmem" \
 		-exec cp -f '{}' "$(OPENTITAN_BUILD_SW_DEVICE_DIR)/otp_img/otp_img_sim_verilator.vmem" \;
 
 ## Build the Verilator sim SW for Open Titan from hw/opentitan-upstream
@@ -87,8 +86,10 @@ opentitan_sw_test: | $(OPENTITAN_BUILD_OUT_DIR) \
 			xargs bazel test --build_tests_only=false \
 				--define DISABLE_VERILATOR_BUILD=true \
 				--test_tag_filters=-broken,-cw310,-verilator,-dv
-	cp -rf $(OPENTITAN_BAZEL_BIN_PATH)/sw/device $(OPENTITAN_BUILD_SW_DIR)
-	cp -rf $(OPENTITAN_BAZEL_LOG_PATH)/sw/device $(OPENTITAN_BUILD_LOG_SW_DIR)
+	cd $(OPENTITAN_SRC_DIR) && \
+		cp -rf "bazel-bin/sw/device" "$(OPENTITAN_BUILD_SW_DIR)"
+	cd $(OPENTITAN_SRC_DIR) && \
+		cp -rf "bazel-testlogs/sw/device" "$(OPENTITAN_BUILD_LOG_SW_DIR)"
 
 
 ## Removes only the OpenTitan build artifacts from out/opentitan/sw
