@@ -18,11 +18,13 @@ $(RUSTDIR)/bin/elf2tab: | rust_presence_check
 	cargo install elf2tab --version 0.6.0
 
 $(MATCHA_APP_DEBUG): | rust_presence_check
-	cd $(MATCHA_PLATFORM_SRC_DIR); cargo build
+	export CARGO_NET_GIT_FETCH_WITH_CLI=true; \
+		cd $(MATCHA_PLATFORM_SRC_DIR); cargo build
 	cd $(MATCHA_APP_SRC_DIR); PLATFORM=opentitan cargo build
 
 $(MATCHA_APP_RELEASE): | rust_presence_check
-	cd $(MATCHA_PLATFORM_SRC_DIR); cargo build --release
+	export CARGO_NET_GIT_FETCH_WITH_CLI=true; \
+		cd $(MATCHA_PLATFORM_SRC_DIR); cargo build --release
 	cd $(MATCHA_APP_SRC_DIR); PLATFORM=opentitan cargo build --release
 
 $(MATCHA_BUNDLE_DEBUG): $(MATCHA_APP_DEBUG) $(RUSTDIR)/bin/elf2tab | rust_presence_check
