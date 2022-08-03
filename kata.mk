@@ -172,13 +172,15 @@ fibonacci_release: $(KATA_OUT_RELEASE)/fibonacci/fibonacci.elf
 
 KATA_BUNDLE_RELEASE	:= $(KATA_OUT_RELEASE)/hello/hello.elf \
                        $(KATA_OUT_RELEASE)/fibonacci/fibonacci.elf
-KATA_MODEL_RELEASE	:= $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static
+# TODO(b/241254202): Revert back to use emitc_static model
+KATA_MODEL_RELEASE	:= $(OUT)/springbok_iree/quant_models/mobilenet_v1_bytecode_static
 $(OUT)/ext_builtins_release.cpio: $(KATA_BUNDLE_RELEASE) $(KATA_MODEL_RELEASE) | $(OUT)/tmp
 	$(ROOTDIR)/scripts/prepare_bundle_image.sh -o $@ -m $(KATA_MODEL_RELEASE) -a $(KATA_BUNDLE_RELEASE)
 
 KATA_BUNDLE_DEBUG	:= $(KATA_OUT_DEBUG)/hello/hello.elf \
                        $(KATA_OUT_DEBUG)/fibonacci/fibonacci.elf
-KATA_MODEL_DEBUG	:= $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static
+# TODO(b/241254202): Revert back to use emitc_static model
+KATA_MODEL_DEBUG	:= $(OUT)/springbok_iree/quant_models/mobilenet_v1_bytecode_static
 $(OUT)/ext_builtins_debug.cpio: $(KATA_BUNDLE_DEBUG) $(KATA_MODEL_DEBUG) | $(OUT)/tmp
 	$(ROOTDIR)/scripts/prepare_bundle_image.sh -o $@ -m $(KATA_MODEL_DEBUG) -a $(KATA_BUNDLE_DEBUG)
 
