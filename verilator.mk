@@ -10,6 +10,7 @@ $(VERILATOR_BIN): | $(VERILATOR_SRC_DIR) $(VERILATOR_BUILD_DIR)
 	cd $(VERILATOR_BUILD_DIR) && \
 		autoconf -o $(VERILATOR_BUILD_DIR)/configure $(VERILATOR_SRC_DIR)/configure.ac
 	cd $(VERILATOR_BUILD_DIR) && sh configure \
+		CC=gcc-11 CXX=g++-11 \
 		--srcdir=$(VERILATOR_SRC_DIR) \
 		--prefix=$(VERILATOR_OUT_DIR)
 	$(MAKE) -C $(VERILATOR_BUILD_DIR)
