@@ -81,6 +81,7 @@ $(OPENTITAN_BUILD_LOG_DIR):
 opentitan_sw_test: | $(OPENTITAN_BUILD_OUT_DIR) \
                    $(OPENTITAN_BUILD_LOG_DIR)
 	cd $(OPENTITAN_SRC_DIR) && \
+		export CC=gcc-11; export CXX=g++-11; \
 		bazel query "kind(test, //sw/device/...)" | \
 			grep "_unittest" | \
 			xargs bazel test --build_tests_only=false \
