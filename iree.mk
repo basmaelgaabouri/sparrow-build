@@ -3,9 +3,11 @@ TOOLCHAINRV32_PATH:=$(CACHE)/toolchain_iree_rv32imf
 IREE_RUNTIME_ROOT:=$(ROOTDIR)/sw/vec_iree
 MODEL_SRC_DIR:=$(ROOTDIR)/ml/ml-models-public
 IREE_RUNTIME_OUT=$(OUT)/springbok_iree
+IREE_RUNTIME_NO_WMMU_OUT=$(OUT)/springbok_iree_no_wmmu
 
 MODEL_INTERNAL_SRC_DIR:=$(ROOTDIR)/ml/ml-models
 IREE_RUNTIME_INTERNAL_OUT=$(OUT)/springbok_iree_internal
+IREE_RUNTIME_INTERNAL_NO_WMMU_OUT=$(OUT)/springbok_iree_internal_no_wmmu
 
 RV32_EXE_LINKER_FLAGS=-Wl,--print-memory-usage
 
@@ -60,6 +62,10 @@ IREE_RUNTIME_DEFAULT_CONFIG :=\
 	-DRISCV_COMPILER_FLAGS="$(RV32_COMPILER_FLAGS)" \
 	-DCMAKE_EXE_LINKER_FLAGS="$(RV32_EXE_LINKER_FLAGS)"
 
+IREE_RUNTIME_NO_WMMU_CONFIG :=\
+	$(IREE_RUNTIME_DEFAULT_CONFIG) \
+	-DSPRINGBOK_LINKER_SCRIPT=$(realpath $(ROOTDIR)/sw/vec/springbok/springbok_no_wmmu.ld)
+
 $(IREE_RUNTIME_OUT)/build.ninja: | iree_check iree_commit_check
 	cmake -G Ninja -B $(IREE_RUNTIME_OUT) \
 	    $(IREE_RUNTIME_DEFAULT_CONFIG) \
@@ -68,6 +74,16 @@ $(IREE_RUNTIME_OUT)/build.ninja: | iree_check iree_commit_check
 $(IREE_RUNTIME_INTERNAL_OUT)/build.ninja: | iree_check iree_commit_check
 	cmake -G Ninja -B $(IREE_RUNTIME_INTERNAL_OUT) \
 	    $(IREE_RUNTIME_DEFAULT_CONFIG) \
+	    $(MODEL_INTERNAL_SRC_DIR)
+
+$(IREE_RUNTIME_NO_WMMU_OUT)/build.ninja: | iree_check iree_commit_check
+	cmake -G Ninja -B $(IREE_RUNTIME_NO_WMMU_OUT) \
+	    $(IREE_RUNTIME_NO_WMMU_CONFIG)
+	    $(MODEL_SRC_DIR)
+
+$(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT)/build.ninja: | iree_check iree_commit_check
+	cmake -G Ninja -B $(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT) \
+	    $(IREE_RUNTIME_NO_WMMU_CONFIG) \
 	    $(MODEL_INTERNAL_SRC_DIR)
 
 ## Installs the IREE runtime applications.
@@ -101,14 +117,29 @@ iree_runtime_internal: $(IREE_RUNTIME_INTERNAL_OUT)/build.ninja | \
 # applications.
 iree_internal: iree_compiler iree_runtime_internal
 
+## Installs the IREE runtime applications, built without WMMU support.
+iree_runtime_no_wmmu: $(IREE_RUNTIME_NO_WMMU_OUT)/build.ninja | iree_check iree_commit_check
+	cmake --build $(IREE_RUNTIME_NO_WMMU_OUT)
+
+## Installs the IREE compiler and its runtime applications without WMMU, for single core testing.
+iree_no_wmmu: iree_compiler iree_runtime_no_wmmu
+
+## Installs the IREE runtime internal applications, built without WMMU support.
+iree_internal_runtime_no_wmmu: $(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT)/build.ninja | iree_check iree_commit_check
+	cmake --build $(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT)
+
+## Installs the IREE compiler and its runtime applications without WMMU, for single core testing.
+iree_internal_no_wmmu: iree_compiler iree_internal_runtime_no_wmmu
+
 ## Clean IREE compiler and runtime applications.
 iree_clean:
-	rm -rf $(IREE_COMPILER_DIR) $(IREE_RUNTIME_OUT)
+	rm -rf $(IREE_COMPILER_DIR) $(IREE_RUNTIME_OUT) $(IREE_RUNTIME_NO_WMMU_OUT)
 
 ## Clean IREE compiler and runtime application of internal models
 iree_internal_clean:
-	rm -rf $(IREE_COMPILER_DIR) $(IREE_RUNTIME_INTERNAL_OUT)
+	rm -rf $(IREE_COMPILER_DIR) $(IREE_RUNTIME_INTERNAL_OUT) $(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT)
 
 .PHONY:: iree iree_check iree_compiler iree_runtime iree_clean
 .PHONY:: iree_commit_check iree_compiler_src
 .PHONY:: iree_runtime_internal iree_internal iree_internal_clean
+.PHONY:: iree_runtime_no_wmmu iree_no_wmmu iree_internal_runtime_no_wmmu iree_internal_no_wmmu
