@@ -78,7 +78,7 @@ $(IREE_RUNTIME_INTERNAL_OUT)/build.ninja: | iree_check iree_commit_check
 
 $(IREE_RUNTIME_NO_WMMU_OUT)/build.ninja: | iree_check iree_commit_check
 	cmake -G Ninja -B $(IREE_RUNTIME_NO_WMMU_OUT) \
-	    $(IREE_RUNTIME_NO_WMMU_CONFIG)
+	    $(IREE_RUNTIME_NO_WMMU_CONFIG) \
 	    $(MODEL_SRC_DIR)
 
 $(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT)/build.ninja: | iree_check iree_commit_check
