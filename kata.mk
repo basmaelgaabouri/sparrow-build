@@ -66,14 +66,31 @@ UART_HJSON=$(UART_IP_DIR)/data/uart.hjson
 $(UART_HEADER): $(REGTOOL) $(UART_HJSON) | $(OPENTITAN_GEN)
 	$(REGTOOL) -D -o $@ $(UART_HJSON)
 
+$(RUSTDIR)/bin/cbindgen: | rust_presence_check
+	cargo install cbindgen
+
+$(OUT)/kata/components:
+	mkdir -p $(OUT)/kata/components
+
+## Builds cbindgen headers for Kata components
+#
+# This target regenerates these header definitions using Makefiles embedded in
+# each component's source tree.
+kata-component-headers: $(RUSTDIR)/bin/cbindgen | rust_presence_check $(OUT)/kata/components
+	for f in $$(find $(KATA_COMPONENTS) -name cbindgen.toml); do \
+		dir=$$(dirname $$f); \
+		test -f $$dir/Makefile && $(MAKE) -C $$dir; \
+	done
+
 ## Builds auto-generated include files for the Kata operating system
-kata-gen-headers: $(TIMER_HEADER) $(UART_HEADER)
+kata-gen-headers: $(TIMER_HEADER) $(UART_HEADER) kata-component-headers
 
 ## Cleans the auto-generated Kata include files
 kata-clean-headers:
 	rm -f $(TIMER_HJSON)
 	rm -f $(TIMER_HEADER)
 	rm -f $(UART_HEADER)
+	rm -f $(OUT)/kata/components
 
 ## Cleans all Kata operating system build artifacts
 kata-clean:
