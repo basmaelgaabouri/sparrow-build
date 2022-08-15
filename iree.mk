@@ -50,7 +50,7 @@ $(IREE_COMPILER_DIR):
 # out/host/iree_compiler.
 #
 iree_compiler: | $(IREE_COMPILER_DIR)
-	scripts/download_iree_compiler.py --tag_name=candidate-20220812.233
+	scripts/download_iree_compiler.py
 iree_commit_check:
 	scripts/check-iree-commit.sh $(IREE_SRC)
 
