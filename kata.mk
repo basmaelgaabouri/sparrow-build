@@ -157,44 +157,51 @@ minisel_release: $(KATA_OUT_RELEASE)/minisel/minisel.elf
 
 # KataOS Test Applications
 
-$(KATA_OUT_DEBUG)/hello/hello.elf: $(KATA_SRC_DIR)/apps/hello/hello.c $(KATA_KERNEL_DEBUG)
-	$(MAKE) -C $(KATA_SRC_DIR)/apps/hello \
+KATA_SRC_C_APP := $(KATA_SRC_DIR)/apps/c/
+KATA_SRC_RUST_APP := $(KATA_SRC_DIR)/apps/rust/
+
+# NB: this assumes you won't have C & Rust apps w/ the same name
+KATA_OUT_APP_DEBUG := $(KATA_OUT_DEBUG)/apps/
+KATA_OUT_APP_RELEASE := $(KATA_OUT_RELEASE)/apps/
+
+$(KATA_OUT_APP_DEBUG)/hello/hello.elf: $(KATA_SRC_C_APP)/hello/hello.c $(KATA_KERNEL_DEBUG)
+	$(MAKE) -C $(KATA_SRC_C_APP)/hello \
         SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
         OUT_KATA=$(KATA_OUT_DEBUG) \
-        OUT_TMP=$(KATA_OUT_DEBUG)/hello
+        OUT_TMP=$(KATA_OUT_APP_DEBUG)/hello
 
-$(KATA_OUT_RELEASE)/hello/hello.elf: $(KATA_SRC_DIR)/apps/hello/hello.c $(KATA_KERNEL_RELEASE)
-	$(MAKE) -C $(KATA_SRC_DIR)/apps/hello \
+$(KATA_OUT_APP_RELEASE)/hello/hello.elf: $(KATA_SRC_C_APP)/hello/hello.c $(KATA_KERNEL_RELEASE)
+	$(MAKE) -C $(KATA_SRC_C_APP)/hello \
         SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
         OUT_KATA=$(KATA_OUT_RELEASE) \
-        OUT_TMP=$(KATA_OUT_RELEASE)/hello
+        OUT_TMP=$(KATA_OUT_APP_RELEASE)/hello
 
-hello_debug: $(KATA_OUT_DEBUG)/hello/hello.elf
-hello_release: $(KATA_OUT_RELEASE)/hello/hello.elf
+hello_debug: $(KATA_OUT_APP_DEBUG)/hello/hello.elf
+hello_release: $(KATA_OUT_APP_RELEASE)/hello/hello.elf
 
-$(KATA_OUT_DEBUG)/fibonacci/fibonacci.elf: $(KATA_SRC_DIR)/apps/fibonacci/fibonacci.c $(KATA_KERNEL_DEBUG)
-	$(MAKE) -C $(KATA_SRC_DIR)/apps/fibonacci \
+$(KATA_OUT_APP_DEBUG)/fibonacci/fibonacci.elf: $(KATA_SRC_C_APP)/fibonacci/fibonacci.c $(KATA_KERNEL_DEBUG)
+	$(MAKE) -C $(KATA_SRC_C_APP)/fibonacci \
         SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
         OUT_KATA=$(KATA_OUT_DEBUG) \
-        OUT_TMP=$(KATA_OUT_DEBUG)/fibonacci
+        OUT_TMP=$(KATA_OUT_APP_DEBUG)/fibonacci
 
-$(KATA_OUT_RELEASE)/fibonacci/fibonacci.elf: $(KATA_SRC_DIR)/apps/fibonacci/fibonacci.c $(KATA_KERNEL_RELEASE)
-	$(MAKE) -C $(KATA_SRC_DIR)/apps/fibonacci \
+$(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.elf: $(KATA_SRC_C_APP)/fibonacci/fibonacci.c $(KATA_KERNEL_RELEASE)
+	$(MAKE) -C $(KATA_SRC_C_APP)/fibonacci \
         SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
         OUT_KATA=$(KATA_OUT_RELEASE) \
-        OUT_TMP=$(KATA_OUT_RELEASE)/fibonacci
+        OUT_TMP=$(KATA_OUT_APP_RELEASE)/fibonacci
 
-fibonacci_debug: $(KATA_OUT_DEBUG)/fibonacci/fibonacci.elf
-fibonacci_release: $(KATA_OUT_RELEASE)/fibonacci/fibonacci.elf
+fibonacci_debug: $(KATA_OUT_APP_DEBUG)/fibonacci/fibonacci.elf
+fibonacci_release: $(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.elf
 
-KATA_BUNDLE_RELEASE	:= $(KATA_OUT_RELEASE)/hello/hello.elf \
-                       $(KATA_OUT_RELEASE)/fibonacci/fibonacci.elf
+KATA_BUNDLE_RELEASE	:= $(KATA_OUT_APP_RELEASE)/hello/hello.elf \
+                       $(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.elf
 KATA_MODEL_RELEASE	:= $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static
 $(OUT)/ext_builtins_release.cpio: $(KATA_BUNDLE_RELEASE) $(KATA_MODEL_RELEASE) | $(OUT)/tmp
 	$(ROOTDIR)/scripts/prepare_bundle_image.sh -o $@ -m $(KATA_MODEL_RELEASE) -a $(KATA_BUNDLE_RELEASE)
 
-KATA_BUNDLE_DEBUG	:= $(KATA_OUT_DEBUG)/hello/hello.elf \
-                       $(KATA_OUT_DEBUG)/fibonacci/fibonacci.elf
+KATA_BUNDLE_DEBUG	:= $(KATA_OUT_APP_DEBUG)/hello/hello.elf \
+                       $(KATA_OUT_APP_DEBUG)/fibonacci/fibonacci.elf
 KATA_MODEL_DEBUG	:= $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static
 $(OUT)/ext_builtins_debug.cpio: $(KATA_BUNDLE_DEBUG) $(KATA_MODEL_DEBUG) | $(OUT)/tmp
 	$(ROOTDIR)/scripts/prepare_bundle_image.sh -o $@ -m $(KATA_MODEL_DEBUG) -a $(KATA_BUNDLE_DEBUG)
