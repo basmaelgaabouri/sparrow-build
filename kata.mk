@@ -194,14 +194,14 @@ $(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.elf: $(KATA_SRC_C_APP)/fibonacci/fib
 fibonacci_debug: $(KATA_OUT_APP_DEBUG)/fibonacci/fibonacci.elf
 fibonacci_release: $(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.elf
 
-$(KATA_OUT_APP_DEBUG)/suicide/suicide.elf: $(KATA_SRC_C_APP)/apps/suicide/suicide.c $(KATA_KERNEL_DEBUG)
-	$(MAKE) -C $(KATA_SRC_C_APP)/apps/suicide \
+$(KATA_OUT_APP_DEBUG)/suicide/suicide.elf: $(KATA_SRC_C_APP)/suicide/suicide.c $(KATA_KERNEL_DEBUG)
+	$(MAKE) -C $(KATA_SRC_C_APP)/suicide \
         SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
         OUT_KATA=$(KATA_OUT_DEBUG) \
         OUT_TMP=$(KATA_OUT_DEBUG)/suicide
 
-$(KATA_OUT_APP_RELEASE)/suicide/suicide.elf: $(KATA_SRC_C_APP)/apps/suicide/suicide.c $(KATA_KERNEL_RELEASE)
-	$(MAKE) -C $(KATA_SRC_C_APP)/apps/suicide \
+$(KATA_OUT_APP_RELEASE)/suicide/suicide.elf: $(KATA_SRC_C_APP)/suicide/suicide.c $(KATA_KERNEL_RELEASE)
+	$(MAKE) -C $(KATA_SRC_C_APP)/suicide \
         SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
         OUT_KATA=$(KATA_OUT_RELEASE) \
         OUT_TMP=$(KATA_OUT_RELEASE)/suicide
