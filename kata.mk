@@ -194,14 +194,31 @@ $(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.elf: $(KATA_SRC_C_APP)/fibonacci/fib
 fibonacci_debug: $(KATA_OUT_APP_DEBUG)/fibonacci/fibonacci.elf
 fibonacci_release: $(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.elf
 
+$(KATA_OUT_APP_DEBUG)/suicide/suicide.elf: $(KATA_SRC_C_APP)/apps/suicide/suicide.c $(KATA_KERNEL_DEBUG)
+	$(MAKE) -C $(KATA_SRC_C_APP)/apps/suicide \
+        SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
+        OUT_KATA=$(KATA_OUT_DEBUG) \
+        OUT_TMP=$(KATA_OUT_DEBUG)/suicide
+
+$(KATA_OUT_APP_RELEASE)/suicide/suicide.elf: $(KATA_SRC_C_APP)/apps/suicide/suicide.c $(KATA_KERNEL_RELEASE)
+	$(MAKE) -C $(KATA_SRC_C_APP)/apps/suicide \
+        SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
+        OUT_KATA=$(KATA_OUT_RELEASE) \
+        OUT_TMP=$(KATA_OUT_RELEASE)/suicide
+
+suicide_debug: $(KATA_OUT_DEBUG)/suicide/suicide.elf
+suicide_release: $(KATA_OUT_RELEASE)/suicide/suicide.elf
+
 KATA_BUNDLE_RELEASE	:= $(KATA_OUT_APP_RELEASE)/hello/hello.elf \
-                       $(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.elf
+                       $(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.elf \
+                       $(KATA_OUT_APP_RELEASE)/suicide/suicide.elf
 KATA_MODEL_RELEASE	:= $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static
 $(OUT)/ext_builtins_release.cpio: $(KATA_BUNDLE_RELEASE) $(KATA_MODEL_RELEASE) | $(OUT)/tmp
 	$(ROOTDIR)/scripts/prepare_bundle_image.sh -o $@ -m $(KATA_MODEL_RELEASE) -a $(KATA_BUNDLE_RELEASE)
 
 KATA_BUNDLE_DEBUG	:= $(KATA_OUT_APP_DEBUG)/hello/hello.elf \
-                       $(KATA_OUT_APP_DEBUG)/fibonacci/fibonacci.elf
+                       $(KATA_OUT_APP_DEBUG)/fibonacci/fibonacci.elf \
+                       $(KATA_OUT_APP_DEBUG)/suicide/suicide.elf
 KATA_MODEL_DEBUG	:= $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static
 $(OUT)/ext_builtins_debug.cpio: $(KATA_BUNDLE_DEBUG) $(KATA_MODEL_DEBUG) | $(OUT)/tmp
 	$(ROOTDIR)/scripts/prepare_bundle_image.sh -o $@ -m $(KATA_MODEL_DEBUG) -a $(KATA_BUNDLE_DEBUG)
@@ -258,3 +275,6 @@ kata-flatbuffers: $(OUT)/host/flatbuffers/bin/flatc $(ROOTDIR)/sw/kata/flatbuffe
 .PHONY:: kata-gen-headers kata-clean-headers
 .PHONY:: kata-flatbuffers
 .PHONY:: cargo_test_kata $(CARGO_TEST_KATA)
+.PHONY:: hello_debug hello_release
+.PHONY:: fibonacci_debug fibonacci_release
+.PHONY:: suicide_debug suicide_release
