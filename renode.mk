@@ -1,5 +1,5 @@
 RENODE_SRC_DIR := $(ROOTDIR)/sim/renode
-RENODE_OUT_DIR := $(OUT)/host/renode
+RENODE_OUT_DIR := $(CACHE)/renode
 RENODE_BIN     := $(RENODE_OUT_DIR)/renode
 RENODE_PORT    ?= 1234
 RENODE_CMD     := cd $(ROOTDIR) && $(RENODE_BIN) --disable-xwt --port $(RENODE_PORT)
