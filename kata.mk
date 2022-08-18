@@ -213,14 +213,14 @@ KATA_BUNDLE_RELEASE	:= $(KATA_OUT_APP_RELEASE)/hello/hello.elf \
                        $(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.elf \
                        $(KATA_OUT_APP_RELEASE)/suicide/suicide.elf
 KATA_MODEL_RELEASE	:= $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static
-$(OUT)/ext_builtins_release.cpio: $(KATA_BUNDLE_RELEASE) $(KATA_MODEL_RELEASE) | $(OUT)/tmp
+$(OUT)/ext_builtins_release.cpio: $(KATA_BUNDLE_RELEASE) | $(OUT)/tmp iree_model_builtins
 	$(ROOTDIR)/scripts/prepare_bundle_image.sh -o $@ -m $(KATA_MODEL_RELEASE) -a $(KATA_BUNDLE_RELEASE)
 
 KATA_BUNDLE_DEBUG	:= $(KATA_OUT_APP_DEBUG)/hello/hello.elf \
                        $(KATA_OUT_APP_DEBUG)/fibonacci/fibonacci.elf \
                        $(KATA_OUT_APP_DEBUG)/suicide/suicide.elf
 KATA_MODEL_DEBUG	:= $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static
-$(OUT)/ext_builtins_debug.cpio: $(KATA_BUNDLE_DEBUG) $(KATA_MODEL_DEBUG) | $(OUT)/tmp
+$(OUT)/ext_builtins_debug.cpio: $(KATA_BUNDLE_DEBUG) | $(OUT)/tmp iree_model_builtins
 	$(ROOTDIR)/scripts/prepare_bundle_image.sh -o $@ -m $(KATA_MODEL_DEBUG) -a $(KATA_BUNDLE_DEBUG)
 
 ## Generates cpio archive of Kata builtins with debugging suport
