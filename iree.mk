@@ -95,7 +95,7 @@ $(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT)/build.ninja: | iree_check iree_commit_check
 # In general, you probably want the `iree` target instead, which combines
 # `iree_compiler` and `iree_runtime`.
 iree_runtime: $(IREE_RUNTIME_OUT)/build.ninja | iree_check iree_commit_check
-	cmake --build $(IREE_RUNTIME_OUT)
+	PYTHONPATH=$(IREE_COMPILER_DIR) cmake --build $(IREE_RUNTIME_OUT)
 
 ## Installs the IREE compiler and its runtime applications.
 iree: iree_compiler iree_runtime
@@ -109,7 +109,7 @@ iree: iree_compiler iree_runtime
 # In general, you probably want the `iree_runtime` target instead.
 iree_runtime_internal: $(IREE_RUNTIME_INTERNAL_OUT)/build.ninja | \
 		iree_check iree_commit_check
-	cmake --build $(IREE_RUNTIME_INTERNAL_OUT)
+	PYTHONPATH=$(IREE_COMPILER_DIR) cmake --build $(IREE_RUNTIME_INTERNAL_OUT)
 
 ## Installs the IREE compiler and internal runtime applications.
 #
@@ -119,14 +119,14 @@ iree_internal: iree_compiler iree_runtime_internal
 
 ## Installs the IREE runtime applications, built without WMMU support.
 iree_runtime_no_wmmu: $(IREE_RUNTIME_NO_WMMU_OUT)/build.ninja | iree_check iree_commit_check
-	cmake --build $(IREE_RUNTIME_NO_WMMU_OUT)
+	PYTHONPATH=$(IREE_COMPILER_DIR) cmake --build $(IREE_RUNTIME_NO_WMMU_OUT)
 
 ## Installs the IREE compiler and its runtime applications without WMMU, for single core testing.
 iree_no_wmmu: iree_compiler iree_runtime_no_wmmu
 
 ## Installs the IREE runtime internal applications, built without WMMU support.
 iree_internal_runtime_no_wmmu: $(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT)/build.ninja | iree_check iree_commit_check
-	cmake --build $(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT)
+	PYTHONPATH=$(IREE_COMPILER_DIR) cmake --build $(IREE_RUNTIME_INTERNAL_NO_WMMU_OUT)
 
 ## Installs the IREE compiler and its runtime applications without WMMU, for single core testing.
 iree_internal_no_wmmu: iree_compiler iree_internal_runtime_no_wmmu
