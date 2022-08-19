@@ -31,7 +31,7 @@ PORT_PRESTART_CMDS:=$(shell $(ROOTDIR)/scripts/generate-renode-port-cmd.sh $(REN
 #
 # This is the default target for the build system, and is generally what you
 # need for day-to-day work on the software side of Sparrow.
-simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree $(OUT)/ext_builtins_release.cpio
+simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree_model_builtins $(OUT)/ext_builtins_release.cpio
 	$(RENODE_CMD) -e "\
     \$$tar = @$(ROOTDIR)/out/ext_flash_release.tar; \
     \$$cpio = @$(ROOTDIR)/out/ext_builtins_release.cpio; \
@@ -42,7 +42,7 @@ simulate: renode multihart_boot_rom $(OUT)/ext_flash_release.tar iree $(OUT)/ext
 # This top-level target does the same job as `simulate`, but instead of
 # unhalting the CPUs and starting the system, this alternate target only unhalts
 # cpu0, and uses the debug build of TockOS from the `matcha_tock_debug` target.
-simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree $(OUT)/ext_builtins_debug.cpio
+simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree_model_builtins $(OUT)/ext_builtins_debug.cpio
 	$(RENODE_CMD) -e "\
     \$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \
     \$$cpio = @$(ROOTDIR)/out/ext_builtins_debug.cpio; \
@@ -55,7 +55,7 @@ simulate-debug: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree $(OUT)
 # unhalting the CPUs and starting the system, this alternate target starts
 # renode with no CPUs unhalted, allowing for GDB to be used for early system
 # start.
-debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree $(OUT)/ext_builtins_debug.cpio
+debug-simulation: renode multihart_boot_rom $(OUT)/ext_flash_debug.tar iree_model_builtins $(OUT)/ext_builtins_debug.cpio
 	$(RENODE_CMD) -e "\
     \$$tar = @$(ROOTDIR)/out/ext_flash_debug.tar; \
     \$$cpio = @$(ROOTDIR)/out/ext_builtins_debug.cpio; \

@@ -26,8 +26,8 @@ CPIO := cpio
 BUILTINS_CPIO_OPTS := -H newc -L --no-absolute-filenames --reproducible --owner=root:root
 
 # HACK(jtgans): Fix the IREE targets to explicitly list the files it generates.
-$(patsubst %.model,%,$(KATA_MODEL_RELEASE)): iree
-$(patsubst %.model,%,$(KATA_MODEL_DEBUG)): iree
+$(patsubst %.model,%,$(KATA_MODEL_RELEASE)): iree_model_builtins
+$(patsubst %.model,%,$(KATA_MODEL_DEBUG)): iree_model_builtins
 
 $(OUT)/kata/builtins/release: $(KATA_APPS_RELEASE) $(KATA_MODEL_RELEASE)
 	rm -rf $@
