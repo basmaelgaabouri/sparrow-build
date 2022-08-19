@@ -1,7 +1,5 @@
 IREE_SRC:=$(ROOTDIR)/toolchain/iree
 TOOLCHAINRV32_PATH:=$(CACHE)/toolchain_iree_rv32imf
-IREE_COMPILER_DIR:=${CACHE}/iree_compiler
-
 IREE_RUNTIME_ROOT:=$(ROOTDIR)/sw/vec_iree
 MODEL_SRC_DIR:=$(ROOTDIR)/ml/ml-models-public
 IREE_RUNTIME_OUT=$(OUT)/springbok_iree
@@ -19,6 +17,10 @@ RV32_COMPILER_FLAGS=-g3 \
 # The following targets are always rebuilt when the iree target is made
 
 iree_check:
+	if [[ ! -d "$(TOOLCHAINRV32_PATH)" ]]; then \
+		echo "IREE toolchain $(TOOLCHAINRV32_PATH) doesn't exist, please run 'm install_llvm' first"; \
+		exit 1; \
+	fi
 	@echo Update $(IREE_SRC) submodules...
 	git -C $(IREE_SRC) submodule sync && \
 	  git -C $(IREE_SRC) submodule update --init --jobs=8 --depth=10
@@ -48,9 +50,9 @@ $(IREE_COMPILER_DIR):
 # out/host/iree_compiler.
 #
 iree_compiler: | $(IREE_COMPILER_DIR)
-	scripts/download_iree_compiler.py --iree_compiler_dir "$(IREE_COMPILER_DIR)"
+	scripts/download_iree_compiler.py
 iree_commit_check:
-	scripts/check-iree-commit.sh "$(IREE_SRC)" "$(IREE_COMPILER_DIR)"
+	scripts/check-iree-commit.sh $(IREE_SRC)
 
 IREE_RUNTIME_DEFAULT_CONFIG :=\
 	-DCMAKE_TOOLCHAIN_FILE="$(IREE_RUNTIME_ROOT)/cmake/riscv_iree.cmake" \
@@ -64,17 +66,10 @@ IREE_RUNTIME_NO_WMMU_CONFIG :=\
 	$(IREE_RUNTIME_DEFAULT_CONFIG) \
 	-DSPRINGBOK_LINKER_SCRIPT=$(realpath $(ROOTDIR)/sw/vec/springbok/springbok_no_wmmu.ld)
 
-$(IREE_RUNTIME_OUT)/build.ninja: | iree_compiler iree_check iree_commit_check
+$(IREE_RUNTIME_OUT)/build.ninja: | iree_check iree_commit_check
 	cmake -G Ninja -B $(IREE_RUNTIME_OUT) \
 	    $(IREE_RUNTIME_DEFAULT_CONFIG) \
 	    $(MODEL_SRC_DIR)
-
-## Model artifact used in kata-builtins-*
-#
-# IREE executables used in kata-builtins-*
-iree_model_builtins: $(IREE_RUNTIME_OUT)/build.ninja | iree_check iree_commit_check
-	cmake --build $(IREE_RUNTIME_OUT) --target quant_models/mobilenet_v1_emitc_static
-
 
 $(IREE_RUNTIME_INTERNAL_OUT)/build.ninja: | iree_check iree_commit_check
 	cmake -G Ninja -B $(IREE_RUNTIME_INTERNAL_OUT) \
@@ -148,4 +143,3 @@ iree_internal_clean:
 .PHONY:: iree_commit_check iree_compiler_src
 .PHONY:: iree_runtime_internal iree_internal iree_internal_clean
 .PHONY:: iree_runtime_no_wmmu iree_no_wmmu iree_internal_runtime_no_wmmu iree_internal_no_wmmu
-.PHONY:: iree_model_builtins
