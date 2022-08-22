@@ -1,3 +1,17 @@
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 # Builds Kata, the seL4-based operating system that runs on the SMC.
 # The source is in $(KATA_SRC_DIR), while the outputs are placed in
 # $(KATA_KERNEL_DEBUG) & $(KATA_ROOTSERVER_DEBUG) or
@@ -155,81 +169,6 @@ $(KATA_OUT_RELEASE)/minisel/minisel.elf: $(ROOTDIR)/kata/projects/minisel/minise
 minisel_debug: $(KATA_OUT_DEBUG)/minisel/minisel.elf
 minisel_release: $(KATA_OUT_RELEASE)/minisel/minisel.elf
 
-# KataOS Test Applications
-
-KATA_SRC_C_APP := $(KATA_SRC_DIR)/apps/c/
-KATA_SRC_RUST_APP := $(KATA_SRC_DIR)/apps/rust/
-
-# NB: this assumes you won't have C & Rust apps w/ the same name
-KATA_OUT_APP_DEBUG := $(KATA_OUT_DEBUG)/apps/
-KATA_OUT_APP_RELEASE := $(KATA_OUT_RELEASE)/apps/
-
-$(KATA_OUT_APP_DEBUG)/hello/hello.elf: $(KATA_SRC_C_APP)/hello/hello.c $(KATA_KERNEL_DEBUG)
-	$(MAKE) -C $(KATA_SRC_C_APP)/hello \
-        SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
-        OUT_KATA=$(KATA_OUT_DEBUG) \
-        OUT_TMP=$(KATA_OUT_APP_DEBUG)/hello
-
-$(KATA_OUT_APP_RELEASE)/hello/hello.elf: $(KATA_SRC_C_APP)/hello/hello.c $(KATA_KERNEL_RELEASE)
-	$(MAKE) -C $(KATA_SRC_C_APP)/hello \
-        SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
-        OUT_KATA=$(KATA_OUT_RELEASE) \
-        OUT_TMP=$(KATA_OUT_APP_RELEASE)/hello
-
-hello_debug: $(KATA_OUT_APP_DEBUG)/hello/hello.elf
-hello_release: $(KATA_OUT_APP_RELEASE)/hello/hello.elf
-
-$(KATA_OUT_APP_DEBUG)/fibonacci/fibonacci.elf: $(KATA_SRC_C_APP)/fibonacci/fibonacci.c $(KATA_KERNEL_DEBUG)
-	$(MAKE) -C $(KATA_SRC_C_APP)/fibonacci \
-        SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
-        OUT_KATA=$(KATA_OUT_DEBUG) \
-        OUT_TMP=$(KATA_OUT_APP_DEBUG)/fibonacci
-
-$(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.elf: $(KATA_SRC_C_APP)/fibonacci/fibonacci.c $(KATA_KERNEL_RELEASE)
-	$(MAKE) -C $(KATA_SRC_C_APP)/fibonacci \
-        SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
-        OUT_KATA=$(KATA_OUT_RELEASE) \
-        OUT_TMP=$(KATA_OUT_APP_RELEASE)/fibonacci
-
-fibonacci_debug: $(KATA_OUT_APP_DEBUG)/fibonacci/fibonacci.elf
-fibonacci_release: $(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.elf
-
-$(KATA_OUT_APP_DEBUG)/suicide/suicide.elf: $(KATA_SRC_C_APP)/suicide/suicide.c $(KATA_KERNEL_DEBUG)
-	$(MAKE) -C $(KATA_SRC_C_APP)/suicide \
-        SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
-        OUT_KATA=$(KATA_OUT_DEBUG) \
-        OUT_TMP=$(KATA_OUT_APP_DEBUG)/suicide
-
-$(KATA_OUT_APP_RELEASE)/suicide/suicide.elf: $(KATA_SRC_C_APP)/suicide/suicide.c $(KATA_KERNEL_RELEASE)
-	$(MAKE) -C $(KATA_SRC_C_APP)/suicide \
-        SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
-        OUT_KATA=$(KATA_OUT_RELEASE) \
-        OUT_TMP=$(KATA_OUT_APP_RELEASE)/suicide
-
-suicide_debug: $(KATA_OUT_APP_DEBUG)/suicide/suicide.elf
-suicide_release: $(KATA_OUT_APP_RELEASE)/suicide/suicide.elf
-
-KATA_BUNDLE_RELEASE	:= $(KATA_OUT_APP_RELEASE)/hello/hello.elf \
-                       $(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.elf \
-                       $(KATA_OUT_APP_RELEASE)/suicide/suicide.elf
-KATA_MODEL_RELEASE	:= $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static
-$(OUT)/ext_builtins_release.cpio: $(KATA_BUNDLE_RELEASE) $(KATA_MODEL_RELEASE) | $(OUT)/tmp
-	$(ROOTDIR)/scripts/prepare_bundle_image.sh -o $@ -m $(KATA_MODEL_RELEASE) -a $(KATA_BUNDLE_RELEASE)
-
-KATA_BUNDLE_DEBUG	:= $(KATA_OUT_APP_DEBUG)/hello/hello.elf \
-                       $(KATA_OUT_APP_DEBUG)/fibonacci/fibonacci.elf \
-                       $(KATA_OUT_APP_DEBUG)/suicide/suicide.elf
-KATA_MODEL_DEBUG	:= $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static
-$(OUT)/ext_builtins_debug.cpio: $(KATA_BUNDLE_DEBUG) $(KATA_MODEL_DEBUG) | $(OUT)/tmp
-	$(ROOTDIR)/scripts/prepare_bundle_image.sh -o $@ -m $(KATA_MODEL_DEBUG) -a $(KATA_BUNDLE_DEBUG)
-
-## Generates cpio archive of Kata builtins with debugging suport
-kata-builtins-debug: $(OUT)/ext_builtins_debug.cpio
-## Generates cpio archive of Kata builtins for release
-kata-builtins-release: $(OUT)/ext_builtins_release.cpio
-## Generates both debug & release cpio archives of Kata builtins
-kata-builtins: kata-builtins-debug kata-builtins-release
-
 # NB: cargo_test_debugconsole_zmodem is broken
 #	TODO(b/232928288): temporarily disable cargo_test_kata_proc_manager &
 #   cargo_test_kata_proc_interface; they have dependency issues
@@ -275,6 +214,3 @@ kata-flatbuffers: $(OUT)/host/flatbuffers/bin/flatc $(ROOTDIR)/sw/kata/flatbuffe
 .PHONY:: kata-gen-headers kata-clean-headers
 .PHONY:: kata-flatbuffers
 .PHONY:: cargo_test_kata $(CARGO_TEST_KATA)
-.PHONY:: hello_debug hello_release
-.PHONY:: fibonacci_debug fibonacci_release
-.PHONY:: suicide_debug suicide_release

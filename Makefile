@@ -38,6 +38,9 @@ prereqs: $(ROOTDIR)/scripts/install-prereqs.sh \
 
 include $(ROOTDIR)/build/toolchain.mk
 include $(ROOTDIR)/build/kata.mk
+include $(ROOTDIR)/build/kata_tools.mk
+include $(ROOTDIR)/build/kata_apps.mk
+include $(ROOTDIR)/build/kata_builtins.mk
 include $(ROOTDIR)/build/tock.mk
 include $(ROOTDIR)/build/opentitan_sw.mk
 
