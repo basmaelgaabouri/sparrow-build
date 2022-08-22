@@ -56,7 +56,7 @@ export PATH="${HOME}/.local/bin:${PATH}"
 export PATH="${CACHE}/toolchain/bin:${PATH}"
 export PATH="${RUSTDIR}/bin:${PATH}"
 export PATH="${ROOTDIR}/scripts:${PATH}"
-export PATH="${OUT}/host/renode:${PATH}"
+export PATH="${CACHE}/renode:${PATH}"
 export PATH="${OUT}/host/qemu/riscv32-softmmu:${PATH}"
 export PATH="${OUT}/host/flatbuffers/bin:${PATH}"
 export PATH="${OUT}/host/verilator/bin:${PATH}"
@@ -69,7 +69,7 @@ export PYTHONPATH="${PYTHONPATH}:${ROOTDIR}/cicd/"
 
 function renode
 {
-    "${OUT}/host/renode/renode" "$@"
+    "${CACHE}/renode/renode" "$@"
 }
 
 function iss
@@ -259,11 +259,15 @@ echo
 if [[ ! -d "${RUSTDIR}" ]] ||
    [[ ! -d "${ROOTDIR}/cache/toolchain" ]] ||
    [[ ! -d "${ROOTDIR}/cache/toolchain_iree_rv32imf" ]] ||
-   [[ ! -d "${ROOTDIR}/out/host/renode" ]]; then
+   [[ ! -d "${ROOTDIR}/cache/renode" ]]; then
     echo
     echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
     echo You have missing tools. Please run \'m prereqs\' followed
     echo by \'m tools\' to install them.
     echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
     echo
+    [[ -d "${RUSTDIR}" ]] || echo "${RUSTDIR} is missing!"
+    [[ -d "${ROOTDIR}/cache/toolchain" ]] || echo "${ROOTDIR}/cache/toolchain is missing"
+    [[ -d "${ROOTDIR}/cache/toolchain_iree_rv32imf" ]] || echo "${ROOTDIR}/cache/toolchain_iree_rv32imf is missing!"
+    [[ -d "${ROOTDIR}/cache/renode" ]] || echo "${ROOTDIR}/cache/renode is missing!"
 fi
