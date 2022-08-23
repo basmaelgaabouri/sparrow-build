@@ -31,14 +31,11 @@ renode_src: $(RENODE_BIN)
 renode: | $(RENODE_OUT_DIR)
 	./scripts/download_renode.py --renode_dir $(RENODE_OUT_DIR)
 
-
 ## Removes Renode build artifacts from sim/renode and out/
 renode_clean:
 	@rm -rf $(RENODE_OUT_DIR)
 	@rm -rf $(RENODE_SRC_DIR)/output
 	@cd $(RENODE_SRC_DIR); find . -type d -name bin | xargs rm -rf
 	@cd $(RENODE_SRC_DIR); find . -type d -name obj | xargs rm -rf
-
-clean:: renode_clean
 
 .PHONY:: renode renode_src renode_clean
