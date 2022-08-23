@@ -28,7 +28,7 @@ iree_check:
         echo "*                                                  *"; \
         echo "****************************************************"; \
 	else \
-		@echo Updating $(IREE_SRC) submodules...; \
+		echo Updating $(IREE_SRC) submodules...; \
 		git -C $(IREE_SRC) submodule sync && \
 	  		git -C $(IREE_SRC) submodule update --init --jobs=8 --depth=10; \
 	fi
