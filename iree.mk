@@ -19,9 +19,19 @@ RV32_COMPILER_FLAGS=-g3 \
 # The following targets are always rebuilt when the iree target is made
 
 iree_check:
-	@echo Update $(IREE_SRC) submodules...
-	git -C $(IREE_SRC) submodule sync && \
-	  git -C $(IREE_SRC) submodule update --init --jobs=8 --depth=10
+	@if echo "$${PIN_TOOLCHAINS}" |grep -qw 'iree'; then \
+        echo "****************************************************"; \
+        echo "*                                                  *"; \
+        echo "*  PIN_TOOLCHAINS includes iree! Skipping the      *"; \
+        echo "*  download of the latest IREE compiler binaries.  *"; \
+        echo "*  Please DO NOT file bugs for IREE mis-behavior!  *"; \
+        echo "*                                                  *"; \
+        echo "****************************************************"; \
+	else \
+		@echo Updating $(IREE_SRC) submodules...; \
+		git -C $(IREE_SRC) submodule sync && \
+	  		git -C $(IREE_SRC) submodule update --init --jobs=8 --depth=10; \
+	fi
 
 $(IREE_COMPILER_DIR)/build.ninja: | iree_check
 	cmake -G Ninja -B $(IREE_COMPILER_DIR) \
