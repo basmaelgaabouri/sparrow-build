@@ -29,8 +29,7 @@ renode_src: $(RENODE_BIN)
 # From AntMicro's release. If there is a local build from `m renode_src` with
 # the same commit sha as the release build, it will be treated as up-to-date.
 renode: | $(RENODE_OUT_DIR)
-	./scripts/download_renode.py --renode_dir $(RENODE_OUT_DIR)
-
+	./scripts/download_renode.py --renode_dir $(RENODE_OUT_DIR) --release_name renode-1.13.1+20220821git40e04cb9
 ## Removes Renode build artifacts from sim/renode and out/
 renode_clean:
 	@rm -rf $(RENODE_OUT_DIR)
