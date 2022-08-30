@@ -23,16 +23,18 @@ KATA_OUT_APP_RELEASE := $(KATA_OUT_RELEASE)/apps
 
 $(KATA_OUT_APP_DEBUG)/%.elf: $(KATA_SRC_C_APP)/%.c $(KATA_KERNEL_DEBUG)
 	$(MAKE) -C $(dir $<) \
-        SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
+        LIBSEL4_SRC=$(SEL4_KERNEL_DIR)/libsel4 \
         OUT_KATA=$(KATA_OUT_DEBUG) \
-        OUT_TMP=$(dir $@)
+		BUILD_ROOT=$(KATA_OUT_APP_DEBUG) \
+		BUILD_TYPE=debug
 .PRECIOUS:: $(KATA_OUT_APP_DEBUG)/%.elf
 
 $(KATA_OUT_APP_RELEASE)/%.elf: $(KATA_SRC_C_APP)/%.c $(KATA_KERNEL_RELEASE)
 	$(MAKE) -C $(dir $<) \
-        SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 \
+        LIBSEL4_SRC=$(SEL4_KERNEL_DIR)/libsel4 \
         OUT_KATA=$(KATA_OUT_RELEASE) \
-        OUT_TMP=$(dir $@)
+		BUILD_ROOT=$(KATA_OUT_APP_RELEASE) \
+		BUILD_TYPE=release
 .PRECIOUS:: $(KATA_OUT_APP_RELEASE)/%.elf
 
 ## Build the hello-world C application in debug mode.
