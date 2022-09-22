@@ -12,14 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-KATA_APPS_RELEASE   := $(KATA_OUT_APP_RELEASE)/hello/hello.app \
-                       $(KATA_OUT_APP_RELEASE)/fibonacci/fibonacci.app \
-                       $(KATA_OUT_APP_RELEASE)/suicide/suicide.app
+KATA_APPS_RELEASE   := $(KATA_OUT_C_APP_RELEASE)/hello/hello.app \
+                       $(KATA_OUT_RUST_APP_RELEASE)/fibonacci/fibonacci.app \
+                       $(KATA_OUT_RUST_APP_RELEASE)/keyval/keyval.app \
+                       $(KATA_OUT_RUST_APP_RELEASE)/panic/panic.app \
+                       $(KATA_OUT_C_APP_RELEASE)/suicide/suicide.app
 KATA_MODEL_RELEASE  := $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static.model
 
-KATA_APPS_DEBUG     := $(KATA_OUT_APP_DEBUG)/hello/hello.app \
-                       $(KATA_OUT_APP_DEBUG)/fibonacci/fibonacci.app \
-                       $(KATA_OUT_APP_DEBUG)/suicide/suicide.app
+KATA_APPS_DEBUG     := $(KATA_OUT_C_APP_DEBUG)/hello/hello.app \
+                       $(KATA_OUT_RUST_APP_DEBUG)/fibonacci/fibonacci.app \
+                       $(KATA_OUT_RUST_APP_DEBUG)/keyval/keyval.app \
+                       $(KATA_OUT_RUST_APP_RELEASE)/panic/panic.app \
+                       $(KATA_OUT_C_APP_DEBUG)/suicide/suicide.app
 KATA_MODEL_DEBUG    := $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static.model
 
 CPIO := cpio
