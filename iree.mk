@@ -57,8 +57,9 @@ $(IREE_COMPILER_DIR):
 # the `iree_runtime` target. The outputs of this target are placed in
 # out/host/iree_compiler.
 #
+# TODO(b/249528563): Unpin IREE release
 iree_compiler: | $(IREE_COMPILER_DIR)
-	scripts/download_iree_compiler.py --iree_compiler_dir "$(IREE_COMPILER_DIR)"
+	scripts/download_iree_compiler.py --iree_compiler_dir "$(IREE_COMPILER_DIR)" --tag_name candidate-20220926.278
 iree_commit_check:
 	scripts/check-iree-commit.sh "$(IREE_SRC)" "$(IREE_COMPILER_DIR)"
 
