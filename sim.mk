@@ -78,11 +78,11 @@ $(OUT)/ext_flash_minisel_release.tar: $(MATCHA_BUNDLE_RELEASE) $(KATA_KERNEL_REL
 	ln -sf $(KATA_OUT_RELEASE)/minisel/minisel.elf $(OUT)/tmp/capdl-loader
 	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_minisel_release.tar matcha-tock-bundle kernel capdl-loader
 
-simulate_minisel: renode multihart_boot_rom $(OUT)/ext_flash_minisel_debug.tar iree
+simulate_minisel: renode multihart_boot_rom $(OUT)/ext_flash_minisel_debug.tar
 	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_minisel_debug.tar; \$$kernel = @$(KATA_KERNEL_DEBUG); $(PORT_PRESTART_CMDS) \
 	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
 
-simulate_minisel_release: renode multihart_boot_rom $(OUT)/ext_flash_minisel_release.tar iree
+simulate_minisel_release: renode multihart_boot_rom $(OUT)/ext_flash_minisel_release.tar
 	$(RENODE_CMD) -e "\$$tar = @$(ROOTDIR)/out/ext_flash_minisel_release.tar; $(PORT_PRESTART_CMDS) \
 	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
 
@@ -97,3 +97,5 @@ test_vc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow.resc
 
 .PHONY:: sim_configs clean_sim_configs simulate simulate-debug debug-simulation
 .PHONY:: test_sc test_mc test_vc
+
+include $(ROOTDIR)/build/sim_sel4test.mk
