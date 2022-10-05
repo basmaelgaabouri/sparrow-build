@@ -86,6 +86,7 @@ IREE_RUNTIME_DEFAULT_CONFIG :=\
 
 IREE_RUNTIME_NO_WMMU_CONFIG :=\
 	$(IREE_RUNTIME_DEFAULT_CONFIG) \
+	-DBUILD_NO_WMMU=ON \
 	-DSPRINGBOK_LINKER_SCRIPT=$(realpath $(ROOTDIR)/sw/vec/springbok/springbok_no_wmmu.ld)
 
 $(IREE_RUNTIME_OUT)/build.ninja: | iree_compiler iree_check iree_commit_check
