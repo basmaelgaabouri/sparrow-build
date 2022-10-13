@@ -72,9 +72,9 @@ $(IREE_COMPILER_DIR):
 # out/host/iree_compiler.
 #
 iree_compiler: | $(IREE_COMPILER_DIR)
-	scripts/download_iree_compiler.py --iree_compiler_dir "$(IREE_COMPILER_DIR)"
+	$(ROOTDIR)/scripts/download_iree_compiler.py --iree_compiler_dir "$(IREE_COMPILER_DIR)"
 iree_commit_check:
-	scripts/check-iree-commit.sh "$(IREE_SRC)" "$(IREE_COMPILER_DIR)"
+	$(ROOTDIR)/scripts/check-iree-commit.sh "$(IREE_SRC)" "$(IREE_COMPILER_DIR)"
 
 IREE_RUNTIME_DEFAULT_CONFIG :=\
 	-DCMAKE_TOOLCHAIN_FILE="$(IREE_RUNTIME_ROOT)/cmake/riscv_iree.cmake" \
