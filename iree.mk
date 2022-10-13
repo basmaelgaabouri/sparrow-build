@@ -101,11 +101,6 @@ iree_model_builtins: $(IREE_RUNTIME_OUT)/build.ninja | iree_check iree_commit_ch
 	PYTHONPATH=$(IREE_COMPILER_DIR) cmake --build $(IREE_RUNTIME_OUT) --target \
 		quant_models/mobilenet_v1_emitc_static
 
-## Model artifact used in MPS demo
-iree_model_mps: $(IREE_RUNTIME_OUT)/build.ninja | iree_check iree_commit_check
-	PYTHONPATH=$(IREE_COMPILER_DIR) cmake --build $(IREE_RUNTIME_OUT) --target \
-		quant_models/mps_0_emitc_static
-
 $(IREE_RUNTIME_INTERNAL_OUT)/build.ninja: | iree_check iree_commit_check
 	cmake -G Ninja -B $(IREE_RUNTIME_INTERNAL_OUT) \
 	    $(IREE_RUNTIME_DEFAULT_CONFIG) \
