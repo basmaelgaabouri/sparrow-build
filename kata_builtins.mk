@@ -26,6 +26,8 @@ KATA_APPS_DEBUG     := $(KATA_OUT_C_APP_DEBUG)/hello/hello.app \
                        $(KATA_OUT_C_APP_DEBUG)/suicide/suicide.app
 KATA_MODEL_DEBUG    := $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static.model
 
+KATA_SCRIPTS        := ${KATA_SRC_DIR}/apps/repl/autostart.repl
+
 CPIO := cpio
 BUILTINS_CPIO_OPTS := -H newc -L --no-absolute-filenames --reproducible --owner=root:root
 
@@ -36,12 +38,12 @@ $(patsubst %.model,%,$(KATA_MODEL_DEBUG)): iree_model_builtins
 $(OUT)/kata/builtins/release: $(KATA_APPS_RELEASE) $(KATA_MODEL_RELEASE)
 	rm -rf $@
 	mkdir -p $@
-	cp $(KATA_APPS_RELEASE) $(KATA_MODEL_RELEASE) $@
+	cp $(KATA_APPS_RELEASE) $(KATA_MODEL_RELEASE) ${KATA_SCRIPTS} $@
 
 $(OUT)/kata/builtins/debug: $(KATA_APPS_DEBUG) $(KATA_MODEL_DEBUG)
 	rm -rf $@
 	mkdir -p $@
-	cp $(KATA_APPS_DEBUG) $(KATA_MODEL_DEBUG) $@
+	cp $(KATA_APPS_DEBUG) $(KATA_MODEL_DEBUG) ${KATA_SCRIPTS} $@
 
 $(OUT)/ext_builtins_release.cpio: $(OUT)/kata/builtins/release
 	ls -1 $(OUT)/kata/builtins/release \
