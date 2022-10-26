@@ -12,39 +12,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Builds Kata, the seL4-based operating system that runs on the SMC.
-# The source is in $(KATA_SRC_DIR), while the outputs are placed in
-# $(KATA_KERNEL_DEBUG) & $(KATA_ROOTSERVER_DEBUG) or
-# $(KATA_KERNEL_RELEASE) & $(KATA_ROOTSERVER_RELEASE).
+# Builds Cantrip, the seL4-based operating system that runs on the SMC.
+# The source is in $(CANTRIP_SRC_DIR), while the outputs are placed in
+# $(CANTRIP_KERNEL_DEBUG) & $(CANTRIP_ROOTSERVER_DEBUG) or
+# $(CANTRIP_KERNEL_RELEASE) & $(CANTRIP_ROOTSERVER_RELEASE).
 
-# NB: see $(KATA_SRC_DIR)/easy-settings.cmake for config knobs;
+# NB: see $(CANTRIP_SRC_DIR)/easy-settings.cmake for config knobs;
 #     but beware you may need to "clean" before building with changes
 
-KATA_SRC_DIR      := $(ROOTDIR)/kata/projects/kata
-KATA_COMPONENTS   := $(KATA_SRC_DIR)/apps/system/components
-CARGO_TEST        := cargo +$(KATA_RUST_VERSION) test
+CANTRIP_SRC_DIR      := $(ROOTDIR)/cantrip/projects/cantrip
+CANTRIP_COMPONENTS   := $(CANTRIP_SRC_DIR)/apps/system/components
+CARGO_TEST        := cargo +$(CANTRIP_RUST_VERSION) test
 
-# NB: $(KATA_SRC_DIR)/apps/system/rust.cmake forces riscv32imac for
+# NB: $(CANTRIP_SRC_DIR)/apps/system/rust.cmake forces riscv32imac for
 #     the target when building Rust code
-KATA_TARGET_ARCH  := riscv32-unknown-elf
+CANTRIP_TARGET_ARCH  := riscv32-unknown-elf
 
 # Location of seL4 kernel source (for sel4-sys)
-SEL4_KERNEL_DIR  := $(ROOTDIR)/kata/kernel
+SEL4_KERNEL_DIR  := $(ROOTDIR)/cantrip/kernel
 
-KATA_OUT_DIR     := $(OUT)/kata/$(KATA_TARGET_ARCH)
-KATA_OUT_DEBUG   := $(KATA_OUT_DIR)/debug
-KATA_OUT_RELEASE := $(KATA_OUT_DIR)/release
+CANTRIP_OUT_DIR     := $(OUT)/cantrip/$(CANTRIP_TARGET_ARCH)
+CANTRIP_OUT_DEBUG   := $(CANTRIP_OUT_DIR)/debug
+CANTRIP_OUT_RELEASE := $(CANTRIP_OUT_DIR)/release
 
 # seL4 kernel included in the ext flash tarball
-KATA_KERNEL_DEBUG   := $(KATA_OUT_DEBUG)/kernel/kernel.elf
-KATA_KERNEL_RELEASE := $(KATA_OUT_RELEASE)/kernel/kernel.elf
+CANTRIP_KERNEL_DEBUG   := $(CANTRIP_OUT_DEBUG)/kernel/kernel.elf
+CANTRIP_KERNEL_RELEASE := $(CANTRIP_OUT_RELEASE)/kernel/kernel.elf
 
 # Rootserver image that has the CAmkES components embedded in
 # the ELF image in a ._archive_cpio section.
-KATA_ROOTSERVER_DEBUG := $(KATA_OUT_DEBUG)/capdl-loader
-KATA_ROOTSERVER_RELEASE := $(KATA_OUT_RELEASE)/capdl-loader
+CANTRIP_ROOTSERVER_DEBUG := $(CANTRIP_OUT_DEBUG)/capdl-loader
+CANTRIP_ROOTSERVER_RELEASE := $(CANTRIP_OUT_RELEASE)/capdl-loader
 
-KATA_SOURCES := $(shell find $(ROOTDIR)/kata \
+CANTRIP_SOURCES := $(shell find $(ROOTDIR)/cantrip \
 	-name \*.rs -or \
 	-name \*.c -or \
 	-name \*.h -or \
@@ -56,7 +56,7 @@ KATA_SOURCES := $(shell find $(ROOTDIR)/kata \
 OPENTITAN_SOURCE=$(ROOTDIR)/hw/opentitan-upstream
 REGTOOL=$(OPENTITAN_SOURCE)/util/regtool.py
 
-OPENTITAN_GEN_DIR=$(KATA_OUT_DIR)/opentitan-gen/include/opentitan
+OPENTITAN_GEN_DIR=$(CANTRIP_OUT_DIR)/opentitan-gen/include/opentitan
 $(OPENTITAN_GEN_DIR):
 	mkdir -p $(OPENTITAN_GEN_DIR)
 
@@ -83,34 +83,34 @@ $(UART_HEADER): $(REGTOOL) $(UART_HJSON) | $(OPENTITAN_GEN)
 $(RUSTDIR)/bin/cbindgen: | rust_presence_check
 	cargo install cbindgen
 
-$(OUT)/kata/components:
-	mkdir -p $(OUT)/kata/components
+$(OUT)/cantrip/components:
+	mkdir -p $(OUT)/cantrip/components
 
-## Builds cbindgen headers for Kata components
+## Builds cbindgen headers for Cantrip components
 #
 # This target regenerates these header definitions using Makefiles embedded in
 # each component's source tree.
-kata-component-headers: $(RUSTDIR)/bin/cbindgen | rust_presence_check $(OUT)/kata/components
-	for f in $$(find $(KATA_COMPONENTS) -name cbindgen.toml); do \
+cantrip-component-headers: $(RUSTDIR)/bin/cbindgen | rust_presence_check $(OUT)/cantrip/components
+	for f in $$(find $(CANTRIP_COMPONENTS) -name cbindgen.toml); do \
 		dir=$$(dirname $$f); \
 		test -f $$dir/Makefile && $(MAKE) -C $$dir; \
 	done
 
-## Builds auto-generated include files for the Kata operating system
-kata-gen-headers: $(TIMER_HEADER) $(UART_HEADER) kata-component-headers
+## Builds auto-generated include files for the Cantrip operating system
+cantrip-gen-headers: $(TIMER_HEADER) $(UART_HEADER) cantrip-component-headers
 
-## Cleans the auto-generated Kata include files
-kata-clean-headers:
+## Cleans the auto-generated Cantrip include files
+cantrip-clean-headers:
 	rm -f $(TIMER_HJSON)
 	rm -f $(TIMER_HEADER)
 	rm -f $(UART_HEADER)
-	rm -f $(OUT)/kata/components
+	rm -f $(OUT)/cantrip/components
 
-## Cleans all Kata operating system build artifacts
-kata-clean:
-	rm -rf $(OUT)/kata
+## Cleans all Cantrip operating system build artifacts
+cantrip-clean:
+	rm -rf $(OUT)/cantrip
 
-# Build Kata bundles. A bundle is an seL4 kernel elf plus the user space
+# Build Cantrip bundles. A bundle is an seL4 kernel elf plus the user space
 # bits: rootserver + CAmkES components (embedded in the rootserver elf).
 # Crates that depend on the kernel check the SEL4_OUT_DIR environment
 # variable for the location of the files generated for the kernel.
@@ -118,99 +118,99 @@ kata-clean:
 # in crates that use sel4-config can calculate this if SEL4_DIR is
 # not defined.
 #
-# NB: files generated by kata-gen-headers are shared so we craft
+# NB: files generated by cantrip-gen-headers are shared so we craft
 #     a symlink in the target-specific build directories
 
-$(KATA_KERNEL_DEBUG): $(KATA_SOURCES) kata-gen-headers | rust_presence_check
-	mkdir -p $(KATA_OUT_DEBUG)
-	ln -sf $(KATA_OUT_DIR)/opentitan-gen $(KATA_OUT_DEBUG)/
-	cmake -B $(KATA_OUT_DEBUG) -G Ninja \
-		-DCROSS_COMPILER_PREFIX=$(KATA_TARGET_ARCH)- \
+$(CANTRIP_KERNEL_DEBUG): $(CANTRIP_SOURCES) cantrip-gen-headers | rust_presence_check
+	mkdir -p $(CANTRIP_OUT_DEBUG)
+	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(CANTRIP_OUT_DEBUG)/
+	cmake -B $(CANTRIP_OUT_DEBUG) -G Ninja \
+		-DCROSS_COMPILER_PREFIX=$(CANTRIP_TARGET_ARCH)- \
 		-DSIMULATION=0 \
 		-DSEL4_CACHE_DIR=$(CACHE)/sel4-debug \
 		-DRELEASE=OFF \
-	  $(KATA_SRC_DIR)
+	  $(CANTRIP_SRC_DIR)
 	SEL4_DIR=$(SEL4_KERNEL_DIR) \
-	SEL4_OUT_DIR=$(KATA_OUT_DEBUG)/kernel \
-		ninja -C $(KATA_OUT_DEBUG)
+	SEL4_OUT_DIR=$(CANTRIP_OUT_DEBUG)/kernel \
+		ninja -C $(CANTRIP_OUT_DEBUG)
 
-## Generates Kata operating build artifacts with debugging suport
-kata-bundle-debug: $(KATA_KERNEL_DEBUG)
+## Generates Cantrip operating build artifacts with debugging suport
+cantrip-bundle-debug: $(CANTRIP_KERNEL_DEBUG)
 
-$(KATA_KERNEL_RELEASE): $(KATA_SOURCES) kata-gen-headers | rust_presence_check
-	mkdir -p $(KATA_OUT_RELEASE)
-	ln -sf $(KATA_OUT_DIR)/opentitan-gen $(KATA_OUT_RELEASE)/
-	cmake -B $(KATA_OUT_RELEASE) -G Ninja \
-		-DCROSS_COMPILER_PREFIX=$(KATA_TARGET_ARCH)- \
+$(CANTRIP_KERNEL_RELEASE): $(CANTRIP_SOURCES) cantrip-gen-headers | rust_presence_check
+	mkdir -p $(CANTRIP_OUT_RELEASE)
+	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(CANTRIP_OUT_RELEASE)/
+	cmake -B $(CANTRIP_OUT_RELEASE) -G Ninja \
+		-DCROSS_COMPILER_PREFIX=$(CANTRIP_TARGET_ARCH)- \
 		-DSIMULATION=0 \
 		-DSEL4_CACHE_DIR=$(CACHE)/sel4-release \
 		-DRELEASE=ON \
-		 $(KATA_SRC_DIR)
+		 $(CANTRIP_SRC_DIR)
 	SEL4_DIR=$(SEL4_KERNEL_DIR) \
-	SEL4_OUT_DIR=$(KATA_OUT_RELEASE)/kernel \
-		ninja -C $(KATA_OUT_RELEASE)
+	SEL4_OUT_DIR=$(CANTRIP_OUT_RELEASE)/kernel \
+		ninja -C $(CANTRIP_OUT_RELEASE)
 
-## Generates Kata operating build artifacts setup for release
-kata-bundle-release: $(KATA_KERNEL_RELEASE)
+## Generates Cantrip operating build artifacts setup for release
+cantrip-bundle-release: $(CANTRIP_KERNEL_RELEASE)
 
-## Generates both debug & release Kata operating system build artifacts
+## Generates both debug & release Cantrip operating system build artifacts
 # NB: shorthand for testing (sim targets depend on explicit pathnames)
-kata: kata-bundle-debug kata-bundle-release
+cantrip: cantrip-bundle-debug cantrip-bundle-release
 
 # Minisel requires that we've already generated our platform-specific headers
-# in $OUT/.../kernel, so we depend on the Kata kernel here.
+# in $OUT/.../kernel, so we depend on the Cantrip kernel here.
 
-$(KATA_OUT_DEBUG)/minisel/minisel.elf: $(ROOTDIR)/kata/projects/minisel/minisel.c $(KATA_KERNEL_DEBUG)
-	$(MAKE) -C $(ROOTDIR)/kata/projects/minisel SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 OUT_KATA=$(KATA_OUT_DEBUG) OUT_MINISEL=$(KATA_OUT_DEBUG)/minisel all
+$(CANTRIP_OUT_DEBUG)/minisel/minisel.elf: $(ROOTDIR)/cantrip/projects/minisel/minisel.c $(CANTRIP_KERNEL_DEBUG)
+	$(MAKE) -C $(ROOTDIR)/cantrip/projects/minisel SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 OUT_CANTRIP=$(CANTRIP_OUT_DEBUG) OUT_MINISEL=$(CANTRIP_OUT_DEBUG)/minisel all
 
-$(KATA_OUT_RELEASE)/minisel/minisel.elf: $(ROOTDIR)/kata/projects/minisel/minisel.c $(KATA_KERNEL_RELEASE)
-	$(MAKE) -C $(ROOTDIR)/kata/projects/minisel OPT=-O3 DBG= SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 OUT_KATA=$(KATA_OUT_RELEASE) OUT_MINISEL=$(KATA_OUT_RELEASE)/minisel all
+$(CANTRIP_OUT_RELEASE)/minisel/minisel.elf: $(ROOTDIR)/cantrip/projects/minisel/minisel.c $(CANTRIP_KERNEL_RELEASE)
+	$(MAKE) -C $(ROOTDIR)/cantrip/projects/minisel OPT=-O3 DBG= SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 OUT_CANTRIP=$(CANTRIP_OUT_RELEASE) OUT_MINISEL=$(CANTRIP_OUT_RELEASE)/minisel all
 
-minisel_debug: $(KATA_OUT_DEBUG)/minisel/minisel.elf
-minisel_release: $(KATA_OUT_RELEASE)/minisel/minisel.elf
+minisel_debug: $(CANTRIP_OUT_DEBUG)/minisel/minisel.elf
+minisel_release: $(CANTRIP_OUT_RELEASE)/minisel/minisel.elf
 
 # NB: cargo_test_debugconsole_zmodem is broken
-#	TODO(b/232928288): temporarily disable cargo_test_kata_proc_manager &
-#   cargo_test_kata_proc_interface; they have dependency issues
-CARGO_TEST_KATA=\
-	cargo_test_kata_os_common_logger \
-	cargo_test_kata_os_common_slot_allocator
+#	TODO(b/232928288): temporarily disable cargo_test_cantrip_proc_manager &
+#   cargo_test_cantrip_proc_interface; they have dependency issues
+CARGO_TEST_CANTRIP=\
+	cargo_test_cantrip_os_common_logger \
+	cargo_test_cantrip_os_common_slot_allocator
 
-## Runs all cargo unit tests for the Kata operating system
-cargo_test_kata: $(CARGO_TEST_KATA)
+## Runs all cargo unit tests for the Cantrip operating system
+cargo_test_cantrip: $(CARGO_TEST_CANTRIP)
 
 ## Runs cargo unit tests for the ProcessManager implementation
-cargo_test_kata_proc_manager:
-	cd $(KATA_COMPONENTS)/ProcessManager/kata-proc-manager && $(CARGO_TEST)
+cargo_test_cantrip_proc_manager:
+	cd $(CANTRIP_COMPONENTS)/ProcessManager/cantrip-proc-manager && $(CARGO_TEST)
 
 ## Runs cargo unit tests for the ProcessManager interface
-cargo_test_kata_proc_interface:
-	cd $(KATA_COMPONENTS)/ProcessManager/kata-proc-interface && $(CARGO_TEST)
+cargo_test_cantrip_proc_interface:
+	cd $(CANTRIP_COMPONENTS)/ProcessManager/cantrip-proc-interface && $(CARGO_TEST)
 
-## Runs cargo unit tests for the KataLogger service
-cargo_test_kata_os_common_logger:
-	cd $(KATA_COMPONENTS)/kata-os-common/src/logger && \
+## Runs cargo unit tests for the CantripLogger service
+cargo_test_cantrip_os_common_logger:
+	cd $(CANTRIP_COMPONENTS)/cantrip-os-common/src/logger && \
 		$(CARGO_TEST) -- --test-threads=1
 
-## Runs cargo unit tests for the KataSlotAllocator crate
-cargo_test_kata_os_common_slot_allocator:
-	cd $(KATA_COMPONENTS)/kata-os-common/src/slot-allocator && \
+## Runs cargo unit tests for the CantripSlotAllocator crate
+cargo_test_cantrip_os_common_slot_allocator:
+	cd $(CANTRIP_COMPONENTS)/cantrip-os-common/src/slot-allocator && \
 		$(CARGO_TEST) -- --test-threads=1
 
 ## Runs cargo unit tests for the DebugConsole zmomdem support
 cargo_test_debugconsole_zmodem:
-	cd $(KATA_COMPONENTS)/DebugConsole/zmodem && $(CARGO_TEST)
+	cd $(CANTRIP_COMPONENTS)/DebugConsole/zmodem && $(CARGO_TEST)
 
-kata-flatbuffers: $(OUT)/host/flatbuffers/bin/flatc $(ROOTDIR)/sw/kata/flatbuffers
-	$(MAKE) -C $(ROOTDIR)/sw/kata/flatbuffers \
+cantrip-flatbuffers: $(OUT)/host/flatbuffers/bin/flatc $(ROOTDIR)/sw/cantrip/flatbuffers
+	$(MAKE) -C $(ROOTDIR)/sw/cantrip/flatbuffers \
 		FLATC=$(OUT)/host/flatbuffers/bin/flatc \
-		SRC_DIR=$(ROOTDIR)/sw/kata/flatbuffers \
+		SRC_DIR=$(ROOTDIR)/sw/cantrip/flatbuffers \
 		TARGET_BASEDIR=$(ROOTDIR) \
 		all
 
-.PHONY:: kata kata-clean
-.PHONY:: kata-bundle-debug kata-bundle-release
-.PHONY:: kata-builtins-debug kata-builtins-release
-.PHONY:: kata-gen-headers kata-clean-headers
-.PHONY:: kata-flatbuffers
-.PHONY:: cargo_test_kata $(CARGO_TEST_KATA)
+.PHONY:: cantrip cantrip-clean
+.PHONY:: cantrip-bundle-debug cantrip-bundle-release
+.PHONY:: cantrip-builtins-debug cantrip-builtins-release
+.PHONY:: cantrip-gen-headers cantrip-clean-headers
+.PHONY:: cantrip-flatbuffers
+.PHONY:: cargo_test_cantrip $(CARGO_TEST_CANTRIP)

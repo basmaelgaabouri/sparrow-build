@@ -18,9 +18,11 @@
 function getrootdir
 {
     local TOPFILE="build/Makefile"
-    if [[ -n "$ROOTDIR" && -f "$ROOTDIR/$TOPFILE" ]]; then
-        # The following circumlocution ensures we remove symlinks from ROOTDIR.
-        (cd "${ROOTDIR}"; PWD= /bin/pwd)
+    # if env variable `SPARROW_ROOTDIR` is set, the setting is sticky.
+    if [[ -n "$SPARROW_ROOTDIR" && -f "$SPARROW_ROOTDIR/$TOPFILE" ]]; then
+        # The following circumlocution ensures we remove symlinks
+        # from SPARROW_ROOTDIR.
+        (cd "${SPARROW_ROOTDIR}"; PWD= /bin/pwd)
     else
         if [[ -f "${TOPFILE}" ]]; then
             # The following circumlocution (repeated below as well) ensures
@@ -60,7 +62,7 @@ export PATH="${OUT}/host/flatbuffers/bin:${PATH}"
 export PATH="${OUT}/host/verilator/bin:${PATH}"
 export PATH="${OUT}/host/verible/bin:${PATH}"
 
-export KATA_RUST_VERSION="nightly-2021-11-05"
+export CANTRIP_RUST_VERSION="nightly-2021-11-05"
 export RENODE_PORT=1234
 
 export PYTHONPATH="${PYTHONPATH}:${ROOTDIR}/cicd/"

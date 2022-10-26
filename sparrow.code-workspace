@@ -74,10 +74,10 @@
           {"text": "add-symbol-file out/matcha/riscv32imc-unknown-none-elf/debug/matcha_app"},
 
           // seL4 symbols
-          {"text": "add-symbol-file out/kata/kernel/kernel.elf"},
-          {"text": "add-symbol-file out/kata/capdl-loader"},
-          {"text": "add-symbol-file out/kata/debug_console.instance.bin"},
-          {"text": "add-symbol-file out/kata/process_manager.instance.bin"},
+          {"text": "add-symbol-file out/cantrip/kernel/kernel.elf"},
+          {"text": "add-symbol-file out/cantrip/capdl-loader"},
+          {"text": "add-symbol-file out/cantrip/debug_console.instance.bin"},
+          {"text": "add-symbol-file out/cantrip/process_manager.instance.bin"},
 
           // Connect to the Renode gdb server.
           {"text": "target remote localhost:3333"},

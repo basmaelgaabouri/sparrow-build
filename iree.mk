@@ -94,9 +94,9 @@ $(IREE_RUNTIME_OUT)/build.ninja: | iree_compiler iree_check iree_commit_check
 	    $(IREE_RUNTIME_DEFAULT_CONFIG) \
 	    $(MODEL_SRC_DIR)
 
-## Model artifact used in kata-builtins-*
+## Model artifact used in cantrip-builtins-*
 #
-# IREE executables used in kata-builtins-*
+# IREE executables used in cantrip-builtins-*
 iree_model_builtins: $(IREE_RUNTIME_OUT)/build.ninja | iree_check iree_commit_check
 	PYTHONPATH=$(IREE_COMPILER_DIR) cmake --build $(IREE_RUNTIME_OUT) --target \
 		quant_models/mobilenet_v1_emitc_static

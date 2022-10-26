@@ -13,8 +13,8 @@
 # limitations under the License.
 
 # Location of sel4test sources and binary output files
-SEL4TEST_SRC_DIR  := $(ROOTDIR)/kata/projects/sel4test
-SEL4TEST_OUT_DIR := $(OUT)/sel4test/$(KATA_TARGET_ARCH)
+SEL4TEST_SRC_DIR  := $(ROOTDIR)/cantrip/projects/sel4test
+SEL4TEST_OUT_DIR := $(OUT)/sel4test/$(CANTRIP_TARGET_ARCH)
 SEL4TEST_OUT_RELEASE := $(SEL4TEST_OUT_DIR)/release
 SEL4TEST_OUT_DEBUG := $(SEL4TEST_OUT_DIR)/debug
 
@@ -29,7 +29,7 @@ SEL4TEST_ROOTSERVER_RELEASE := $(SEL4TEST_OUT_RELEASE)/apps/sel4test-driver/sel4
 #   console properly so we need seL4_DebugPutChar to display test results.
 SEL4TEST_CMAKE_ARGS := \
 	-G Ninja \
-	-DCROSS_COMPILER_PREFIX=$(KATA_TARGET_ARCH)- \
+	-DCROSS_COMPILER_PREFIX=$(CANTRIP_TARGET_ARCH)- \
 	-DSIMULATION=TRUE \
 	-DPLATFORM=sparrow \
 	-DRISCV32=1 \
@@ -52,7 +52,7 @@ sel4test-gen-headers: $(TIMER_HEADER) $(UART_HEADER)
 ${SEL4TEST_OUT_RELEASE}/build.ninja: ${SEL4TEST_SOURCES}
 ${SEL4TEST_OUT_RELEASE}/build.ninja: sel4test-gen-headers
 	mkdir -p $(SEL4TEST_OUT_RELEASE)
-	ln -sf $(KATA_OUT_DIR)/opentitan-gen $(SEL4TEST_OUT_RELEASE)/
+	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_OUT_RELEASE)/
 	cmake -B $(SEL4TEST_OUT_RELEASE) \
 		-DSEL4_CACHE_DIR=$(CACHE)/sel4test-release \
 		-DRELEASE=ON \
@@ -74,7 +74,7 @@ sel4test-bundle-release: $(SEL4TEST_ROOTSERVER_RELEASE)
 # Generates seltest debug build.ninja
 ${SEL4TEST_OUT_DEBUG}/build.ninja: ${SEL4TEST_SOURCES} sel4test-gen-headers
 	mkdir -p $(SEL4TEST_OUT_DEBUG)
-	ln -sf $(KATA_OUT_DIR)/opentitan-gen $(SEL4TEST_OUT_DEBUG)/
+	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_OUT_DEBUG)/
 	cmake -B $(SEL4TEST_OUT_DEBUG) \
 		-DSEL4_CACHE_DIR=$(CACHE)/sel4test-debug \
 		-DRELEASE=OFF \
@@ -110,7 +110,7 @@ sel4test-clean:
 # sel4test build machinery whenever possible.
 
 SEL4TEST_WRAPPER_LIBRARY_DIR := $(SEL4TEST_SRC_DIR)/integrations/sel4-sys-wrapper
-SEL4TEST_WRAPPER_OUT_DIR := $(OUT)/sel4test-wrapper/$(KATA_TARGET_ARCH)
+SEL4TEST_WRAPPER_OUT_DIR := $(OUT)/sel4test-wrapper/$(CANTRIP_TARGET_ARCH)
 SEL4TEST_WRAPPER_OUT_RELEASE := $(SEL4TEST_WRAPPER_OUT_DIR)/release
 SEL4TEST_WRAPPER_OUT_DEBUG := $(SEL4TEST_WRAPPER_OUT_DIR)/debug
 
@@ -120,7 +120,7 @@ SEL4TEST_WRAPPER_ROOTSERVER_RELEASE := $(SEL4TEST_WRAPPER_OUT_RELEASE)/apps/sel4
 # seltest-wrapper configuration & build.ninja generation
 ${SEL4TEST_WRAPPER_OUT_RELEASE}/build.ninja: ${SEL4TEST_SOURCES} sel4test-gen-headers
 	mkdir -p $(SEL4TEST_WRAPPER_OUT_RELEASE)
-	ln -sf $(KATA_OUT_DIR)/opentitan-gen $(SEL4TEST_WRAPPER_OUT_RELEASE)/
+	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_WRAPPER_OUT_RELEASE)/
 	cmake -B $(SEL4TEST_WRAPPER_OUT_RELEASE) \
 		-DSEL4_CACHE_DIR=$(CACHE)/sel4test-release \
 		-DRELEASE=ON \
@@ -128,7 +128,7 @@ ${SEL4TEST_WRAPPER_OUT_RELEASE}/build.ninja: ${SEL4TEST_SOURCES} sel4test-gen-he
 		-DLibSel4ExternalLibrary=$(SEL4TEST_WRAPPER_LIBRARY_DIR) \
         -DRustTarget=riscv32imac-unknown-none-elf \
         -DRustCFlags="" \
-        -DRustVersion=${KATA_RUST_VERSION} \
+        -DRustVersion=${CANTRIP_RUST_VERSION} \
         ${SEL4TEST_CMAKE_ARGS}
 
 # sel4test-wrapper rootserver, requries kernel

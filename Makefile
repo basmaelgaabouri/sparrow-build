@@ -37,11 +37,11 @@ prereqs: $(ROOTDIR)/scripts/install-prereqs.sh \
 
 
 include $(ROOTDIR)/build/toolchain.mk
-include $(ROOTDIR)/build/kata.mk
-include $(ROOTDIR)/build/kata_tools.mk
-include $(ROOTDIR)/build/kata_apps.mk
-include $(ROOTDIR)/build/kata_builtins.mk
-include $(ROOTDIR)/build/kata_sel4test.mk
+include $(ROOTDIR)/build/cantrip.mk
+include $(ROOTDIR)/build/cantrip_tools.mk
+include $(ROOTDIR)/build/cantrip_apps.mk
+include $(ROOTDIR)/build/cantrip_builtins.mk
+include $(ROOTDIR)/build/cantrip_sel4test.mk
 include $(ROOTDIR)/build/tock.mk
 include $(ROOTDIR)/build/opentitan_sw.mk
 
@@ -78,4 +78,4 @@ tools: install_rust install_gcc install_llvm verilator renode qemu
 clean::
 	rm -rf $(OUT)
 
-.PHONY:: prereqs clean kata simulate tools
+.PHONY:: prereqs clean cantrip simulate tools

@@ -15,13 +15,13 @@
 ## Target to build the elfconvert utility
 #
 # Used in the CPIO bundling process, this tool converts ELF-formatted binaries
-# into something directly loadable by KataOS.
+# into something directly loadable by CantripOS.
 #
-# See also the source code in $(ROOTDIR)/kata/tools/seL4/misc/elfconvert for
+# See also the source code in $(ROOTDIR)/cantrip/tools/seL4/misc/elfconvert for
 # more information.
 elfconvert:
 	cargo build -q \
-        --manifest-path "$(ROOTDIR)/kata/tools/seL4/misc/elfconvert/Cargo.toml" \
+        --manifest-path "$(ROOTDIR)/cantrip/tools/seL4/misc/elfconvert/Cargo.toml" \
         --target-dir "$(OUT)/host"
 
 ELFCONVERT := $(OUT)/host/debug/elfconvert
