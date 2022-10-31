@@ -15,6 +15,7 @@
 CANTRIP_APPS_RELEASE   := $(CANTRIP_OUT_C_APP_RELEASE)/hello/hello.app \
                        $(CANTRIP_OUT_RUST_APP_RELEASE)/fibonacci/fibonacci.app \
                        $(CANTRIP_OUT_RUST_APP_RELEASE)/keyval/keyval.app \
+                       $(CANTRIP_OUT_RUST_APP_RELEASE)/logtest/logtest.app \
                        $(CANTRIP_OUT_RUST_APP_RELEASE)/panic/panic.app \
                        $(CANTRIP_OUT_C_APP_RELEASE)/suicide/suicide.app
 CANTRIP_MODEL_RELEASE  := $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static.model
@@ -22,6 +23,7 @@ CANTRIP_MODEL_RELEASE  := $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_
 CANTRIP_APPS_DEBUG     := $(CANTRIP_OUT_C_APP_DEBUG)/hello/hello.app \
                        $(CANTRIP_OUT_RUST_APP_DEBUG)/fibonacci/fibonacci.app \
                        $(CANTRIP_OUT_RUST_APP_DEBUG)/keyval/keyval.app \
+                       $(CANTRIP_OUT_RUST_APP_DEBUG)/logtest/logtest.app \
                        $(CANTRIP_OUT_RUST_APP_RELEASE)/panic/panic.app \
                        $(CANTRIP_OUT_C_APP_DEBUG)/suicide/suicide.app
 CANTRIP_MODEL_DEBUG    := $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static.model

@@ -83,6 +83,11 @@ keyval_debug: $(CANTRIP_OUT_RUST_APP_DEBUG)/keyval/keyval.app
 ## Build the keyval Rust application in release mode.
 keyval_release: $(CANTRIP_OUT_RUST_APP_RELEASE)/keyval/keyval.app
 
+## Build the logtest Rust application in debug mode.
+logtest_debug: $(CANTRIP_OUT_RUST_APP_DEBUG)/logtest/logtest.app
+## Build the logtest Rust application in release mode.
+logtest_release: $(CANTRIP_OUT_RUST_APP_RELEASE)/logtest/logtest.app
+
 ## Build the panic Rust application in debug mode.
 panic_debug: $(CANTRIP_OUT_RUST_APP_DEBUG)/panic/panic.app
 ## Build the panic Rust application in release mode.
@@ -96,5 +101,6 @@ suicide_release: $(CANTRIP_OUT_C APP_RELEASE)/suicide/suicide.app
 .PHONY:: hello_debug hello_release
 .PHONY:: fibonacci_debug fibonacci_release
 .PHONY:: keyval_debug keyval_release
+.PHONY:: logtest_debug logtest_release
 .PHONY:: panic_debug panic_release
 .PHONY:: suicide_debug suicide_release
