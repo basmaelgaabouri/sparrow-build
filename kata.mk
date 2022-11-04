@@ -12,10 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Builds Cantrip, the seL4-based operating system that runs on the SMC.
+# Builds Cantrip, the seL4-based operating system with a Rust-based userland.
 # The source is in $(CANTRIP_SRC_DIR), while the outputs are placed in
 # $(CANTRIP_KERNEL_DEBUG) & $(CANTRIP_ROOTSERVER_DEBUG) or
 # $(CANTRIP_KERNEL_RELEASE) & $(CANTRIP_ROOTSERVER_RELEASE).
+
+# Drivers for each platform and platform-specific make targets are stored in
+# platform/$PLATFORM/platform.mk make files. Everything in this file must be
+# made platform-agnostic. As such, we use phony targets that can be extended in
+# the platform.mk files as double-colon (::) aggregate targets. These phony
+# targets are explicitly grouped and have notes in their doccomments.
 
 # NB: see $(CANTRIP_SRC_DIR)/easy-settings.cmake for config knobs;
 #     but beware you may need to "clean" before building with changes
@@ -23,10 +29,6 @@
 CANTRIP_SRC_DIR      := $(ROOTDIR)/cantrip/projects/cantrip
 CANTRIP_COMPONENTS   := $(CANTRIP_SRC_DIR)/apps/system/components
 CARGO_TEST        := cargo +$(CANTRIP_RUST_VERSION) test
-
-# NB: $(CANTRIP_SRC_DIR)/apps/system/rust.cmake forces riscv32imac for
-#     the target when building Rust code
-CANTRIP_TARGET_ARCH  := riscv32-unknown-elf
 
 # Location of seL4 kernel source (for sel4-sys)
 SEL4_KERNEL_DIR  := $(ROOTDIR)/cantrip/kernel
@@ -51,34 +53,53 @@ CANTRIP_SOURCES := $(shell find $(ROOTDIR)/cantrip \
 	-name \*.cpp \
 	-type f)
 
-# Driver include files auto-generated from opentitan definitions.
+# Platform-specific aggregate targets
 
-OPENTITAN_SOURCE=$(ROOTDIR)/hw/opentitan-upstream
-REGTOOL=$(OPENTITAN_SOURCE)/util/regtool.py
+## Builds auto-generated include files for the Cantrip operating system
+#
+# In the generic case, this doesn't do anything except generate headers for our
+# Rust components to use from the CAmkES assemblies. It's an aggregate target,
+# though, so that platform-specific headers may also be generated from other
+# parts of the project.
+#
+# Note: this is a platform-specific aggregate phony target, and additional rules
+# for each platform are defined in build/$PLATFORM/platform.mk
+cantrip-gen-headers:: cantrip-component-headers
 
-OPENTITAN_GEN_DIR=$(CANTRIP_OUT_DIR)/opentitan-gen/include/opentitan
-$(OPENTITAN_GEN_DIR):
-	mkdir -p $(OPENTITAN_GEN_DIR)
+## Cleans the auto-generated Cantrip include files
+#
+# Note: this is a platform-specific aggregate phony target, and additional rules
+# for each platform are defined in build/$PLATFORM/platform.mk
+cantrip-clean-headers::
+	rm -f $(OUT)/cantrip/components
 
-TIMER_IP_DIR=$(OPENTITAN_SOURCE)/hw/ip/rv_timer
-TIMER_JINJA=$(TIMER_IP_DIR)/util/reg_timer.py
-TIMER_TEMPLATE=$(TIMER_IP_DIR)/data/rv_timer.hjson.tpl
+## Cantrip debug build-tree preparation target
+#
+# Prepares the output directory tree for building. In the generic case, this
+# just makes our target directory tree, but each specific platform may also need
+# to link in source files or modify the target tree somewhat. This aggregate
+# target provides that functionality for a debug build.
+#
+# Note: this is a platform-specific aggregate phony target, and additional rules
+# for each platform are defined in build/$PLATFORM/platform.mk
+cantrip-build-debug-prepare:: | $(CANTRIP_OUT_DEBUG)
 
-TIMER_HEADER=$(OPENTITAN_GEN_DIR)/timer.h
-TIMER_HJSON=$(OPENTITAN_GEN_DIR)/rv_timer.hjson
+## Cantrip release build-tree preparation target
+#
+# Prepares the output directory tree for building. In the generic case, this
+# just makes our target directory tree, but each specific platform may also need
+# to link in source files or modify the target tree somewhat. This aggregate
+# target provides that functionality for a release build.
+#
+# Note: this is a platform-specific aggregate phony target, and additional rules
+# for each platform are defined in build/$PLATFORM/platform.mk
+cantrip-build-release-prepare:: | $(CANTRIP_OUT_RELEASE)
 
-$(TIMER_HJSON): $(TIMER_JINJA) $(TIMER_TEMPLATE) | $(OPENTITAN_GEN_DIR)
-	$(TIMER_JINJA) -s 2 -t 1 $(TIMER_TEMPLATE) > $(TIMER_HJSON)
-$(TIMER_HEADER): $(REGTOOL) $(TIMER_HJSON)
-	$(REGTOOL) -D -o $@ $(TIMER_HJSON)
+# Cantrip-generic targets
 
-UART_IP_DIR=$(OPENTITAN_SOURCE)/hw/ip/uart
-
-UART_HEADER=$(OPENTITAN_GEN_DIR)/uart.h
-UART_HJSON=$(UART_IP_DIR)/data/uart.hjson
-
-$(UART_HEADER): $(REGTOOL) $(UART_HJSON) | $(OPENTITAN_GEN)
-	$(REGTOOL) -D -o $@ $(UART_HJSON)
+## Cleans all Cantrip operating system build artifacts
+cantrip-clean:
+	rm -rf $(OUT)/cantrip
 
 $(RUSTDIR)/bin/cbindgen: | rust_presence_check
 	cargo install cbindgen
@@ -96,19 +117,11 @@ cantrip-component-headers: $(RUSTDIR)/bin/cbindgen | rust_presence_check $(OUT)/
 		test -f $$dir/Makefile && $(MAKE) -C $$dir; \
 	done
 
-## Builds auto-generated include files for the Cantrip operating system
-cantrip-gen-headers: $(TIMER_HEADER) $(UART_HEADER) cantrip-component-headers
+$(CANTRIP_OUT_DEBUG):
+	mkdir -p $(CANTRIP_OUT_DEBUG)
 
-## Cleans the auto-generated Cantrip include files
-cantrip-clean-headers:
-	rm -f $(TIMER_HJSON)
-	rm -f $(TIMER_HEADER)
-	rm -f $(UART_HEADER)
-	rm -f $(OUT)/cantrip/components
-
-## Cleans all Cantrip operating system build artifacts
-cantrip-clean:
-	rm -rf $(OUT)/cantrip
+$(CANTRIP_OUT_RELEASE):
+	mkdir -p $(CANTRIP_OUT_RELEASE)
 
 # Build Cantrip bundles. A bundle is an seL4 kernel elf plus the user space
 # bits: rootserver + CAmkES components (embedded in the rootserver elf).
@@ -121,9 +134,7 @@ cantrip-clean:
 # NB: files generated by cantrip-gen-headers are shared so we craft
 #     a symlink in the target-specific build directories
 
-$(CANTRIP_KERNEL_DEBUG): $(CANTRIP_SOURCES) cantrip-gen-headers | rust_presence_check
-	mkdir -p $(CANTRIP_OUT_DEBUG)
-	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(CANTRIP_OUT_DEBUG)/
+$(CANTRIP_KERNEL_DEBUG): $(CANTRIP_SOURCES) cantrip-gen-headers cantrip-build-debug-prepare | $(CANTRIP_OUT_DEBUG) rust_presence_check
 	cmake -B $(CANTRIP_OUT_DEBUG) -G Ninja \
 		-DCROSS_COMPILER_PREFIX=$(CANTRIP_TARGET_ARCH)- \
 		-DSIMULATION=0 \
@@ -137,9 +148,7 @@ $(CANTRIP_KERNEL_DEBUG): $(CANTRIP_SOURCES) cantrip-gen-headers | rust_presence_
 ## Generates Cantrip operating build artifacts with debugging suport
 cantrip-bundle-debug: $(CANTRIP_KERNEL_DEBUG)
 
-$(CANTRIP_KERNEL_RELEASE): $(CANTRIP_SOURCES) cantrip-gen-headers | rust_presence_check
-	mkdir -p $(CANTRIP_OUT_RELEASE)
-	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(CANTRIP_OUT_RELEASE)/
+$(CANTRIP_KERNEL_RELEASE): $(CANTRIP_SOURCES) cantrip-gen-headers cantrip-build-release-prepare | $(CANTRIP_OUT_RELEASE) rust_presence_check
 	cmake -B $(CANTRIP_OUT_RELEASE) -G Ninja \
 		-DCROSS_COMPILER_PREFIX=$(CANTRIP_TARGET_ARCH)- \
 		-DSIMULATION=0 \
@@ -154,20 +163,9 @@ $(CANTRIP_KERNEL_RELEASE): $(CANTRIP_SOURCES) cantrip-gen-headers | rust_presenc
 cantrip-bundle-release: $(CANTRIP_KERNEL_RELEASE)
 
 ## Generates both debug & release Cantrip operating system build artifacts
+#
 # NB: shorthand for testing (sim targets depend on explicit pathnames)
 cantrip: cantrip-bundle-debug cantrip-bundle-release
-
-# Minisel requires that we've already generated our platform-specific headers
-# in $OUT/.../kernel, so we depend on the Cantrip kernel here.
-
-$(CANTRIP_OUT_DEBUG)/minisel/minisel.elf: $(ROOTDIR)/cantrip/projects/minisel/minisel.c $(CANTRIP_KERNEL_DEBUG)
-	$(MAKE) -C $(ROOTDIR)/cantrip/projects/minisel SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 OUT_CANTRIP=$(CANTRIP_OUT_DEBUG) OUT_MINISEL=$(CANTRIP_OUT_DEBUG)/minisel all
-
-$(CANTRIP_OUT_RELEASE)/minisel/minisel.elf: $(ROOTDIR)/cantrip/projects/minisel/minisel.c $(CANTRIP_KERNEL_RELEASE)
-	$(MAKE) -C $(ROOTDIR)/cantrip/projects/minisel OPT=-O3 DBG= SRC_LIBSEL4=$(SEL4_KERNEL_DIR)/libsel4 OUT_CANTRIP=$(CANTRIP_OUT_RELEASE) OUT_MINISEL=$(CANTRIP_OUT_RELEASE)/minisel all
-
-minisel_debug: $(CANTRIP_OUT_DEBUG)/minisel/minisel.elf
-minisel_release: $(CANTRIP_OUT_RELEASE)/minisel/minisel.elf
 
 # NB: cargo_test_debugconsole_zmodem is broken
 #	TODO(b/232928288): temporarily disable cargo_test_cantrip_proc_manager &
@@ -201,6 +199,7 @@ cargo_test_cantrip_os_common_slot_allocator:
 cargo_test_debugconsole_zmodem:
 	cd $(CANTRIP_COMPONENTS)/DebugConsole/zmodem && $(CARGO_TEST)
 
+## Builds the flatbuffers tooling and libraries
 cantrip-flatbuffers: $(OUT)/host/flatbuffers/bin/flatc $(ROOTDIR)/sw/cantrip/flatbuffers
 	$(MAKE) -C $(ROOTDIR)/sw/cantrip/flatbuffers \
 		FLATC=$(OUT)/host/flatbuffers/bin/flatc \
@@ -214,3 +213,5 @@ cantrip-flatbuffers: $(OUT)/host/flatbuffers/bin/flatc $(ROOTDIR)/sw/cantrip/fla
 .PHONY:: cantrip-gen-headers cantrip-clean-headers
 .PHONY:: cantrip-flatbuffers
 .PHONY:: cargo_test_cantrip $(CARGO_TEST_CANTRIP)
+.PHONY:: cantrip-build-debug-prepare cantrip-build-release-prepare
+.PHONY:: $(CANTRIP_OUT_DEBUG) $(CANTRIP_OUT_RELEASE)

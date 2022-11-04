@@ -173,6 +173,33 @@ function safe-abandon
     repo abandon "${branch}" .
 }
 
+function list-platforms
+{
+    for i in $(echo "${ROOTDIR}/build/platforms"/*); do
+        basename $i |sed 's/\.sh$//'
+    done
+}
+
+function set-platform
+{
+    local platform="${1}"; shift
+
+    if [[ -z "${platform}" ]]; then
+        (
+            echo "Usage: set-platform <platform>"
+            echo
+            echo "Sets the target platform for the build. Platforms available are:"
+            echo
+            list-platforms
+            echo
+        ) | fmt
+        return 1
+    fi
+
+    export PLATFORM="${platform}"
+    source "${ROOTDIR}/build/platforms/${platform}/setup.sh"
+}
+
 if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
     unset JUMP_TARGETS
     declare -Ax JUMP_TARGETS
@@ -240,11 +267,26 @@ if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
 
         complete -F _complete_build_targets m
         complete -F _complete_build_targets hmm
+
+        function _complete_platform_targets
+        {
+            local cur="${COMP_WORDS[COMP_CWORD]}"
+            COMPREPLY=()
+            if [[ "${COMP_CWORD}" -eq 1 ]]; then
+                COMPREPLY=( $(compgen -W "$(list-platforms)" $cur) )
+            fi
+        }
+
+        complete -F _complete_platform_targets set-platform
     fi
 fi
+
+set-platform sparrow
+
 echo "========================================"
 echo ROOTDIR="${ROOTDIR}"
 echo OUT="${OUT}"
+echo PLATFORM="${PLATFORM}"
 echo "========================================"
 echo
 echo Type \'m \[target\]\' to build.

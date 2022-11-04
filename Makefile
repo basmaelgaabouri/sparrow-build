@@ -35,17 +35,14 @@ prereqs: $(ROOTDIR)/scripts/install-prereqs.sh \
 			$(ROOTDIR)/scripts/python-requirements.txt" \
 		-a "$(ROOTDIR)/hw/opentitan-upstream/apt-requirements.txt"
 
-
 include $(ROOTDIR)/build/toolchain.mk
 include $(ROOTDIR)/build/cantrip.mk
 include $(ROOTDIR)/build/cantrip_tools.mk
 include $(ROOTDIR)/build/cantrip_apps.mk
 include $(ROOTDIR)/build/cantrip_builtins.mk
 include $(ROOTDIR)/build/cantrip_sel4test.mk
+include $(ROOTDIR)/build/minisel.mk
 include $(ROOTDIR)/build/tock.mk
-include $(ROOTDIR)/build/opentitan_sw.mk
-
-include $(ROOTDIR)/build/springbok.mk
 include $(ROOTDIR)/build/iree.mk
 include $(ROOTDIR)/build/sparrow_boot_rom.mk
 include $(ROOTDIR)/build/riscv_tests.mk
@@ -53,14 +50,10 @@ include $(ROOTDIR)/build/riscv_toolchain.mk
 include $(ROOTDIR)/build/renode.mk
 include $(ROOTDIR)/build/verible.mk
 include $(ROOTDIR)/build/verilator.mk
-include $(ROOTDIR)/build/opentitan_hw.mk
 include $(ROOTDIR)/build/flatbuffers.mk
-include $(ROOTDIR)/build/systemc.mk
-include $(ROOTDIR)/build/springbok_systemc.mk
 include $(ROOTDIR)/build/spike.mk
 
-# Must be after other makefiles so that we pick up various $(TARGETS)
-include $(ROOTDIR)/build/sim.mk
+include $(ROOTDIR)/build/platforms/$(PLATFORM)/platform.mk
 
 $(OUT):
 	@mkdir -p $(OUT)

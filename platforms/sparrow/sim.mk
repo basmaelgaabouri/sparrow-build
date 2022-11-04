@@ -111,5 +111,3 @@ test_vc: renode multihart_boot_rom $(ROOTDIR)/sim/config/sparrow.resc
 
 .PHONY:: sim_configs clean_sim_configs simulate simulate-debug debug-simulation
 .PHONY:: test_sc test_mc test_vc
-
-include $(ROOTDIR)/build/sim_sel4test.mk
