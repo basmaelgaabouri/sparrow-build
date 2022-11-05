@@ -98,9 +98,15 @@ suicide_debug: $(CANTRIP_OUT_C APP_DEBUG)/suicide/suicide.app
 ## Build the suicide C application in release mode.
 suicide_release: $(CANTRIP_OUT_C APP_RELEASE)/suicide/suicide.app
 
+## Build the timer Rust application in debug mode.
+timer_debug: $(CANTRIP_OUT_RUST_APP_DEBUG)/timer/timer.app
+## Build the timer Rust application in release mode.
+timer_release: $(CANTRIP_OUT_RUST_APP_RELEASE)/timer/timer.app
+
 .PHONY:: hello_debug hello_release
 .PHONY:: fibonacci_debug fibonacci_release
 .PHONY:: keyval_debug keyval_release
 .PHONY:: logtest_debug logtest_release
 .PHONY:: panic_debug panic_release
 .PHONY:: suicide_debug suicide_release
+.PHONY:: trimer_debug trimer_release
