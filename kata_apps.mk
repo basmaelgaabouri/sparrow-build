@@ -109,4 +109,4 @@ timer_release: $(CANTRIP_OUT_RUST_APP_RELEASE)/timer/timer.app
 .PHONY:: logtest_debug logtest_release
 .PHONY:: panic_debug panic_release
 .PHONY:: suicide_debug suicide_release
-.PHONY:: trimer_debug trimer_release
+.PHONY:: timer_debug timer_release
