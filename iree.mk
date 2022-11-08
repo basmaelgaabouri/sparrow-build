@@ -71,8 +71,10 @@ $(IREE_COMPILER_DIR):
 # the `iree_runtime` target. The outputs of this target are placed in
 # out/host/iree_compiler.
 #
+# TODO(b/258243964): Revert this pin when wmmu issue is addressed.
 iree_compiler: | $(IREE_COMPILER_DIR)
-	$(ROOTDIR)/scripts/download_iree_compiler.py --iree_compiler_dir "$(IREE_COMPILER_DIR)"
+	$(ROOTDIR)/scripts/download_iree_compiler.py --iree_compiler_dir "$(IREE_COMPILER_DIR)" --tag candidate-20221107.320
+
 iree_commit_check:
 	$(ROOTDIR)/scripts/check-iree-commit.sh "$(IREE_SRC)" "$(IREE_COMPILER_DIR)"
 
