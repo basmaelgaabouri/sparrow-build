@@ -1,4 +1,3 @@
-include $(ROOTDIR)/build/platforms/sparrow/cantrip_builtins.mk
 include $(ROOTDIR)/build/platforms/sparrow/opentitan_sw.mk
 include $(ROOTDIR)/build/platforms/sparrow/opentitan_hw.mk
 include $(ROOTDIR)/build/platforms/sparrow/matcha_hw.mk
@@ -38,10 +37,10 @@ $(TIMER_HEADER): $(REGTOOL) $(TIMER_HJSON)
 $(UART_HEADER): $(REGTOOL) $(UART_HJSON) | $(OPENTITAN_GEN)
 	$(REGTOOL) -D -o $@ $(UART_HJSON)
 
-cantrip-build-debug-prepare:: | $(CANTRIP_OUT_DEBUG)
+cantrip-build-debug-prepare:: | $(CANTRIP_OUT_RELEASE)
 	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(CANTRIP_OUT_DEBUG)/
 
-cantrip-build-release-prepare:: | $(CANTRIP_OUT_RELEASE)
+cantrip-build-release-prepare:: | $(CANTRIP_OUT_DEBUG)
 	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(CANTRIP_OUT_RELEASE)/
 
 cantrip-gen-headers:: $(TIMER_HEADER) $(UART_HEADER)
