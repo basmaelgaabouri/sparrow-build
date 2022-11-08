@@ -75,9 +75,10 @@ QEMU_DEPS=$(wildcard $(QEMU_SRC_DIR)/**/*.[ch])
 $(QEMU_OUT_DIR): | $(QEMU_SRC_DIR)
 	mkdir -p $(QEMU_OUT_DIR);
 
+# Disable configure check to be compatible with lib6 2.36.
 $(QEMU_BINARY): $(QEMU_DEPS) | $(QEMU_OUT_DIR)
 	cd $(QEMU_OUT_DIR) && $(QEMU_SRC_DIR)/configure \
-		--target-list=riscv32-softmmu,riscv32-linux-user
+		--target-list=riscv32-softmmu,riscv32-linux-user --disable-werror
 	$(MAKE) -C $(QEMU_OUT_DIR)
 
 ## Builds and installs the QEMU RISCV32 simulator.
