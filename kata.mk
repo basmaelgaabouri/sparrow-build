@@ -28,7 +28,8 @@
 
 CANTRIP_SRC_DIR      := $(ROOTDIR)/cantrip/projects/cantrip
 CANTRIP_COMPONENTS   := $(CANTRIP_SRC_DIR)/apps/system/components
-CARGO_TEST        := cargo +$(CANTRIP_RUST_VERSION) test
+CARGO_CMD         := cargo +$(CANTRIP_RUST_VERSION)
+CARGO_TEST        := ${CARGO_CMD} test
 
 # Location of seL4 kernel source (for sel4-sys)
 SEL4_KERNEL_DIR  := $(ROOTDIR)/cantrip/kernel
@@ -102,7 +103,7 @@ cantrip-clean:
 	rm -rf $(OUT)/cantrip
 
 $(RUSTDIR)/bin/cbindgen: | rust_presence_check
-	cargo install cbindgen
+	${CARGO_CMD} install cbindgen
 
 $(OUT)/cantrip/components:
 	mkdir -p $(OUT)/cantrip/components
@@ -136,7 +137,9 @@ $(CANTRIP_OUT_RELEASE):
 
 $(CANTRIP_KERNEL_DEBUG): $(CANTRIP_SOURCES) cantrip-gen-headers cantrip-build-debug-prepare | $(CANTRIP_OUT_DEBUG) rust_presence_check
 	cmake -B $(CANTRIP_OUT_DEBUG) -G Ninja \
-		-DCROSS_COMPILER_PREFIX=$(CANTRIP_TARGET_ARCH)- \
+		-DCROSS_COMPILER_PREFIX=$(C_PREFIX) \
+		-DRUST_TARGET=${RUST_TARGET} \
+		-DPLATFORM=${PLATFORM} \
 		-DSIMULATION=0 \
 		-DSEL4_CACHE_DIR=$(CACHE)/sel4-debug \
 		-DRELEASE=OFF \
@@ -150,7 +153,9 @@ cantrip-bundle-debug: $(CANTRIP_KERNEL_DEBUG)
 
 $(CANTRIP_KERNEL_RELEASE): $(CANTRIP_SOURCES) cantrip-gen-headers cantrip-build-release-prepare | $(CANTRIP_OUT_RELEASE) rust_presence_check
 	cmake -B $(CANTRIP_OUT_RELEASE) -G Ninja \
-		-DCROSS_COMPILER_PREFIX=$(CANTRIP_TARGET_ARCH)- \
+		-DCROSS_COMPILER_PREFIX=$(C_PREFIX) \
+		-DRUST_TARGET=${RUST_TARGET} \
+		-DPLATFORM=${PLATFORM} \
 		-DSIMULATION=0 \
 		-DSEL4_CACHE_DIR=$(CACHE)/sel4-release \
 		-DRELEASE=ON \

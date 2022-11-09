@@ -29,10 +29,9 @@ SEL4TEST_ROOTSERVER_RELEASE := $(SEL4TEST_OUT_RELEASE)/apps/sel4test-driver/sel4
 #   console properly so we need seL4_DebugPutChar to display test results.
 SEL4TEST_CMAKE_ARGS := \
 	-G Ninja \
-	-DCROSS_COMPILER_PREFIX=$(CANTRIP_TARGET_ARCH)- \
+	-DCROSS_COMPILER_PREFIX=$(C_PREFIX) \
 	-DSIMULATION=TRUE \
-	-DPLATFORM=sparrow \
-	-DRISCV32=1 \
+	-DPLATFORM=${PLATFORM} \
 	-DKernelPrinting=1 \
 	-DMCS=ON \
 	$(SEL4TEST_SRC_DIR)
@@ -46,11 +45,10 @@ SEL4TEST_SOURCES := $(shell find \
 	${SEL4TEST_SRC_DIR}/../util_libs \
 	-name \*.c -or -name \*.h -or -name \*.cpp -type f)
 
-sel4test-gen-headers: $(TIMER_HEADER) $(UART_HEADER)
+sel4test-gen-headers: cantrip-gen-headers
 
-# Generates seltest release build.ninja
-${SEL4TEST_OUT_RELEASE}/build.ninja: ${SEL4TEST_SOURCES}
-${SEL4TEST_OUT_RELEASE}/build.ninja: sel4test-gen-headers
+# Generates sel4test release build.ninja
+${SEL4TEST_OUT_RELEASE}/build.ninja: ${SEL4TEST_SOURCES} sel4test-gen-headers
 	mkdir -p $(SEL4TEST_OUT_RELEASE)
 	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_OUT_RELEASE)/
 	cmake -B $(SEL4TEST_OUT_RELEASE) \
@@ -132,8 +130,7 @@ ${SEL4TEST_WRAPPER_OUT_RELEASE}/build.ninja: ${SEL4TEST_SOURCES} sel4test-gen-he
         ${SEL4TEST_CMAKE_ARGS}
 
 # sel4test-wrapper rootserver, requries kernel
-$(SEL4TEST_WRAPPER_ROOTSERVER_RELEASE): ${SEL4TEST_WRAPPER_OUT_RELEASE}/build.ninja
-$(SEL4TEST_WRAPPER_ROOTSERVER_RELEASE): ${SEL4TEST_KERNEL_RELEASE} | rust_presence_check
+$(SEL4TEST_WRAPPER_ROOTSERVER_RELEASE): ${SEL4TEST_WRAPPER_OUT_RELEASE}/build.ninja ${SEL4TEST_KERNEL_RELEASE} | rust_presence_check
 	SEL4_DIR=$(SEL4_KERNEL_DIR) \
 	SEL4_OUT_DIR=$(SEL4TEST_OUT_RELEASE)/kernel \
 	    ninja -C $(SEL4TEST_WRAPPER_OUT_RELEASE) sel4test-driver

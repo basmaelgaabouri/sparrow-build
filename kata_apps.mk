@@ -14,9 +14,12 @@
 
 # CantripOS Test Applications
 
-#CANTRIP_APP_ARCH := ${CANTRIP_TARGET_ARCH}
-RUST_TARGET := riscv32imac-unknown-none-elf
-CANTRIP_APP_ARCH := riscv32
+# NB: these are platform-specific
+RUST_TARGET     := unknown
+CANTRIP_APP_ARCH   := unknown
+
+# TODO(jtgans): should include from platforms/${PLATFORM}/platform.mk
+include $(ROOTDIR)/build/platforms/$(PLATFORM)/cantrip_apps.mk
 
 # C apps
 
@@ -50,9 +53,12 @@ CANTRIP_SRC_RUST_APP := $(CANTRIP_SRC_DIR)/apps/rust
 CANTRIP_OUT_RUST_APP_DEBUG := $(CANTRIP_OUT_DEBUG)/apps/rust
 CANTRIP_OUT_RUST_APP_RELEASE := $(CANTRIP_OUT_RELEASE)/apps/rust
 
+# NB: pass SEL4_DIR for sel4-config to find the kernel
+
 $(CANTRIP_OUT_RUST_APP_DEBUG)/%.elf: $(CANTRIP_SRC_RUST_APP)/%.rs $(CANTRIP_KERNEL_DEBUG)
 	$(MAKE) -C $(dir $<) \
         OUT_CANTRIP=$(CANTRIP_OUT_DEBUG) \
+        SEL4_DIR=$(SEL4_KERNEL_DIR) \
         BUILD_ARCH=${CANTRIP_APP_ARCH} \
         RUST_TARGET=${RUST_TARGET} \
         BUILD_ROOT=$(CANTRIP_OUT_RUST_APP_DEBUG) \
@@ -62,6 +68,7 @@ $(CANTRIP_OUT_RUST_APP_DEBUG)/%.elf: $(CANTRIP_SRC_RUST_APP)/%.rs $(CANTRIP_KERN
 $(CANTRIP_OUT_RUST_APP_RELEASE)/%.elf: $(CANTRIP_SRC_RUST_APP)/%.rs $(CANTRIP_KERNEL_RELEASE)
 	$(MAKE) -C $(dir $<) \
         OUT_CANTRIP=$(CANTRIP_OUT_RELEASE) \
+        SEL4_DIR=$(SEL4_KERNEL_DIR) \
         BUILD_ARCH=${CANTRIP_APP_ARCH} \
         RUST_TARGET=${RUST_TARGET} \
         BUILD_ROOT=$(CANTRIP_OUT_RUST_APP_RELEASE) \
