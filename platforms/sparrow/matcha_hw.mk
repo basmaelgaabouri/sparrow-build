@@ -17,7 +17,6 @@ OPENTITAN_HW_DIR           := $(OPENTITAN_SRC_DIR)/hw
 MATCHA_OUT_DIR             := $(OUT)/matcha/hw
 MATCHA_VERILATOR_TB        := $(MATCHA_OUT_DIR)/sim-verilator/Vchip_sim_tb
 MATCHA_HW_TEST_OUT         := $(MATCHA_OUT_DIR)/sw/hw_tests
-MATCHA_SMC_BUILD_DIR       := $(MATCHA_OUT_DIR)/sw/smc
 MATCHA_SW_DEVICE_DIR       := $(MATCHA_OUT_DIR)/sw/device
 MATCHA_TESTLOG_DIR         := $(MATCHA_OUT_DIR)/test-log
 
@@ -82,19 +81,6 @@ matcha_hw_fpga_v6: | $(MATCHA_OUT_DIR)
 		find bazel-bin/hw/bitstream/vivado/build.fpga_v6/ -regex '.*.\(bit\|mmi\)' \
 			-exec cp -f '{}' "$(MATCHA_OUT_DIR)" \;
 
-## Run Matcha verilator simulation.
-# This target runs the testbench with SW hello_world artifacts.
-#
-# This is a dev-only target (not for CI).
-# TODO(hoangm): Change binary of SMC once multi-hart bootrom integration occurs.
-matcha_hw_verilator_sim_run: matcha_smc_sram_img verilator \
-		opentitan_sw_verilator_sim matcha_hw_verilator_sim matcha_sw_helloworld
-	./scripts/run-chip-verilator-sim.sh $(MATCHA_VERILATOR_TB) \
-		$(OPENTITAN_BUILD_SW_DEVICE_DIR)/boot_rom/boot_rom_sim_verilator.scr.39.vmem \
-		$(OPENTITAN_BUILD_SW_DEVICE_DIR)/examples/hello_world/hello_world_sim_verilator.elf \
-		$(OPENTITAN_BUILD_SW_DEVICE_DIR)/otp_img/otp_img_sim_verilator.vmem \
-		$(MATCHA_SMC_BUILD_DIR)/matcha_smc_test.elf
-
 $(MATCHA_HW_TEST_OUT):
 	mkdir -p $(MATCHA_HW_TEST_OUT)
 $(MATCHA_SW_DEVICE_DIR)/examples/hello_world: | $(MATCH_OUT_DIR)
@@ -104,21 +90,6 @@ $(MATCHA_SW_DEVICE_DIR)/tests: | $(MATCH_OUT_DIR)
 $(MATCHA_TESTLOG_DIR):
 	mkdir -p $(MATCHA_TESTLOG_DIR)
 
-$(MATCHA_HW_TEST_OUT)/matcha_hw_test.elf: | $(MATCHA_HW_TEST_OUT)
-	# TODO(ykwang): Change target name to build all peripheral test elfs.
-	cd $(MATCHA_SRC_DIR); \
-	bazel build --cpu=riscv32 --crosstool_top=@toolchain//:cc-compiler-suite //sw/hw_tests:matcha_hw_test.elf
-	cp -f $(MATCHA_SRC_DIR)/bazel-out/riscv32-fastbuild/bin/sw/hw_tests/*.elf $(MATCHA_HW_TEST_OUT)
-
-## Build the ported helloworld test from opentitan.
-# The output is stored at out/matcha/hw/sw/device/examples/hello_world
-matcha_sw_helloworld: | $(MATCHA_SW_DEVICE_DIR)/examples/hello_world
-	cd $(MATCHA_SRC_DIR) && \
-		bazel build //sw/device/examples/hello_world:hello_world
-	cd $(MATCHA_SRC_DIR) && \
-		find "bazel-out/" -name "hello_world*.elf" \
-		-exec cp -f '{}' "$(MATCHA_SW_DEVICE_DIR)/examples/hello_world" \;
-
 ## Build and run matcha verilator test suite
 #
 matcha_hw_verilator_tests: verilator | $(MATCHA_TESTLOG_DIR)
@@ -126,21 +97,11 @@ matcha_hw_verilator_tests: verilator | $(MATCHA_TESTLOG_DIR)
 		bazel test --test_output=streamed //sw/device/tests:verilator_test_suite
 	cd $(MATCHA_SRC_DIR) && cp -rf "bazel-testlogs/sw" "$(MATCHA_TESTLOG_DIR)"
 
-$(MATCHA_SMC_BUILD_DIR):
-	mkdir -p $(MATCHA_SMC_BUILD_DIR)
-
-## Build Matcha SMC image artifact
-#  TODO(hoangm): Move to matcha_sw.mk once more matcha binaries are ready
-matcha_smc_sram_img: | $(MATCHA_SMC_BUILD_DIR)
-	@cd $(MATCHA_SRC_DIR)/hw/top_matcha/ip/smc/examples/sw/simple_system/hello_test && \
-		make && \
-		cp hello_test.elf $(MATCHA_SMC_BUILD_DIR)/matcha_smc_test.elf
-
-
 ## Clean Matcha HW artifact
 matcha_hw_clean:
 	rm -rf $(MATCHA_OUT_DIR)
+	cd $(MATCHA_SRC_DIR) && \
+		bazel clean --expunge
 
-.PHONY:: matcha_hw_verilator_sim matcha_hw_verilator_sim_run  matcha_hw_clean
-.PHONY:: matcha_smc_sram_img matcha_hw_verilator_tests
+.PHONY:: matcha_hw_verilator_sim matcha_hw_clean matcha_hw_verilator_tests
 .PHONY:: matcha_hw_fpga_nexus matcha_hw_fpga_v6
