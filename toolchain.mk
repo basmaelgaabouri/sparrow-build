@@ -33,7 +33,7 @@ install_rust: $(CACHE)/rust_toolchain/bin/rustc
 # This target should not be called by the end user, but used as an order-only
 # dependency by other targets.
 rust_presence_check:
-	@if [[ ! -f $(ROOTDIR)/cache/rust_toolchain/bin/rustc ]]; then \
+	@if [[ ! -f $(CARGO_HOME)/bin/rustc ]]; then \
 		echo '!!! Rust is not installed. Please run `m tools`!'; \
 		exit 1; \
 	fi

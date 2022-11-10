@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+PLATFORM=${PLATFORM:-sparrow}
+
 ## Shamelessly borrowed from android's envsetup.sh.
 function getrootdir
 {
@@ -48,13 +50,9 @@ export ROOTDIR="$(getrootdir)"
 export OUT="${ROOTDIR}/out"
 export CACHE="${ROOTDIR}/cache"
 
-export RUSTDIR="${CACHE}/rust_toolchain"
-export CARGO_HOME="${RUSTDIR}"
-export RUSTUP_HOME="${RUSTDIR}"
-
+# NB: platform setup.sh (included below) sets up the rust toolchain
 export PATH="${HOME}/.local/bin:${PATH}"
 export PATH="${CACHE}/toolchain/bin:${PATH}"
-export PATH="${RUSTDIR}/bin:${PATH}"
 export PATH="${ROOTDIR}/scripts:${PATH}"
 export PATH="${CACHE}/renode:${PATH}"
 export PATH="${OUT}/host/qemu/riscv32-softmmu:${PATH}"
@@ -281,7 +279,7 @@ if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
     fi
 fi
 
-set-platform sparrow
+set-platform ${PLATFORM}
 
 echo "========================================"
 echo ROOTDIR="${ROOTDIR}"
@@ -298,18 +296,4 @@ echo
 echo "To get more information on a target, use 'hmm [target]'"
 echo
 
-if [[ ! -d "${RUSTDIR}" ]] ||
-   [[ ! -d "${ROOTDIR}/cache/toolchain" ]] ||
-   [[ ! -d "${ROOTDIR}/cache/toolchain_iree_rv32imf" ]] ||
-   [[ ! -d "${ROOTDIR}/cache/renode" ]]; then
-    echo
-    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-    echo You have missing tools. Please run \'m prereqs\' followed
-    echo by \'m tools\' to install them.
-    echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-    echo
-    [[ -d "${RUSTDIR}" ]] || echo "${RUSTDIR} is missing!"
-    [[ -d "${ROOTDIR}/cache/toolchain" ]] || echo "${ROOTDIR}/cache/toolchain is missing"
-    [[ -d "${ROOTDIR}/cache/toolchain_iree_rv32imf" ]] || echo "${ROOTDIR}/cache/toolchain_iree_rv32imf is missing!"
-    [[ -d "${ROOTDIR}/cache/renode" ]] || echo "${ROOTDIR}/cache/renode is missing!"
-fi
+declare -F parting_messages >/dev/null && parting_messages

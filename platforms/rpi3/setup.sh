@@ -17,3 +17,33 @@
 export TARGET_PLATFORM="rpi3"
 export C_PREFIX="aarch64-none-linux-gnu-"
 export RUST_PREFIX="aarch64-unknown-none"
+
+# For non-Sparrow targets we use CARGO_HOME or RUSTUP_HOME (if set) to find
+# the Rust toolchain. Otherwise we fallback to the search path and look for
+# cargo. The rest of the build system uses CARGO_HOME and RUSTUP_HOME so we
+# force set them below. See
+#    https://rust-lang.github.io/rustup/environment-variables.html
+# and/or
+#    https://doc.rust-lang.org/cargo/reference/environment-variables.html
+RUSTDIR=
+for path in "${CARGO_HOME}" "${RUSTUP_HOME}"; do
+    if [[ -x "${path}/bin/cargo" ]]; then
+        export RUSTDIR="${path}"
+        break
+    fi
+done
+if [[ -z "${RUSTDIR}" ]]; then
+    # Fall back to the search path to find cargo (where cbindgen is also
+    # expected to be found).
+    cargo_binary="$(which cargo)"
+    if [[ -x "${cargo_binary}" ]]; then
+        export RUSTDIR="$(dirname $(dirname ${cargo_binary}))";
+    fi
+fi
+if [[ -z "${RUSTDIR}" ]]; then
+    echo '!!! Cannot locate Rust. Please install and/or fix your search path!'
+    exit 1
+fi
+export CARGO_HOME="${RUSTDIR}"
+export RUSTUP_HOME="${RUSTDIR}"
+export PATH="${RUSTDIR}/bin:${PATH}"

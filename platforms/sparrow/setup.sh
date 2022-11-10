@@ -22,3 +22,27 @@ export RUST_PREFIX="riscv32-unknown-linux-gnu"
 # NB: $(CANTRIP_SRC_DIR)/apps/system/rust.cmake forces riscv32imac for
 #     the target when building Rust code
 export CANTRIP_TARGET_ARCH="riscv32-unknown-elf"
+
+# Sparrow's toolchains are setup specially, just setup the environment.
+export RUSTDIR="${CACHE}/rust_toolchain"
+export CARGO_HOME="${RUSTDIR}"
+export RUSTUP_HOME="${RUSTDIR}"
+export PATH="${RUSTDIR}/bin:${PATH}"
+
+function parting_messages() {
+    if [[ ! -d "${RUSTDIR}" ]] ||
+       [[ ! -d "${ROOTDIR}/cache/toolchain" ]] ||
+       [[ ! -d "${ROOTDIR}/cache/toolchain_iree_rv32imf" ]] ||
+       [[ ! -d "${ROOTDIR}/cache/renode" ]]; then
+        echo
+        echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+        echo You have missing tools. Please run \'m prereqs\' followed
+        echo by \'m tools\' to install them.
+        echo '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+        echo
+        [[ -d "${RUSTDIR}" ]] || echo "${RUSTDIR} is missing!"
+        [[ -d "${ROOTDIR}/cache/toolchain" ]] || echo "${ROOTDIR}/cache/toolchain is missing"
+        [[ -d "${ROOTDIR}/cache/toolchain_iree_rv32imf" ]] || echo "${ROOTDIR}/cache/toolchain_iree_rv32imf is missing!"
+        [[ -d "${ROOTDIR}/cache/renode" ]] || echo "${ROOTDIR}/cache/renode is missing!"
+    fi
+}
