@@ -16,8 +16,6 @@ SPARROW_BOOT_ROM_SOURCE_DIR:=$(ROOTDIR)/sw/multihart_boot_rom
 SPARROW_BOOT_ROM_BUILD_DIR:=$(OUT)/sparrow_boot_rom
 SPARROW_BOOT_ROM_BUILD_NINJA_SCRIPT:=$(SPARROW_BOOT_ROM_BUILD_DIR)/build.ninja
 SPARROW_BOOT_ROM_ELF:=multihart_boot_rom.elf
-PUPPETEER_BOOT_ROM_ELF:=$(SPARROW_BOOT_ROM_BUILD_DIR)/puppeteer_boot_rom.elf
-PUPPETEER_BOOT_ROM_SCR_VMEM:=$(SPARROW_BOOT_ROM_BUILD_DIR)/puppeteer_boot_rom.scr.vmem
 
 $(SPARROW_BOOT_ROM_BUILD_DIR):
 	@mkdir -p "$(SPARROW_BOOT_ROM_BUILD_DIR)"
@@ -45,23 +43,19 @@ $(MATCHA_OUT_DIR)/data/autogen/top_matcha.gen.hjson: | $(MATCHA_OUT_DIR)/data/au
 			-t $(MATCHA_SRC_DIR)/hw/top_matcha/data/top_matcha.hjson --no-top \
 			-o $(MATCHA_OUT_DIR) --dump_gen_hjson
 
-$(PUPPETEER_BOOT_ROM_ELF):
-	$(MAKE) -C "$(SPARROW_BOOT_ROM_SOURCE_DIR)" puppeteer_boot_rom
-
-$(PUPPETEER_BOOT_ROM_SCR_VMEM): $(PUPPETEER_BOOT_ROM_ELF) $(MATCHA_OUT_DIR)/data/autogen/top_matcha.gen.hjson
-	cd $(OPENTITAN_SRC_DIR) && bazel run //hw/ip/rom_ctrl/util:scramble_image \
-			$(MATCHA_OUT_DIR)/data/autogen/top_matcha.gen.hjson $(PUPPETEER_BOOT_ROM_ELF) $@
-
-## Build the Puppeteer boot ROM image
+## Build the Puppeteer boot ROM image and scramble it for Verilator simulation.
 #
 # This builds an *insecure*, test-only bootrom that allows a client to
 # read/write arbitrary memory via a simple UART console.
-puppeteer_boot_rom_elf: $(PUPPETEER_BOOT_ROM_ELF)
+# Puppeteer currently does _not_ work in Renode as it now requires manipulating
+# hardware registers that don't exist in Renode on bootup in order to work
+# correctly on our FPGA platforms. Once those peripherals are stubbed out in
+# Renode, Puppeteer should work there again.
+puppeteer_boot_rom_scr_vmem: $(MATCHA_OUT_DIR)/data/autogen/top_matcha.gen.hjson $(SPARROW_BOOT_ROM_BUILD_NINJA_SCRIPT)
+	cmake --build $(SPARROW_BOOT_ROM_BUILD_DIR) --target puppeteer_boot_rom.elf
+	cd $(OPENTITAN_SRC_DIR) && bazel run //hw/ip/rom_ctrl/util:scramble_image \
+			$(MATCHA_OUT_DIR)/data/autogen/top_matcha.gen.hjson \
+			$(SPARROW_BOOT_ROM_BUILD_DIR)/puppeteer_boot_rom.elf \
+			$(SPARROW_BOOT_ROM_BUILD_DIR)/puppeteer_boot_rom.scr.39.vmem
 
-## Build the Puppeteer boot ROM image and scramble it for Verilator simulation.
-#
-# Same as above, but applies a scrambling pass to enable compatibility with
-# the secure SRAM configuration used in Verilator.
-puppeteer_boot_rom_scr_vmem: $(PUPPETEER_BOOT_ROM_SCR_VMEM)
-
-.PHONY:: multihart_boot_rom multihart_boot_rom_clean puppeteer_boot_rom_elf puppeteer_boot_rom_scr_vmem
+.PHONY:: multihart_boot_rom multihart_boot_rom_clean puppeteer_boot_rom_scr_vmem
