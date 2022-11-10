@@ -25,6 +25,8 @@ TOOLCHAINLLVM_SRC_DIR    := $(OUT)/tmp/toolchain/llvm-project
 TOOLCHAINLLVM_BUILD_DIR  := $(OUT)/tmp/toolchain/build_toolchain_llvm
 TOOLCHAINLLVM_BIN        := $(TOOLCHAINIREE_OUT_DIR)/bin/clang
 
+TOOLCHAIN_BUILD_DATE := $(shell date +%Y-%m-%d)
+
 
 toolchain_src:
 	if [[ -f "${TOOLCHAIN_BIN}" ]]; then \
@@ -45,14 +47,16 @@ $(TOOLCHAIN_BIN): | toolchain_src $(TOOLCHAIN_BUILD_DIR)
 		--with-arch=rv32imac \
 		--with-abi=ilp32
 	$(MAKE) -C $(TOOLCHAIN_BUILD_DIR) newlib \
-	  GDB_TARGET_FLAGS="--with-expat=yes --with-python=python3.9"
+	  GDB_TARGET_FLAGS="--with-expat=yes --with-python=python3.10"
 	$(MAKE) -C $(TOOLCHAIN_BUILD_DIR) clean
 
-$(OUT)/toolchain.tar.gz: $(TOOLCHAIN_BIN)
-	cd $(CACHE) && tar -czf $(OUT)/toolchain.tar.gz toolchain
-	cd $(OUT) && sha256sum toolchain.tar.gz > toolchain.tar.gz.sha256sum
+$(OUT)/toolchain_$(TOOLCHAIN_BUILD_DATE).tar.gz: $(TOOLCHAIN_BIN)
+	tar -C $(CACHE) -czf \
+		"$(OUT)/toolchain_$(TOOLCHAIN_BUILD_DATE).tar.gz" toolchain
+	cd $(OUT) && sha256sum "toolchain_$(TOOLCHAIN_BUILD_DATE).tar.gz" > \
+		"toolchain_$(TOOLCHAIN_BUILD_DATE).tar.gz.sha256sum"
 	@echo "==========================================================="
-	@echo "Toolchain tarball ready at $(OUT)/toolchain.tar.gz"
+	@echo "Toolchain tarball ready at $(OUT)/toolchain_$(TOOLCHAIN_BUILD_DATE).tar.gz"
 	@echo "==========================================================="
 
 ## Builds the GCC toolchain for the security core and SMC.
@@ -61,11 +65,12 @@ $(OUT)/toolchain.tar.gz: $(TOOLCHAIN_BIN)
 # tarball, and is most likely not the target you actually want.
 #
 # This target can take hours to build, and results in a tarball and sha256sum
-# called `out/toolchain.tar.gz` and `out/toolchain.tar.gz.sha256sum`, ready for
+# called `out/toolchain_<timestamp>.tar.gz` and
+# `out/toolchain_<timestamp>.tar.gz.sha256sum`, ready for
 # upload. In the process of generating this tarball, this target also builds the
 # actual tools in `cache/toolchain`, so untarring this tarball is
 # unneccessary.
-toolchain: $(OUT)/toolchain.tar.gz
+toolchain: $(OUT)/toolchain_$(TOOLCHAIN_BUILD_DATE).tar.gz
 
 toolchain_src_llvm:
 	if [[ -f "${TOOLCHAINLLVM_BIN}" ]]; then \
@@ -88,7 +93,7 @@ $(TOOLCHAINIREE_BIN): | toolchain_src_llvm $(TOOLCHAINIREE_BUILD_DIR)
 		--with-abi=ilp32 \
 		--with-cmodel=medany
 	$(MAKE) -C $(TOOLCHAINIREE_BUILD_DIR) newlib \
-	  GDB_TARGET_FLAGS="--with-expat=yes --with-python=python3.9"
+	  GDB_TARGET_FLAGS="--with-expat=yes --with-python=python3.10"
 	$(MAKE) -C $(TOOLCHAINIREE_BUILD_DIR) clean
 
 # Build with 32-bit baremetal config.
@@ -113,11 +118,13 @@ $(TOOLCHAINLLVM_BIN): $(TOOLCHAINIREE_BIN)
 	cd "$(TOOLCHAINIREE_OUT_DIR)/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libm_nano.a libm.a
 	cd "$(TOOLCHAINIREE_OUT_DIR)/riscv32-unknown-elf/lib/newlib-nano" && ln -sf ../libgloss_nano.a libgloss.a
 
-$(OUT)/toolchain_iree_rv32.tar.gz: $(TOOLCHAINLLVM_BIN)
-	cd $(CACHE) && tar -czf $(OUT)/toolchain_iree_rv32.tar.gz toolchain_iree_rv32imf
-	cd $(OUT) && sha256sum toolchain_iree_rv32.tar.gz > toolchain_iree_rv32.tar.gz.sha256sum
+$(OUT)/toolchain_iree_rv32_$(TOOLCHAIN_BUILD_DATE).tar.gz: $(TOOLCHAINLLVM_BIN)
+	tar -C $(CACHE) -czf \
+		"$(OUT)/toolchain_iree_rv32_$(TOOLCHAIN_BUILD_DATE).tar.gz" toolchain_iree_rv32imf
+	cd $(OUT) && sha256sum "toolchain_iree_rv32_$(TOOLCHAIN_BUILD_DATE).tar.gz" > \
+		"toolchain_iree_rv32_$(TOOLCHAIN_BUILD_DATE).tar.gz.sha256sum"
 	@echo "==========================================================="
-	@echo "Toolchain tarball ready at $(OUT)/toolchain_iree_rv32.tar.gz"
+	@echo "Toolchain tarball ready at $(OUT)/toolchain_iree_rv32_$(TOOLCHAIN_BUILD_DATE).tar.gz"
 	@echo "==========================================================="
 
 ## Builds the LLVM toolchain for the vector core.
@@ -126,11 +133,12 @@ $(OUT)/toolchain_iree_rv32.tar.gz: $(TOOLCHAINLLVM_BIN)
 # tarball, and is most likely not the target you actually want.
 #
 # This target can take hours to build, and results in a tarball and sha256sum
-# called `out/toolchain_iree_rv32.tar.gz` and
-# `out/toolchain_iree_rv32.tar.gz.sha256sum`, ready for upload. In the process
-# of generating this tarball, this target also builds the actual tools in
-# `cache/toolchain_iree_rv32imf`, so untarring this tarball is unneccessary.
-toolchain_llvm: $(OUT)/toolchain_iree_rv32.tar.gz
+# called `out/toolchain_iree_rv32_<timestamp>.tar.gz` and
+# `out/toolchain_iree_rv32_<timestamp>.tar.gz.sha256sum`, ready for upload.
+# In the process of generating this tarball, this target also builds the actual
+# tools in `cache/toolchain_iree_rv32imf`, so untarring this tarball is
+# unneccessary.
+toolchain_llvm: $(OUT)/toolchain_iree_rv32_$(TOOLCHAIN_BUILD_DATE).tar.gz
 
 ## Removes the IREE RV32IMF toolchain from cache/, forcing a re-fetch if needed.
 toolchain_llvm_clean:
