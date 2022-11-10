@@ -15,13 +15,11 @@
 MATCHA_SRC_DIR             := $(ROOTDIR)/hw/matcha
 OPENTITAN_HW_DIR           := $(OPENTITAN_SRC_DIR)/hw
 MATCHA_OUT_DIR             := $(OUT)/matcha/hw
-MATCHA_OUT_ROM_SPLICES_DIR := $(MATCHA_OUT_DIR)/rom_splices
 MATCHA_VERILATOR_TB        := $(MATCHA_OUT_DIR)/sim-verilator/Vchip_sim_tb
 MATCHA_HW_TEST_OUT         := $(MATCHA_OUT_DIR)/sw/hw_tests
 MATCHA_SMC_BUILD_DIR       := $(MATCHA_OUT_DIR)/sw/smc
 MATCHA_SW_DEVICE_DIR       := $(MATCHA_OUT_DIR)/sw/device
 MATCHA_TESTLOG_DIR         := $(MATCHA_OUT_DIR)/test-log
-ISP_SRC_DIR                := $(ROOTDIR)/hw/ip/isp
 
 $(MATCHA_OUT_DIR):
 	mkdir -p $(MATCHA_OUT_DIR)
@@ -54,21 +52,6 @@ $(MATCHA_VERILATOR_TB): $(MATCHA_OUT_DIR) verilator
 		cp -rf --no-preserve=mode bazel-bin/hw/build.verilator/* "$(MATCHA_OUT_DIR)" && \
 		chmod +x "$(MATCHA_OUT_DIR)/sim-verilator/Vchip_sim_tb"
 
-$(MATCHA_OUT_ROM_SPLICES_DIR):
-	@mkdir -p $(MATCHA_OUT_ROM_SPLICES_DIR)
-
-##Build ROM splices to be included in the Nexus bitstream.
-# This target is a requirement for matcha_hw_fpga_nexus and matcha_hw_fpga_v6.
-matcha_hw_rom_splices: | $(MATCHA_OUT_ROM_SPLICES_DIR)
-	@cd $(OPENTITAN_SRC_DIR) && \
-		bazel build //sw/device/lib/testing/test_rom:test_rom_fpga_cw310_scr_vmem && \
-		find "bazel-out/" -name "test_rom_fpga_cw310.scr.39.vmem" \
-			-exec cp -f '{}' "$(MATCHA_OUT_ROM_SPLICES_DIR)/test_rom_fpga_nexus.scr.39.vmem" \;
-	@cd $(OPENTITAN_SRC_DIR) && \
-		bazel build //hw/ip/otp_ctrl/data:img_rma && \
-		find "bazel-out/" -name "img_rma.24.vmem" \
-			-exec cp -f '{}' "$(MATCHA_OUT_ROM_SPLICES_DIR)/otp_img_fpga_nexus.vmem" \;
-
 ## Build Matcha FPGA Target for Nexus Board.
 # This target builds the FPGA bit file from hw/matcha using
 # hw/opentitan-upstream as the library. The output is stored in
@@ -77,17 +60,12 @@ matcha_hw_rom_splices: | $(MATCHA_OUT_ROM_SPLICES_DIR)
 # and Vivado suporting the latest UltraScale+ device to build it.
 # Move the $(MATCH_SRC_DIR) to the last, so some of prim_xilinx IPs will override the
 # default one from $(OPENTITAN_HW_DIR)/ip.
-matcha_hw_fpga_nexus: matcha_hw_rom_splices
-	fusesoc --cores-root $(OPENTITAN_HW_DIR)/dv \
-		--cores-root $(OPENTITAN_HW_DIR)/ip \
-		--cores-root $(OPENTITAN_HW_DIR)/lint \
-		--cores-root $(OPENTITAN_HW_DIR)/vendor \
-		--cores-root $(MATCHA_SRC_DIR) \
-		--cores-root $(ISP_SRC_DIR) \
-		run \
-		--flag=fileset_top --target=synth --setup \
-		--build-root $(MATCHA_OUT_DIR) \
-		--build google:systems:chip_matcha_nexus
+matcha_hw_fpga_nexus: | $(MATCHA_OUT_DIR)
+	cd $(MATCHA_SRC_DIR) && \
+		bazel build //hw/bitstream/vivado:fpga_nexus
+	cd $(MATCHA_SRC_DIR) && \
+		find bazel-bin/hw/bitstream/vivado/build.fpga_nexus/ -regex '.*.\(bit\|mmi\)' \
+			-exec cp -f '{}' "$(MATCHA_OUT_DIR)" \;
 
 ## Build Matcha FPGA Target for  V6 Board.
 # This target builds the FPGA bit file from hw/matcha using
@@ -97,18 +75,12 @@ matcha_hw_fpga_nexus: matcha_hw_rom_splices
 # and Vivado suporting the latest UltraScale device to build it.
 # Move the $(MATCH_SRC_DIR) to the last, so some of prim_xilinx IPs will override the
 # default one from $(OPENTITAN_HW_DIR)/ip.
-matcha_hw_fpga_v6: matcha_hw_rom_splices
-	fusesoc --cores-root $(OPENTITAN_HW_DIR)/dv \
-		--cores-root $(OPENTITAN_HW_DIR)/ip \
-		--cores-root $(OPENTITAN_HW_DIR)/lint \
-		--cores-root $(OPENTITAN_HW_DIR)/vendor \
-		--cores-root $(MATCHA_SRC_DIR) \
-		--cores-root $(ISP_SRC_DIR) \
-		run \
-		--flag=fileset_top --target=synth --setup \
-		--build-root $(MATCHA_OUT_DIR) \
-		--build google:systems:chip_matcha_v6
-
+matcha_hw_fpga_v6: | $(MATCHA_OUT_DIR)
+	cd $(MATCHA_SRC_DIR) && \
+		bazel build //hw/bitstream/vivado:fpga_v6
+	cd $(MATCHA_SRC_DIR) && \
+		find bazel-bin/hw/bitstream/vivado/build.fpga_v6/ -regex '.*.\(bit\|mmi\)' \
+			-exec cp -f '{}' "$(MATCHA_OUT_DIR)" \;
 
 ## Run Matcha verilator simulation.
 # This target runs the testbench with SW hello_world artifacts.
@@ -170,5 +142,5 @@ matcha_hw_clean:
 	rm -rf $(MATCHA_OUT_DIR)
 
 .PHONY:: matcha_hw_verilator_sim matcha_hw_verilator_sim_run  matcha_hw_clean
-.PHONY:: matcha_hw_rom_splices matcha_smc_sram_img
-.PHONY:: matcha_hw_verilator_tests
+.PHONY:: matcha_smc_sram_img matcha_hw_verilator_tests
+.PHONY:: matcha_hw_fpga_nexus matcha_hw_fpga_v6
