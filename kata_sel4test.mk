@@ -34,6 +34,7 @@ SEL4TEST_CMAKE_ARGS := \
 	-DPLATFORM=${PLATFORM} \
 	-DKernelPrinting=1 \
 	-DMCS=ON \
+	${CANTRIP_EXTRA_CMAKE_OPTS} \
 	$(SEL4TEST_SRC_DIR)
 
 # NB: no Rust code included, sel4test is pure C
