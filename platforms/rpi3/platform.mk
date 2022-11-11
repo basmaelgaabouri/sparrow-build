@@ -1,3 +1,4 @@
+include $(ROOTDIR)/build/platforms/rpi3/cantrip.mk
 include $(ROOTDIR)/build/platforms/rpi3/cantrip_builtins.mk
 include $(ROOTDIR)/build/platforms/rpi3/sim.mk
 include $(ROOTDIR)/build/platforms/rpi3/sim_sel4test.mk

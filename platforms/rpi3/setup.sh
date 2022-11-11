@@ -17,6 +17,7 @@
 export TARGET_PLATFORM="rpi3"
 export C_PREFIX="aarch64-none-linux-gnu-"
 export RUST_PREFIX="aarch64-unknown-none"
+export CANTRIP_TARGET_ARCH="aarch64-unknown-elf"
 
 # For non-Sparrow targets we use CARGO_HOME or RUSTUP_HOME (if set) to find
 # the Rust toolchain. Otherwise we fallback to the search path and look for
