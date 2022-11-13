@@ -71,6 +71,3 @@ cantrip-builtins-clean: cantrip-builtins-debug-clean cantrip-builtins-release-cl
 .PHONY:: cantrip-builtins-debug-clean
 .PHONY:: cantrip-builtins-release-clean
 .PHONY:: cantrip-builtins-clean
-
-# Enforce rebuilding of the builtins directory each time
-.PHONY:: $(CANTRIP_OUT_RELEASE)/builtins $(CANTRIP_OUT_DEBUG)/builtins
