@@ -12,9 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Built-in applications. Platforms typically override these settings from
-# their platform.mk depending on their functionality (e.g. platforms with
-# ML support seet CANTRIP_MODEL_*).
+# Built-in applications. Platforms typically override these settings
+# depending on their functionality (e.g. platforms with ML support
+# set CANTRIP_MODEL_*).
 
 CANTRIP_APPS_RELEASE   := $(CANTRIP_OUT_C_APP_RELEASE)/hello/hello.app
 CANTRIP_APPS_DEBUG     := $(CANTRIP_OUT_C_APP_DEBUG)/hello/hello.app
@@ -32,40 +32,45 @@ BUILTINS_CPIO_OPTS := -H newc -L --no-absolute-filenames --reproducible --owner=
 $(patsubst %.model,%,$(CANTRIP_MODEL_RELEASE)): iree_model_builtins
 $(patsubst %.model,%,$(CANTRIP_MODEL_DEBUG)): iree_model_builtins
 
-$(OUT)/cantrip/builtins/release: $(CANTRIP_APPS_RELEASE) $(CANTRIP_MODEL_RELEASE) ${CANTRIP_SCRIPTS}
+$(CANTRIP_OUT_RELEASE)/builtins: $(CANTRIP_APPS_RELEASE) $(CANTRIP_MODEL_RELEASE) ${CANTRIP_SCRIPTS}
 	rm -rf $@
 	mkdir -p $@
 	cp $(CANTRIP_APPS_RELEASE) $(CANTRIP_MODEL_RELEASE) ${CANTRIP_SCRIPTS} $@
 
-$(OUT)/cantrip/builtins/debug: $(CANTRIP_APPS_DEBUG) $(CANTRIP_MODEL_DEBUG) ${CANTRIP_SCRIPTS}
+$(CANTRIP_OUT_DEBUG)/builtins: $(CANTRIP_APPS_DEBUG) $(CANTRIP_MODEL_DEBUG) ${CANTRIP_SCRIPTS}
 	rm -rf $@
 	mkdir -p $@
 	cp $(CANTRIP_APPS_DEBUG) $(CANTRIP_MODEL_DEBUG) ${CANTRIP_SCRIPTS} $@
 
-$(OUT)/ext_builtins_release.cpio: $(OUT)/cantrip/builtins/release
-	ls -1 $(OUT)/cantrip/builtins/release \
-        | $(CPIO) -o -D $(OUT)/cantrip/builtins/release $(BUILTINS_CPIO_OPTS) -O "$@"
+$(CANTRIP_OUT_RELEASE)/ext_builtins.cpio: $(CANTRIP_OUT_RELEASE)/builtins
+	ls -1 $< | $(CPIO) -o -D $< $(BUILTINS_CPIO_OPTS) -O "$@"
 
-$(OUT)/ext_builtins_debug.cpio: $(OUT)/cantrip/builtins/debug
-	ls -1 $(OUT)/cantrip/builtins/debug \
-        | $(CPIO) -o -D $(OUT)/cantrip/builtins/debug $(BUILTINS_CPIO_OPTS) -O "$@"
+$(CANTRIP_OUT_DEBUG)/ext_builtins.cpio: $(CANTRIP_OUT_DEBUG)/builtins
+	ls -1 $< | $(CPIO) -o -D $< $(BUILTINS_CPIO_OPTS) -O "$@"
 
 ## Generates cpio archive of Cantrip builtins with debugging suport
-cantrip-builtins-debug: $(OUT)/ext_builtins_debug.cpio
+cantrip-builtins-debug: $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio
 ## Generates cpio archive of Cantrip builtins for release
-cantrip-builtins-release: $(OUT)/ext_builtins_release.cpio
+cantrip-builtins-release: $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio
 ## Generates both debug & release cpio archives of Cantrip builtins
 cantrip-builtins: cantrip-builtins-debug cantrip-builtins-release
 
-cantrip-builtins-clean:
-	rm -rf $(OUT)/cantrip/builtins
-	rm -f $(OUT)/ext_builtins_release.cpio
-	rm -f $(OUT)/ext_builtins_debug.cpio
+cantrip-builtins-clean-debug:
+	rm -rf $(CANTRIP_OUT_DEBUG)/builtins
+	rm -f $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio
+
+cantrip-builtins-clean-release:
+	rm -rf $(CANTRIP_OUT_RELEASE)/builtins
+	rm -f $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio
+
+cantrip-builtins-clean: cantrip-builtins-debug-clean cantrip-builtins-release-clean
 
 .PHONY:: cantrip-builtins-debug
 .PHONY:: cantrip-builtins-release
 .PHONY:: cantrip-builtins
+.PHONY:: cantrip-builtins-debug-clean
+.PHONY:: cantrip-builtins-release-clean
 .PHONY:: cantrip-builtins-clean
 
 # Enforce rebuilding of the builtins directory each time
-.PHONY:: $(OUT)/builtins/release $(OUT)/builtins/debug
+.PHONY:: $(CANTRIP_OUT_RELEASE)/builtins $(CANTRIP_OUT_DEBUG)/builtins

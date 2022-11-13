@@ -47,7 +47,7 @@ $(CANTRIP_OUT_RELEASE)/capdl-loader-image: ${CANTRIP_OUT_RELEASE}/elfloader/elfl
 
 # XXX no dep on system.camkes
 $(CANTRIP_OUT_RELEASE)/cantrip.mem:  ${CANTRIP_OUT_RELEASE}/kernel/gen_config/kernel/gen_config.h
-$(CANTRIP_OUT_RELEASE)/cantrip.mem:  $(OUT)/ext_builtins_release.cpio
+$(CANTRIP_OUT_RELEASE)/cantrip.mem:  $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio
 	dd if=/dev/zero of=$@ bs=1G count=1
 	SEL4_PLATFORM=$$(awk '\
 		/\<CONFIG_PLAT\>/ { print $$3 } \
@@ -56,7 +56,7 @@ $(CANTRIP_OUT_RELEASE)/cantrip.mem:  $(OUT)/ext_builtins_release.cpio
         /cpio.cpio_size = / { print "ibs=" strtonum($$3) / (1024*1024) "M" } \
         /cpio.cpio_paddr = / { print "obs=1M seek=" strtonum($$3) / (1024*1024) } \
 	' $(CANTRIP_SRC_DIR)/apps/system/platforms/$${SEL4_PLATFORM}/system.camkes) && \
-	dd if=$(OUT)/ext_builtins_release.cpio of=$@ $${DD_ARGS} conv=sync,nocreat,notrunc
+	dd if=$(CANTRIP_OUT_RELEASE)/ext_builtins.cpio of=$@ $${DD_ARGS} conv=sync,nocreat,notrunc
 
 ## Debug version of the `simulate` target
 #
@@ -75,7 +75,7 @@ $(CANTRIP_OUT_DEBUG)/capdl-loader-image: ${CANTRIP_OUT_DEBUG}/elfloader/elfloade
 
 # XXX no dep on system.camkes
 $(CANTRIP_OUT_DEBUG)/cantrip.mem:  ${CANTRIP_OUT_DEBUG}/kernel/gen_config/kernel/gen_config.h
-$(CANTRIP_OUT_DEBUG)/cantrip.mem:  $(OUT)/ext_builtins_debug.cpio
+$(CANTRIP_OUT_DEBUG)/cantrip.mem:  $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio
 	dd if=/dev/zero of=$@ bs=1G count=1
 	SEL4_PLATFORM=$$(awk '\
 		/\<CONFIG_PLAT\>/ { print $$3 } \
@@ -84,7 +84,7 @@ $(CANTRIP_OUT_DEBUG)/cantrip.mem:  $(OUT)/ext_builtins_debug.cpio
         /cpio.cpio_size = / { print "ibs=" strtonum($$3) / (1024*1024) "M" } \
         /cpio.cpio_paddr = / { print "obs=1M seek=" strtonum($$3) / (1024*1024) } \
 	' $(CANTRIP_SRC_DIR)/apps/system/platforms/$${SEL4_PLATFORM}/system.camkes) && \
-	dd if=$(OUT)/ext_builtins_debug.cpio of=$@ $${DD_ARGS} conv=sync,nocreat,notrunc
+	dd if=$(CANTRIP_OUT_DEBUG)/ext_builtins.cpio of=$@ $${DD_ARGS} conv=sync,nocreat,notrunc
 
 ## Debug version of the `simulate` target
 #
