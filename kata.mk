@@ -72,7 +72,7 @@ cantrip-gen-headers:: cantrip-component-headers
 # Note: this is a platform-specific aggregate phony target, and additional rules
 # for each platform are defined in build/$PLATFORM/platform.mk
 cantrip-clean-headers::
-	rm -f $(OUT)/cantrip/components
+	rm -rf $(OUT)/cantrip/components
 
 ## Cantrip debug build-tree preparation target
 #
@@ -98,9 +98,10 @@ cantrip-build-release-prepare:: | $(CANTRIP_OUT_RELEASE)
 
 # Cantrip-generic targets
 
-## Cleans all Cantrip operating system build artifacts
+## Cleans all Cantrip operating system build artifacts for the current platform
+# TODO(sleffler): cantrip-clean-headers once they are per-platform
 cantrip-clean:
-	rm -rf $(OUT)/cantrip
+	rm -rf $(CANTRIP_OUT_DIR)
 
 $(RUSTDIR)/bin/cbindgen: | rust_presence_check
 	${CARGO_CMD} install cbindgen
