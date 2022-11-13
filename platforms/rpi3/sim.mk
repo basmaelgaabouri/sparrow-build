@@ -35,19 +35,18 @@ qemu_presence_check:
 #
 # This is the default target for the build system, and is generally what you
 # need for day-to-day work on the software side of Sparrow.
-simulate: ${CANTRIP_OUT_RELEASE}/capdl-loader-image
-simulate: ${CANTRIP_OUT_RELEASE}/cantrip.mem
-simulate: | qemu_presence_check
+simulate: ${CANTRIP_OUT_RELEASE}/capdl-loader-image ${CANTRIP_OUT_RELEASE}/cantrip.mem | qemu_presence_check
 	$(QEMU_CMD) \
 	-kernel ${CANTRIP_OUT_RELEASE}/capdl-loader-image \
 	--mem-path ${CANTRIP_OUT_RELEASE}/cantrip.mem
 
-$(CANTRIP_OUT_RELEASE)/capdl-loader-image: ${CANTRIP_OUT_RELEASE}/elfloader/elfloader
+$(CANTRIP_OUT_RELEASE)/capdl-loader-image: $(CANTRIP_KERNEL_RELEASE) \
+		$(CANTRIP_ROOTSERVER_RELEASE) ${CANTRIP_OUT_RELEASE}/elfloader/elfloader
 	${C_PREFIX}objcopy -O binary ${CANTRIP_OUT_RELEASE}/elfloader/elfloader $@
 
 # XXX no dep on system.camkes
-$(CANTRIP_OUT_RELEASE)/cantrip.mem:  ${CANTRIP_OUT_RELEASE}/kernel/gen_config/kernel/gen_config.h
-$(CANTRIP_OUT_RELEASE)/cantrip.mem:  $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio
+$(CANTRIP_OUT_RELEASE)/cantrip.mem:  $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio \
+		${CANTRIP_OUT_RELEASE}/kernel/gen_config/kernel/gen_config.h
 	dd if=/dev/zero of=$@ bs=1G count=1
 	SEL4_PLATFORM=$$(awk '\
 		/\<CONFIG_PLAT\>/ { print $$3 } \
@@ -63,19 +62,16 @@ $(CANTRIP_OUT_RELEASE)/cantrip.mem:  $(CANTRIP_OUT_RELEASE)/ext_builtins.cpio
 # This top-level target does the same job as `simulate`, but instead of
 # unhalting the CPUs and starting the system, this alternate target only unhalts
 # cpu0, and uses the debug build of TockOS from the `matcha_tock_debug` target.
-simulate-debug: ${CANTRIP_OUT_DEBUG}/capdl-loader-image
-simulate-debug: ${CANTRIP_OUT_DEBUG}/cantrip.mem
-simulate-debug: | qemu_presence_check
+simulate-debug: ${CANTRIP_OUT_DEBUG}/cantrip.mem ${CANTRIP_OUT_DEBUG}/capdl-loader-image | qemu_presence_check
 	$(QEMU_CMD) -s \
 	-kernel ${CANTRIP_OUT_DEBUG}/capdl-loader-image \
 	--mem-path ${CANTRIP_OUT_DEBUG}/cantrip.mem
 
-$(CANTRIP_OUT_DEBUG)/capdl-loader-image: ${CANTRIP_OUT_DEBUG}/elfloader/elfloader
+$(CANTRIP_OUT_DEBUG)/capdl-loader-image: $(CANTRIP_KERNEL_DEBUG) $(CANTRIP_ROOTSERVER_DEBUG) ${CANTRIP_OUT_DEBUG}/elfloader/elfloader
 	${C_PREFIX}objcopy -O binary ${CANTRIP_OUT_DEBUG}/elfloader/elfloader $@
 
 # XXX no dep on system.camkes
-$(CANTRIP_OUT_DEBUG)/cantrip.mem:  ${CANTRIP_OUT_DEBUG}/kernel/gen_config/kernel/gen_config.h
-$(CANTRIP_OUT_DEBUG)/cantrip.mem:  $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio
+$(CANTRIP_OUT_DEBUG)/cantrip.mem:  $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio ${CANTRIP_OUT_DEBUG}/kernel/gen_config/kernel/gen_config.h
 	dd if=/dev/zero of=$@ bs=1G count=1
 	SEL4_PLATFORM=$$(awk '\
 		/\<CONFIG_PLAT\>/ { print $$3 } \
@@ -92,9 +88,7 @@ $(CANTRIP_OUT_DEBUG)/cantrip.mem:  $(CANTRIP_OUT_DEBUG)/ext_builtins.cpio
 # unhalting the CPUs and starting the system, this alternate target starts
 # renode with no CPUs unhalted, allowing for GDB to be used for early system
 # start.
-debug-simulation: ${CANTRIP_OUT_DEBUG}/capdl-loader-image
-debug-simulation: ${CANTRIP_OUT_DEBUG}/cantrip.mem
-debug-simulation: | qemu_presence_check
+debug-simulation: ${CANTRIP_OUT_DEBUG}/cantrip.mem ${CANTRIP_OUT_DEBUG}/capdl-loader-image | qemu_presence_check
 	$(QEMU_CMD) -s -S \
 	-kernel ${CANTRIP_OUT_DEBUG}/capdl-loader-image \
 	--mem-path ${CANTRIP_OUT_DEBUG}/cantrip.mem
