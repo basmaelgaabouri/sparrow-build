@@ -32,12 +32,12 @@ BUILTINS_CPIO_OPTS := -H newc -L --no-absolute-filenames --reproducible --owner=
 $(patsubst %.model,%,$(CANTRIP_MODEL_RELEASE)): iree_model_builtins
 $(patsubst %.model,%,$(CANTRIP_MODEL_DEBUG)): iree_model_builtins
 
-$(OUT)/cantrip/builtins/release: $(CANTRIP_APPS_RELEASE) $(CANTRIP_MODEL_RELEASE)
+$(OUT)/cantrip/builtins/release: $(CANTRIP_APPS_RELEASE) $(CANTRIP_MODEL_RELEASE) ${CANTRIP_SCRIPTS}
 	rm -rf $@
 	mkdir -p $@
 	cp $(CANTRIP_APPS_RELEASE) $(CANTRIP_MODEL_RELEASE) ${CANTRIP_SCRIPTS} $@
 
-$(OUT)/cantrip/builtins/debug: $(CANTRIP_APPS_DEBUG) $(CANTRIP_MODEL_DEBUG)
+$(OUT)/cantrip/builtins/debug: $(CANTRIP_APPS_DEBUG) $(CANTRIP_MODEL_DEBUG) ${CANTRIP_SCRIPTS}
 	rm -rf $@
 	mkdir -p $@
 	cp $(CANTRIP_APPS_DEBUG) $(CANTRIP_MODEL_DEBUG) ${CANTRIP_SCRIPTS} $@
