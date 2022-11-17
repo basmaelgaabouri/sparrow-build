@@ -13,11 +13,8 @@
 # limitations under the License.
 
 MATCHA_SRC_DIR             := $(ROOTDIR)/hw/matcha
-OPENTITAN_HW_DIR           := $(OPENTITAN_SRC_DIR)/hw
 MATCHA_OUT_DIR             := $(OUT)/matcha/hw
 MATCHA_VERILATOR_TB        := $(MATCHA_OUT_DIR)/sim-verilator/Vchip_sim_tb
-MATCHA_HW_TEST_OUT         := $(MATCHA_OUT_DIR)/sw/hw_tests
-MATCHA_SW_DEVICE_DIR       := $(MATCHA_OUT_DIR)/sw/device
 MATCHA_TESTLOG_DIR         := $(MATCHA_OUT_DIR)/test-log
 
 $(MATCHA_OUT_DIR):
@@ -57,8 +54,6 @@ $(MATCHA_VERILATOR_TB): $(MATCHA_OUT_DIR) verilator
 # out/matcha/hw/.
 # This target is compute-intensive. Make sure you have a powerful enough machine
 # and Vivado suporting the latest UltraScale+ device to build it.
-# Move the $(MATCH_SRC_DIR) to the last, so some of prim_xilinx IPs will override the
-# default one from $(OPENTITAN_HW_DIR)/ip.
 matcha_hw_fpga_nexus: | $(MATCHA_OUT_DIR)
 	cd $(MATCHA_SRC_DIR) && \
 		bazel build //hw/bitstream/vivado:fpga_nexus
@@ -72,8 +67,6 @@ matcha_hw_fpga_nexus: | $(MATCHA_OUT_DIR)
 # out/matcha/hw/.
 # This target is compute-intensive. Make sure you have a powerful enough machine
 # and Vivado suporting the latest UltraScale device to build it.
-# Move the $(MATCH_SRC_DIR) to the last, so some of prim_xilinx IPs will override the
-# default one from $(OPENTITAN_HW_DIR)/ip.
 matcha_hw_fpga_v6: | $(MATCHA_OUT_DIR)
 	cd $(MATCHA_SRC_DIR) && \
 		bazel build //hw/bitstream/vivado:fpga_v6
@@ -81,12 +74,6 @@ matcha_hw_fpga_v6: | $(MATCHA_OUT_DIR)
 		find bazel-bin/hw/bitstream/vivado/build.fpga_v6/ -regex '.*.\(bit\|mmi\)' \
 			-exec cp -f '{}' "$(MATCHA_OUT_DIR)" \;
 
-$(MATCHA_HW_TEST_OUT):
-	mkdir -p $(MATCHA_HW_TEST_OUT)
-$(MATCHA_SW_DEVICE_DIR)/examples/hello_world: | $(MATCH_OUT_DIR)
-	@mkdir -p "$(MATCHA_SW_DEVICE_DIR)/examples/hello_world"
-$(MATCHA_SW_DEVICE_DIR)/tests: | $(MATCH_OUT_DIR)
-	@mkdir -p "$(MATCHA_SW_DEVICE_DIR)/tests"
 $(MATCHA_TESTLOG_DIR):
 	mkdir -p $(MATCHA_TESTLOG_DIR)
 
