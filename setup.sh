@@ -110,7 +110,9 @@ function _hmm
 {
     local targetname="$1"; shift
     targetname="${targetname}" gawk -f "${ROOTDIR}/build/helpmemake.awk" \
-              "${ROOTDIR}/build/Makefile" "${ROOTDIR}"/build/*.mk
+              "${ROOTDIR}/build/Makefile" \
+              "${ROOTDIR}/build/platforms/${PLATFORM}"/*.mk \
+              "${ROOTDIR}"/build/*.mk
 }
 
 function hmm
