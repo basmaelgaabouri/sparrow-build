@@ -29,14 +29,15 @@ $(OPENTITAN_BUILD_OUT_DIR):
 	@mkdir -p "$(OPENTITAN_BUILD_SW_DEVICE_TESTS_DIR)"
 
 ## Builds the hardware testing binaries from OpenTitan in hw/opentitan-upstream
-# The output is stored at out/opentitan/sw/build-bin
+# The output is stored at out/opentitan/sw/build-out/sw/device
 opentitan_sw_all: | $(OPENTITAN_BUILD_OUT_DIR) \
                   opentitan_sw_verilator_sim
 	cd $(OPENTITAN_SRC_DIR) && \
-		bazel query "kind(test, //sw/device/tests:all)" | \
+		bazel query "kind(test, //sw/device/tests/...)" | \
 			grep "_fpga" | \
-			xargs bazel build  --define DISABLE_VERILATOR_BUILD=true && \
-		find "bazel-out/" -type f -wholename "*fastbuild-*/sw/device/tests/*.bin" | \
+			xargs bazel build --action_env=BITSTREAM=d20fe23d160fea56980790b8d43a73c80e25855c \
+				--define DISABLE_VERILATOR_BUILD=true && \
+		find "bazel-out/" -type f -wholename "*fastbuild-*/sw/device/tests*/*.bin" | \
 			sed 's/\.bin//g' | \
 			xargs -I {} cp -f {} "$(OPENTITAN_BUILD_SW_DEVICE_TESTS_DIR)/"
 
@@ -62,8 +63,8 @@ opentitan_sw_bootrom: | $(OPENTITAN_BUILD_SW_DEVICE_DIR)/boot_rom
 	cd $(OPENTITAN_SRC_DIR) && \
 		bazel build //sw/device/lib/testing/test_rom:test_rom
 	cd $(OPENTITAN_SRC_DIR) && \
-		find "bazel-out/" -name "test_rom_sim_verilator.scr.39.vmem" \
-		-exec cp -f '{}' "$(OPENTITAN_BUILD_SW_DEVICE_DIR)/boot_rom/boot_rom_sim_verilator.scr.39.vmem" \;
+		find "bazel-out/" -wholename "*fastbuild-*/*test_rom_fpga_cw310.scr.39.vmem" \
+		-exec cp -f '{}' "$(OPENTITAN_BUILD_SW_DEVICE_DIR)/boot_rom/" \;
 
 $(OPENTITAN_BUILD_SW_DEVICE_DIR)/otp_img: | $(OPENTITAN_BUILD_OUT_DIR)
 	@mkdir -p "$(OPENTITAN_BUILD_SW_DEVICE_DIR)/otp_img"
