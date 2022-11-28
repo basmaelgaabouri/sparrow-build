@@ -24,7 +24,7 @@ $(RENODE_OUT_DIR):
 	mkdir -p $(RENODE_OUT_DIR)
 
 $(RENODE_BIN): | $(RENODE_SRC_DIR) $(RENODE_OUT_DIR)
-	cd $(RENODE_SRC_DIR); \
+	cd $(RENODE_SRC_DIR); unset PLATFORM; \
 		./build.sh -d -o $(RENODE_OUT_DIR)
 	echo -e "built_from_src\ncommit_sha: $(RENODE_COMMIT)\n" > $(RENODE_OUT_DIR)/tag
 
