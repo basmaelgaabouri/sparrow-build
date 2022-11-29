@@ -29,7 +29,6 @@
 CANTRIP_SRC_DIR      := $(ROOTDIR)/cantrip/projects/cantrip
 CANTRIP_COMPONENTS   := $(CANTRIP_SRC_DIR)/apps/system/components
 CARGO_CMD         := cargo +$(CANTRIP_RUST_VERSION)
-CARGO_TEST        := ${CARGO_CMD} test
 
 # Location of seL4 kernel source (for sel4-sys)
 SEL4_KERNEL_DIR  := $(ROOTDIR)/cantrip/kernel
@@ -177,38 +176,6 @@ cantrip-bundle-release: $(CANTRIP_KERNEL_RELEASE)
 # NB: shorthand for testing (sim targets depend on explicit pathnames)
 cantrip: cantrip-bundle-debug cantrip-bundle-release
 
-# NB: cargo_test_debugconsole_zmodem is broken
-#	TODO(b/232928288): temporarily disable cargo_test_cantrip_proc_manager &
-#   cargo_test_cantrip_proc_interface; they have dependency issues
-CARGO_TEST_CANTRIP=\
-	cargo_test_cantrip_os_common_logger \
-	cargo_test_cantrip_os_common_slot_allocator
-
-## Runs all cargo unit tests for the Cantrip operating system
-cargo_test_cantrip: $(CARGO_TEST_CANTRIP)
-
-## Runs cargo unit tests for the ProcessManager implementation
-cargo_test_cantrip_proc_manager:
-	cd $(CANTRIP_COMPONENTS)/ProcessManager/cantrip-proc-manager && $(CARGO_TEST)
-
-## Runs cargo unit tests for the ProcessManager interface
-cargo_test_cantrip_proc_interface:
-	cd $(CANTRIP_COMPONENTS)/ProcessManager/cantrip-proc-interface && $(CARGO_TEST)
-
-## Runs cargo unit tests for the CantripLogger service
-cargo_test_cantrip_os_common_logger:
-	cd $(CANTRIP_COMPONENTS)/cantrip-os-common/src/logger && \
-		$(CARGO_TEST) -- --test-threads=1
-
-## Runs cargo unit tests for the CantripSlotAllocator crate
-cargo_test_cantrip_os_common_slot_allocator:
-	cd $(CANTRIP_COMPONENTS)/cantrip-os-common/src/slot-allocator && \
-		$(CARGO_TEST) -- --test-threads=1
-
-## Runs cargo unit tests for the DebugConsole zmomdem support
-cargo_test_debugconsole_zmodem:
-	cd $(CANTRIP_COMPONENTS)/DebugConsole/zmodem && $(CARGO_TEST)
-
 ## Builds the flatbuffers tooling and libraries
 cantrip-flatbuffers: $(OUT)/host/flatbuffers/bin/flatc $(ROOTDIR)/sw/cantrip/flatbuffers
 	$(MAKE) -C $(ROOTDIR)/sw/cantrip/flatbuffers \
@@ -222,6 +189,5 @@ cantrip-flatbuffers: $(OUT)/host/flatbuffers/bin/flatc $(ROOTDIR)/sw/cantrip/fla
 .PHONY:: cantrip-builtins-debug cantrip-builtins-release
 .PHONY:: cantrip-gen-headers cantrip-clean-headers
 .PHONY:: cantrip-flatbuffers
-.PHONY:: cargo_test_cantrip $(CARGO_TEST_CANTRIP)
 .PHONY:: cantrip-build-debug-prepare cantrip-build-release-prepare
 .PHONY:: $(CANTRIP_OUT_DEBUG) $(CANTRIP_OUT_RELEASE)

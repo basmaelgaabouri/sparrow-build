@@ -41,6 +41,7 @@ include $(ROOTDIR)/build/cantrip_tools.mk
 include $(ROOTDIR)/build/cantrip_apps.mk
 include $(ROOTDIR)/build/cantrip_builtins.mk
 include $(ROOTDIR)/build/cantrip_sel4test.mk
+include $(ROOTDIR)/build/cantrip_tests.mk
 include $(ROOTDIR)/build/minisel.mk
 include $(ROOTDIR)/build/tock.mk
 include $(ROOTDIR)/build/iree.mk
