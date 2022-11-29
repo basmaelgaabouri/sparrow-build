@@ -16,6 +16,7 @@ CANTRIP_APPS_RELEASE  := $(CANTRIP_OUT_C_APP_RELEASE)/hello/hello.app \
                          $(CANTRIP_OUT_RUST_APP_RELEASE)/fibonacci/fibonacci.app \
                          $(CANTRIP_OUT_RUST_APP_RELEASE)/keyval/keyval.app \
                          $(CANTRIP_OUT_RUST_APP_RELEASE)/logtest/logtest.app \
+                         $(CANTRIP_OUT_RUST_APP_RELEASE)/mltest/mltest.app \
                          $(CANTRIP_OUT_RUST_APP_RELEASE)/panic/panic.app \
                          $(CANTRIP_OUT_C_APP_RELEASE)/suicide/suicide.app \
                          $(CANTRIP_OUT_RUST_APP_RELEASE)/timer/timer.app
@@ -25,6 +26,7 @@ CANTRIP_APPS_DEBUG    := $(CANTRIP_OUT_C_APP_DEBUG)/hello/hello.app \
                          $(CANTRIP_OUT_RUST_APP_DEBUG)/fibonacci/fibonacci.app \
                          $(CANTRIP_OUT_RUST_APP_DEBUG)/keyval/keyval.app \
                          $(CANTRIP_OUT_RUST_APP_DEBUG)/logtest/logtest.app \
+                         $(CANTRIP_OUT_RUST_APP_DEBUG)/mltest/mltest.app \
                          $(CANTRIP_OUT_RUST_APP_RELEASE)/panic/panic.app \
                          $(CANTRIP_OUT_C_APP_DEBUG)/suicide/suicide.app \
                          $(CANTRIP_OUT_RUST_APP_DEBUG)/timer/timer.app
