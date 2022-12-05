@@ -14,23 +14,25 @@
 
 # sel4test simulation support; this is meant to be included from sim.mk
 
-$(OUT)/ext_flash_sel4test_release.tar: $(MATCHA_BUNDLE_RELEASE) $(SEL4TEST_KERNEL_RELEASE) $(SEL4TEST_ROOTSERVER_RELEASE) | $(OUT)/tmp
+$(SEL4TEST_OUT_RELEASE)/ext_flash.tar: $(MATCHA_BUNDLE_RELEASE) \
+		$(SEL4TEST_KERNEL_RELEASE) $(SEL4TEST_ROOTSERVER_RELEASE) | $(OUT)/tmp
 	ln -sf $(MATCHA_BUNDLE_RELEASE) $(OUT)/tmp/matcha-tock-bundle
 	ln -sf $(SEL4TEST_KERNEL_RELEASE) $(OUT)/tmp/kernel
 	ln -sf $(SEL4TEST_ROOTSERVER_RELEASE) $(OUT)/tmp/capdl-loader
-	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_sel4test_release.tar matcha-tock-bundle kernel capdl-loader
+	tar -C $(OUT)/tmp -cvhf $@ matcha-tock-bundle kernel capdl-loader
 
-$(OUT)/ext_flash_sel4test_debug.tar: $(MATCHA_BUNDLE_DEBUG) $(SEL4TEST_KERNEL_DEBUG) $(SEL4TEST_ROOTSERVER_DEBUG) | $(OUT)/tmp
+$(SEL4TEST_OUT_DEBUG)/ext_flash.tar: $(MATCHA_BUNDLE_DEBUG) \
+		$(SEL4TEST_KERNEL_DEBUG) $(SEL4TEST_ROOTSERVER_DEBUG) | $(OUT)/tmp
 	ln -sf $(MATCHA_BUNDLE_DEBUG) $(OUT)/tmp/matcha-tock-bundle
 	ln -sf $(SEL4TEST_KERNEL_DEBUG) $(OUT)/tmp/kernel
 	ln -sf $(SEL4TEST_ROOTSERVER_DEBUG) $(OUT)/tmp/capdl-loader
-	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_sel4test_debug.tar matcha-tock-bundle kernel capdl-loader
+	tar -C $(OUT)/tmp -cvhf $@ matcha-tock-bundle kernel capdl-loader
 
 ## Launches an end-to-end build of the sel4test system setup using the
 ## C-based libsel4 syscall api wrappers. The result is run under Renode.
-sel4test: renode multihart_boot_rom $(OUT)/ext_flash_sel4test_release.tar
+sel4test: renode multihart_boot_rom $(SEL4TEST_OUT_RELEASE)/ext_flash.tar
 	$(RENODE_CMD) -e "\
-    \$$tar = @$(ROOTDIR)/out/ext_flash_sel4test_release.tar; \
+    \$$tar = @$(SEL4TEST_OUT_RELEASE)/ext_flash.tar; \
     \$$kernel = @$(SEL4TEST_KERNEL_RELEASE); \
     \$$cpio = @/dev/null; \
     $(PORT_PRESTART_CMDS) \
@@ -38,25 +40,27 @@ sel4test: renode multihart_boot_rom $(OUT)/ext_flash_sel4test_release.tar
 
 ## Debug version of the `sel4test` target that stops very early to wait
 ## for a debugger to be attached.
-sel4test-debug: renode multihart_boot_rom $(OUT)/ext_flash_sel4test_debug.tar
+sel4test-debug: renode multihart_boot_rom $(SEL4TEST_OUT_DEBUG)/ext_flash.tar
 	$(RENODE_CMD) -e "\
-    \$$tar = @$(ROOTDIR)/out/ext_flash_sel4test_debug.tar; \
+    \$$tar = @$(SEL4TEST_OUT_DEBUG)/ext_flash.tar; \
     \$$kernel = @$(SEL4TEST_KERNEL_DEBUG); \
     \$$cpio = @/dev/null; \
     $(PORT_PRESTART_CMDS) \
 	  i @sim/config/sparrow.resc; $(RENODE_PRESTART_CMDS) start"
 
-$(OUT)/ext_flash_wrapper_release.tar: $(MATCHA_BUNDLE_RELEASE) $(SEL4TEST_KERNEL_RELEASE) $(SEL4TEST_WRAPPER_ROOTSERVER_RELEASE) | $(OUT)/tmp
+$(SEL4TEST_WRAPPER_OUT_RELEASE)/ext_flash.tar: $(MATCHA_BUNDLE_RELEASE) \
+		$(SEL4TEST_KERNEL_RELEASE) $(SEL4TEST_WRAPPER_ROOTSERVER_RELEASE) | $(OUT)/tmp
 	ln -sf $(MATCHA_BUNDLE_RELEASE) $(OUT)/tmp/matcha-tock-bundle
 	ln -sf $(SEL4TEST_KERNEL_RELEASE) $(OUT)/tmp/kernel
 	ln -sf $(SEL4TEST_WRAPPER_ROOTSERVER_RELEASE) $(OUT)/tmp/capdl-loader
-	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_wrapper_release.tar matcha-tock-bundle kernel capdl-loader
+	tar -C $(OUT)/tmp -cvhf $@ matcha-tock-bundle kernel capdl-loader
 
 ## Launches a version of the sel4test target that uses the sel4-sys Rust
 ## crate wrapped with C shims. The result is run under Renode.
-sel4test+wrapper: renode multihart_boot_rom $(OUT)/ext_flash_wrapper_release.tar
+sel4test+wrapper: renode multihart_boot_rom \
+		$(SEL4TEST_WRAPPER_OUT_RELEASE)/ext_flash.tar
 	$(RENODE_CMD) -e "\
-    \$$tar = @$(ROOTDIR)/out/ext_flash_wrapper_release.tar; \
+    \$$tar = @$(SEL4TEST_WRAPPER_OUT_RELEASE)/ext_flash.tar; \
     \$$kernel = @$(SEL4TEST_KERNEL_RELEASE); \
     \$$cpio = @/dev/null; \
     $(PORT_PRESTART_CMDS) \

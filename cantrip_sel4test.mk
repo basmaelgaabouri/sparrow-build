@@ -34,7 +34,6 @@ SEL4TEST_CMAKE_ARGS := \
 	-DPLATFORM=${PLATFORM} \
 	-DKernelPrinting=1 \
 	-DMCS=ON \
-	${CANTRIP_EXTRA_CMAKE_OPTS} \
 	$(SEL4TEST_SRC_DIR)
 
 # NB: no Rust code included, sel4test is pure C
@@ -48,13 +47,18 @@ SEL4TEST_SOURCES := $(shell find \
 
 sel4test-gen-headers: cantrip-gen-headers
 
-# Generates sel4test release build.ninja
-${SEL4TEST_OUT_RELEASE}/build.ninja: ${SEL4TEST_SOURCES} sel4test-gen-headers
+$(SEL4TEST_OUT_DEBUG):
+	mkdir -p $(SEL4TEST_OUT_DEBUG)
+$(SEL4TEST_OUT_RELEASE):
 	mkdir -p $(SEL4TEST_OUT_RELEASE)
-	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_OUT_RELEASE)/
+
+# Generates sel4test release build.ninja
+${SEL4TEST_OUT_RELEASE}/build.ninja: ${SEL4TEST_SOURCES} sel4test-gen-headers \
+		sel4test-build-release-prepare | ${SEL4TEST_OUT_RELEASE}
 	cmake -B $(SEL4TEST_OUT_RELEASE) \
 		-DSEL4_CACHE_DIR=$(CACHE)/sel4test-release \
 		-DRELEASE=ON \
+		${CANTRIP_EXTRA_CMAKE_OPTS} \
         ${SEL4TEST_CMAKE_ARGS}
 
 # Generates sel4test release kernel
@@ -65,18 +69,18 @@ $(SEL4TEST_KERNEL_RELEASE): ${SEL4TEST_OUT_RELEASE}/build.ninja
 $(SEL4TEST_ROOTSERVER_RELEASE): ${SEL4TEST_KERNEL_RELEASE} | rust_presence_check
 	SEL4_DIR=$(SEL4_KERNEL_DIR) \
 	SEL4_OUT_DIR=$(SEL4TEST_OUT_RELEASE)/kernel \
-	    ninja -C $(SEL4TEST_OUT_RELEASE) sel4test-driver
+	    ninja -C $(SEL4TEST_OUT_RELEASE)
 
 ## Generates all sel4test release build artifacts
 sel4test-bundle-release: $(SEL4TEST_ROOTSERVER_RELEASE)
 
 # Generates seltest debug build.ninja
-${SEL4TEST_OUT_DEBUG}/build.ninja: ${SEL4TEST_SOURCES} sel4test-gen-headers
-	mkdir -p $(SEL4TEST_OUT_DEBUG)
-	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_OUT_DEBUG)/
+${SEL4TEST_OUT_DEBUG}/build.ninja: ${SEL4TEST_SOURCES} sel4test-gen-headers \
+		sel4test-build-debug-prepare | ${SEL4TEST_OUT_DEBUG}
 	cmake -B $(SEL4TEST_OUT_DEBUG) \
 		-DSEL4_CACHE_DIR=$(CACHE)/sel4test-debug \
 		-DRELEASE=OFF \
+		${CANTRIP_EXTRA_CMAKE_OPTS} \
         ${SEL4TEST_CMAKE_ARGS}
 
 # Generates sel4test debug kernel
@@ -87,7 +91,7 @@ $(SEL4TEST_KERNEL_DEBUG): ${SEL4TEST_OUT_DEBUG}/build.ninja
 $(SEL4TEST_ROOTSERVER_DEBUG): ${SEL4TEST_KERNEL_DEBUG} | rust_presence_check
 	SEL4_DIR=$(SEL4_KERNEL_DIR) \
 	SEL4_OUT_DIR=$(SEL4TEST_OUT_DEBUG)/kernel \
-	    ninja -C $(SEL4TEST_OUT_DEBUG) sel4test-driver
+	    ninja -C $(SEL4TEST_OUT_DEBUG)
 
 ## Generates all sel4test debug build artifacts
 sel4test-bundle-debug: $(SEL4TEST_ROOTSERVER_DEBUG)
@@ -116,25 +120,29 @@ SEL4TEST_WRAPPER_OUT_DEBUG := $(SEL4TEST_WRAPPER_OUT_DIR)/debug
 SEL4TEST_WRAPPER_ROOTSERVER_DEBUG := $(SEL4TEST_WRAPPER_OUT_DEBUG)/apps/sel4test-driver/sel4test-driver
 SEL4TEST_WRAPPER_ROOTSERVER_RELEASE := $(SEL4TEST_WRAPPER_OUT_RELEASE)/apps/sel4test-driver/sel4test-driver
 
-# seltest-wrapper configuration & build.ninja generation
-${SEL4TEST_WRAPPER_OUT_RELEASE}/build.ninja: ${SEL4TEST_SOURCES} sel4test-gen-headers
+$(SEL4TEST_WRAPPER_OUT_RELEASE):
 	mkdir -p $(SEL4TEST_WRAPPER_OUT_RELEASE)
-	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_WRAPPER_OUT_RELEASE)/
+
+# seltest-wrapper configuration & build.ninja generation
+${SEL4TEST_WRAPPER_OUT_RELEASE}/build.ninja: ${SEL4TEST_SOURCES} \
+		sel4test-gen-headers sel4test-build-wrapper-prepare | ${SEL4TEST_WRAPPER_OUT_RELEASE}
 	cmake -B $(SEL4TEST_WRAPPER_OUT_RELEASE) \
 		-DSEL4_CACHE_DIR=$(CACHE)/sel4test-release \
 		-DRELEASE=ON \
 		-DLibSel4FunctionAttributes=public \
 		-DLibSel4ExternalLibrary=$(SEL4TEST_WRAPPER_LIBRARY_DIR) \
-        -DRustTarget=riscv32imac-unknown-none-elf \
+        -DRustTarget=${RUST_TARGET} \
         -DRustCFlags="" \
         -DRustVersion=${CANTRIP_RUST_VERSION} \
+		${CANTRIP_EXTRA_CMAKE_OPTS} \
         ${SEL4TEST_CMAKE_ARGS}
 
-# sel4test-wrapper rootserver, requries kernel
-$(SEL4TEST_WRAPPER_ROOTSERVER_RELEASE): ${SEL4TEST_WRAPPER_OUT_RELEASE}/build.ninja ${SEL4TEST_KERNEL_RELEASE} | rust_presence_check
+# sel4test-wrapper rootserver, requires kernel
+$(SEL4TEST_WRAPPER_ROOTSERVER_RELEASE): ${SEL4TEST_WRAPPER_OUT_RELEASE}/build.ninja \
+		${SEL4TEST_KERNEL_RELEASE} | rust_presence_check
 	SEL4_DIR=$(SEL4_KERNEL_DIR) \
 	SEL4_OUT_DIR=$(SEL4TEST_OUT_RELEASE)/kernel \
-	    ninja -C $(SEL4TEST_WRAPPER_OUT_RELEASE) sel4test-driver
+	    ninja -C $(SEL4TEST_WRAPPER_OUT_RELEASE)
 
 ## Generates sel4test build artifacts setup for release
 sel4test-wrapper-bundle-release: $(SEL4TEST_WRAPPER_ROOTSERVER_RELEASE)
@@ -144,4 +152,7 @@ sel4test-wrapper-bundle-release: $(SEL4TEST_WRAPPER_ROOTSERVER_RELEASE)
 .PHONY:: sel4test-clean
 .PHONY:: sel4test-bundle-debug sel4test-bundle-release
 .PHONY:: sel4test+wrapper-bundle-debug sel4test+wrapper-bundle-release
+.PHONY:: sel4test-build-debug-headers
+.PHONY:: sel4test-build-release-headers
+.PHONY:: sel4test-build-wrapper-headers
 .PHONY:: sel4test-gen-headers

@@ -39,11 +39,22 @@ $(TIMER_HEADER): $(REGTOOL) $(TIMER_HJSON)
 $(UART_HEADER): $(REGTOOL) $(UART_HJSON) | $(OPENTITAN_GEN)
 	$(REGTOOL) -D -o $@ $(UART_HJSON)
 
+# Targets to install the symlink to opentitan headers for each build
+
 cantrip-build-debug-prepare:: | $(CANTRIP_OUT_DEBUG)
 	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(CANTRIP_OUT_DEBUG)/
 
 cantrip-build-release-prepare:: | $(CANTRIP_OUT_RELEASE)
 	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(CANTRIP_OUT_RELEASE)/
+
+sel4test-build-debug-prepare:: | $(SEL4TEST_OUT_DEBUG)
+	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_OUT_DEBUG)/
+
+sel4test-build-release-prepare:: | $(SEL4TEST_OUT_RELEASE)
+	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_OUT_RELEASE)/
+
+sel4test-build-wrapper-prepare:: | $(SEL4TEST_WRAPPER_OUT_RELEASE)
+	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_WRAPPER_OUT_RELEASE)/
 
 cantrip-gen-headers:: $(TIMER_HEADER) $(UART_HEADER)
 
