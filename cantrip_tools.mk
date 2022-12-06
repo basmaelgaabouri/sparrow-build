@@ -20,7 +20,7 @@
 # See also the source code in $(ROOTDIR)/cantrip/tools/seL4/misc/elfconvert for
 # more information.
 elfconvert:
-	cargo build -q \
+	$(CARGO_CMD) build -q \
         --manifest-path "$(ROOTDIR)/cantrip/tools/seL4/misc/elfconvert/Cargo.toml" \
         --target-dir "$(OUT)/host"
 
