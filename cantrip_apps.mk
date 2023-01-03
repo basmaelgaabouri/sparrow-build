@@ -76,14 +76,30 @@ $(CANTRIP_OUT_RUST_APP_RELEASE)/%.elf: $(CANTRIP_SRC_RUST_APP)/%.rs $(CANTRIP_KE
 .PRECIOUS:: $(CANTRIP_OUT_RUST_APP_RELEASE)/%.elf
 
 ## Build the hello-world C application in debug mode.
-hello_debug: $(CANTRIP_OUT_C_APP_DEBUG)/hello/hello.app
+hello_debug_c: $(CANTRIP_OUT_C_APP_DEBUG)/hello/hello.app
 ## Build the hello-world C application in release mode.
-hello_release: $(CANTRIP_OUT_RUST_APP_RELEASE)/hello/hello.app
+hello_release_c: $(CANTRIP_OUT_C_APP_RELEASE)/hello/hello.app
+## Build the hello-world Rust application in debug mode.
+hello_debug_rust: $(CANTRIP_OUT_RUST_APP_DEBUG)/hello/hello.app
+## Build the hello-world Rust application in release mode.
+hello_release_rust: $(CANTRIP_OUT_RUST_APP_RELEASE)/hello/hello.app
+## Build the hello-world C and Rust applications in debug mode.
+hello_debug: hello_debug_c hello_debug_rust
+## Build the hello-world C and Rust applications in release mode.
+hello_release: hello_release_c hello_release_rust
 
 ## Build the fibonacci C application in debug mode.
-fibonacci_debug: $(CANTRIP_OUT_C_APP_DEBUG)/fibonacci/fibonacci.app
+fibonacci_debug_c: $(CANTRIP_OUT_C_APP_DEBUG)/fibonacci/fibonacci.app
 ## Build the fibonacci C application in release mode.
-fibonacci_release: $(CANTRIP_OUT_RUST_APP_RELEASE)/fibonacci/fibonacci.app
+fibonacci_release_c: $(CANTRIP_OUT_C_APP_RELEASE)/fibonacci/fibonacci.app
+## Build the fibonacci Rust application in debug mode.
+fibonacci_debug_rust: $(CANTRIP_OUT_RUST_APP_DEBUG)/fibonacci/fibonacci.app
+## Build the fibonacci Rust application in release mode.
+fibonacci_release_rust: $(CANTRIP_OUT_RUST_APP_RELEASE)/fibonacci/fibonacci.app
+## Build the Fibonacci C and Rust applications in debug mode.
+fibonacci_debug: fibonacci_debug_c fibonacci_debug_rust
+## Build the Fibonacci C and Rust applications in release mode.
+fibonacci_release: fibonacci_release_c fibonacci_release_rust
 
 ## Build the keyval Rust application in debug mode.
 keyval_debug: $(CANTRIP_OUT_RUST_APP_DEBUG)/keyval/keyval.app
@@ -101,9 +117,9 @@ panic_debug: $(CANTRIP_OUT_RUST_APP_DEBUG)/panic/panic.app
 panic_release: $(CANTRIP_OUT_RUST_APP_RELEASE)/panic/panic.app
 
 ## Build the suicide C application in debug mode.
-suicide_debug: $(CANTRIP_OUT_C APP_DEBUG)/suicide/suicide.app
+suicide_debug: $(CANTRIP_OUT_C_APP_DEBUG)/suicide/suicide.app
 ## Build the suicide C application in release mode.
-suicide_release: $(CANTRIP_OUT_C APP_RELEASE)/suicide/suicide.app
+suicide_release: $(CANTRIP_OUT_C_APP_RELEASE)/suicide/suicide.app
 
 ## Build the timer Rust application in debug mode.
 timer_debug: $(CANTRIP_OUT_RUST_APP_DEBUG)/timer/timer.app
