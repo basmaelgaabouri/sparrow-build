@@ -53,6 +53,7 @@ include $(ROOTDIR)/build/verible.mk
 include $(ROOTDIR)/build/verilator.mk
 include $(ROOTDIR)/build/flatbuffers.mk
 include $(ROOTDIR)/build/spike.mk
+include $(ROOTDIR)/build/tbm.mk
 
 include $(ROOTDIR)/build/platforms/$(PLATFORM)/platform.mk
 
