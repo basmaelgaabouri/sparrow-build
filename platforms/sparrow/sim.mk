@@ -21,16 +21,20 @@ clean_sim_configs:
 # NB: $(CANTRIP_ROOTSERVER_*) is built together with $(CANTRIP_KERNEL_*)
 
 $(OUT)/ext_flash_debug.tar: $(MATCHA_BUNDLE_DEBUG) $(CANTRIP_KERNEL_DEBUG) $(CANTRIP_ROOTSERVER_DEBUG) | $(OUT)/tmp
-	ln -sf $(MATCHA_BUNDLE_DEBUG) $(OUT)/tmp/matcha-tock-bundle
+	cp -f $(MATCHA_BUNDLE_DEBUG) $(OUT)/tmp/matcha-tock-bundle
+	${C_PREFIX}strip $(OUT)/tmp/matcha-tock-bundle
+	${C_PREFIX}objcopy -O binary -g $(OUT)/tmp/matcha-tock-bundle ${OUT}/tmp/matcha-tock-bundle.bin
 	ln -sf $(CANTRIP_KERNEL_DEBUG) $(OUT)/tmp/kernel
 	ln -sf $(CANTRIP_ROOTSERVER_DEBUG) $(OUT)/tmp/capdl-loader
-	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_debug.tar matcha-tock-bundle kernel capdl-loader
+	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_debug.tar matcha-tock-bundle.bin kernel capdl-loader
 
 $(OUT)/ext_flash_release.tar: $(MATCHA_BUNDLE_RELEASE) $(CANTRIP_KERNEL_RELEASE) $(CANTRIP_ROOTSERVER_RELEASE) | $(OUT)/tmp
-	ln -sf $(MATCHA_BUNDLE_RELEASE) $(OUT)/tmp/matcha-tock-bundle
+	cp -f $(MATCHA_BUNDLE_RELEASE) $(OUT)/tmp/matcha-tock-bundle
+	${C_PREFIX}strip $(OUT)/tmp/matcha-tock-bundle
+	${C_PREFIX}objcopy -O binary -g $(OUT)/tmp/matcha-tock-bundle ${OUT}/tmp/matcha-tock-bundle.bin
 	ln -sf $(CANTRIP_KERNEL_RELEASE) $(OUT)/tmp/kernel
 	ln -sf $(CANTRIP_ROOTSERVER_RELEASE) $(OUT)/tmp/capdl-loader
-	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_release.tar matcha-tock-bundle kernel capdl-loader
+	tar -C $(OUT)/tmp -cvhf $(OUT)/ext_flash_release.tar matcha-tock-bundle.bin kernel capdl-loader
 
 # Renode commands to issue before the initial start of a simulation.
 # This pauses all cores and then sets cpu0 (SC) & cpu1 (SMC) running.

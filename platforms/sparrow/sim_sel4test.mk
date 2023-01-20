@@ -16,17 +16,21 @@
 
 $(SEL4TEST_OUT_RELEASE)/ext_flash.tar: $(MATCHA_BUNDLE_RELEASE) \
 		$(SEL4TEST_KERNEL_RELEASE) $(SEL4TEST_ROOTSERVER_RELEASE) | $(OUT)/tmp
-	ln -sf $(MATCHA_BUNDLE_RELEASE) $(OUT)/tmp/matcha-tock-bundle
+	cp -f $(MATCHA_BUNDLE_RELEASE) $(OUT)/tmp/matcha-tock-bundle
+	${C_PREFIX}strip $(OUT)/tmp/matcha-tock-bundle
+	${C_PREFIX}objcopy -O binary -g $(OUT)/tmp/matcha-tock-bundle ${OUT}/tmp/matcha-tock-bundle.bin
 	ln -sf $(SEL4TEST_KERNEL_RELEASE) $(OUT)/tmp/kernel
 	ln -sf $(SEL4TEST_ROOTSERVER_RELEASE) $(OUT)/tmp/capdl-loader
-	tar -C $(OUT)/tmp -cvhf $@ matcha-tock-bundle kernel capdl-loader
+	tar -C $(OUT)/tmp -cvhf $@ matcha-tock-bundle.bin kernel capdl-loader
 
 $(SEL4TEST_OUT_DEBUG)/ext_flash.tar: $(MATCHA_BUNDLE_DEBUG) \
 		$(SEL4TEST_KERNEL_DEBUG) $(SEL4TEST_ROOTSERVER_DEBUG) | $(OUT)/tmp
-	ln -sf $(MATCHA_BUNDLE_DEBUG) $(OUT)/tmp/matcha-tock-bundle
+	cp -f $(MATCHA_BUNDLE_DEBUG) $(OUT)/tmp/matcha-tock-bundle
+	${C_PREFIX}strip $(OUT)/tmp/matcha-tock-bundle
+	${C_PREFIX}objcopy -O binary -g $(OUT)/tmp/matcha-tock-bundle ${OUT}/tmp/matcha-tock-bundle.bin
 	ln -sf $(SEL4TEST_KERNEL_DEBUG) $(OUT)/tmp/kernel
 	ln -sf $(SEL4TEST_ROOTSERVER_DEBUG) $(OUT)/tmp/capdl-loader
-	tar -C $(OUT)/tmp -cvhf $@ matcha-tock-bundle kernel capdl-loader
+	tar -C $(OUT)/tmp -cvhf $@ matcha-tock-bundle.bin kernel capdl-loader
 
 ## Launches an end-to-end build of the sel4test system setup using the
 ## C-based libsel4 syscall api wrappers. The result is run under Renode.
