@@ -33,13 +33,13 @@ $(RUSTDIR)/bin/elf2tab: | rust_presence_check
 
 $(MATCHA_APP_DEBUG): | rust_presence_check
 	export CARGO_NET_GIT_FETCH_WITH_CLI=true; \
-		cd $(MATCHA_PLATFORM_SRC_DIR); cargo build
-	cd $(MATCHA_APP_SRC_DIR); PLATFORM=opentitan cargo build
+		cd $(MATCHA_PLATFORM_SRC_DIR); cargo -Z unstable-options --config 'build.rustflags = ["-C", "link-arg=-Tlayout_debug.ld"]' build
+	cd $(MATCHA_APP_SRC_DIR); PLATFORM=opentitan cargo -Z unstable-options --config 'build.rustflags = ["-C", "link-arg=-Tlayout_matcha_debug.ld",]' build
 
 $(MATCHA_APP_RELEASE): | rust_presence_check
 	export CARGO_NET_GIT_FETCH_WITH_CLI=true; \
-		cd $(MATCHA_PLATFORM_SRC_DIR); cargo build --release
-	cd $(MATCHA_APP_SRC_DIR); PLATFORM=opentitan cargo build --release
+		cd $(MATCHA_PLATFORM_SRC_DIR); cargo -Z unstable-options --config 'build.rustflags = ["-C", "link-arg=-Tlayout.ld"]' build --release
+	cd $(MATCHA_APP_SRC_DIR); PLATFORM=opentitan cargo -Z unstable-options --config 'build.rustflags = ["-C", "link-arg=-Tlayout_matcha.ld",]' build --release
 
 $(MATCHA_BUNDLE_DEBUG): $(MATCHA_APP_DEBUG) $(RUSTDIR)/bin/elf2tab | rust_presence_check
 	elf2tab -n matcha -o $(MATCHA_APP_DEBUG).tab $(MATCHA_APP_DEBUG) --stack 4096 --app-heap 1024 --kernel-heap 1024 --protected-region-size=64
