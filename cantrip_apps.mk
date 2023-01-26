@@ -111,6 +111,11 @@ logtest_debug: $(CANTRIP_OUT_RUST_APP_DEBUG)/logtest/logtest.app
 ## Build the logtest Rust application in release mode.
 logtest_release: $(CANTRIP_OUT_RUST_APP_RELEASE)/logtest/logtest.app
 
+## Build the mltest Rust application in debug mode.
+mltest_debug: $(CANTRIP_OUT_RUST_APP_DEBUG)/mltest/mltest.app
+## Build the mltest Rust application in release mode.
+mltest_release: $(CANTRIP_OUT_RUST_APP_RELEASE)/mltest/mltest.app
+
 ## Build the panic Rust application in debug mode.
 panic_debug: $(CANTRIP_OUT_RUST_APP_DEBUG)/panic/panic.app
 ## Build the panic Rust application in release mode.
@@ -130,6 +135,7 @@ timer_release: $(CANTRIP_OUT_RUST_APP_RELEASE)/timer/timer.app
 .PHONY:: fibonacci_debug fibonacci_release
 .PHONY:: keyval_debug keyval_release
 .PHONY:: logtest_debug logtest_release
+.PHONY:: mltest_debug mltest_release
 .PHONY:: panic_debug panic_release
 .PHONY:: suicide_debug suicide_release
 .PHONY:: timer_debug timer_release
