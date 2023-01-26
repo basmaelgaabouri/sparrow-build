@@ -54,10 +54,12 @@ sel4test-debug: renode multihart_boot_rom $(SEL4TEST_OUT_DEBUG)/ext_flash.tar
 
 $(SEL4TEST_WRAPPER_OUT_RELEASE)/ext_flash.tar: $(MATCHA_BUNDLE_RELEASE) \
 		$(SEL4TEST_KERNEL_RELEASE) $(SEL4TEST_WRAPPER_ROOTSERVER_RELEASE) | $(OUT)/tmp
-	ln -sf $(MATCHA_BUNDLE_RELEASE) $(OUT)/tmp/matcha-tock-bundle
+	cp -f $(MATCHA_BUNDLE_RELEASE) $(OUT)/tmp/matcha-tock-bundle
+	${C_PREFIX}strip $(OUT)/tmp/matcha-tock-bundle
+	${C_PREFIX}objcopy -O binary -g $(OUT)/tmp/matcha-tock-bundle ${OUT}/tmp/matcha-tock-bundle.bin
 	ln -sf $(SEL4TEST_KERNEL_RELEASE) $(OUT)/tmp/kernel
 	ln -sf $(SEL4TEST_WRAPPER_ROOTSERVER_RELEASE) $(OUT)/tmp/capdl-loader
-	tar -C $(OUT)/tmp -cvhf $@ matcha-tock-bundle kernel capdl-loader
+	tar -C $(OUT)/tmp -cvhf $@ matcha-tock-bundle.bin kernel capdl-loader
 
 ## Launches a version of the sel4test target that uses the sel4-sys Rust
 ## crate wrapped with C shims. The result is run under Renode.
