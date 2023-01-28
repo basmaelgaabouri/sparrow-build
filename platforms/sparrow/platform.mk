@@ -4,8 +4,6 @@ include $(ROOTDIR)/build/platforms/sparrow/opentitan_sw.mk
 include $(ROOTDIR)/build/platforms/sparrow/opentitan_hw.mk
 include $(ROOTDIR)/build/platforms/sparrow/matcha_hw.mk
 include $(ROOTDIR)/build/platforms/sparrow/springbok.mk
-include $(ROOTDIR)/build/platforms/sparrow/systemc.mk
-include $(ROOTDIR)/build/platforms/sparrow/springbok_systemc.mk
 include $(ROOTDIR)/build/platforms/sparrow/sim.mk
 include $(ROOTDIR)/build/platforms/sparrow/sim_sel4test.mk
 
