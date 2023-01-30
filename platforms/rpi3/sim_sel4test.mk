@@ -14,18 +14,13 @@
 
 # sel4test simulation support; this is meant to be included from sim.mk
 
-## Launches an end-to-end build of the sel4test system setup using the
-## C-based libsel4 syscall api wrappers. The result is run under qemu.
-sel4test: ${SEL4TEST_OUT_RELEASE}/capdl-loader-image | qemu_presence_check
-	$(QEMU_CMD) -kernel ${SEL4TEST_OUT_RELEASE}/capdl-loader-image
+# NB: default is to use debug builds for compat with upstream.
 
-$(SEL4TEST_OUT_RELEASE)/capdl-loader-image: $(SEL4TEST_KERNEL_RELEASE) \
-		$(SEL4TEST_ROOTSERVER_RELEASE) ${SEL4TEST_OUT_RELEASE}/elfloader/elfloader
-	${C_PREFIX}objcopy -O binary ${SEL4TEST_OUT_RELEASE}/elfloader/elfloader $@
-
-## Debug version of the `sel4test` target that runs under qemu.
-sel4test-debug: ${SEL4TEST_OUT_DEBUG}/capdl-loader-image | qemu_presence_check
+## Launches an end-to-end debug build of the sel4test system. The result
+## is run under qemu.
+sel4test: ${SEL4TEST_OUT_DEBUG}/capdl-loader-image | qemu_presence_check
 	$(QEMU_CMD) -kernel ${SEL4TEST_OUT_DEBUG}/capdl-loader-image
+sel4test-debug: sel4test
 
 $(SEL4TEST_OUT_DEBUG)/capdl-loader-image: $(SEL4TEST_KERNEL_DEBUG) \
 		$(SEL4TEST_ROOTSERVER_DEBUG) ${SEL4TEST_OUT_DEBUG}/elfloader/elfloader
@@ -33,12 +28,12 @@ $(SEL4TEST_OUT_DEBUG)/capdl-loader-image: $(SEL4TEST_KERNEL_DEBUG) \
 
 ## Launches a version of the sel4test target that uses the sel4-sys Rust
 ## crate wrapped with C shims. The result is run under qemu.
-sel4test+wrapper: ${SEL4TEST_WRAPPER_OUT_RELEASE}/capdl-loader-image | qemu_presence_check
-	$(QEMU_CMD) -kernel ${SEL4TEST_WRAPPER_OUT_RELEASE}/capdl-loader-image
+sel4test+wrapper: ${SEL4TEST_WRAPPER_OUT_DEBUG}/capdl-loader-image | qemu_presence_check
+	$(QEMU_CMD) -kernel ${SEL4TEST_WRAPPER_OUT_DEBUG}/capdl-loader-image
 
-$(SEL4TEST_WRAPPER_OUT_RELEASE)/capdl-loader-image: $(SEL4TEST_KERNEL_RELEASE) \
-		$(SEL4TEST_WRAPPER_ROOTSERVER_RELEASE) ${SEL4TEST_WRAPPER_OUT_RELEASE}/elfloader/elfloader
-	${C_PREFIX}objcopy -O binary ${SEL4TEST_WRAPPER_OUT_RELEASE}/elfloader/elfloader $@
+$(SEL4TEST_WRAPPER_OUT_DEBUG)/capdl-loader-image: $(SEL4TEST_KERNEL_DEBUG) \
+		$(SEL4TEST_WRAPPER_ROOTSERVER_DEBUG) ${SEL4TEST_WRAPPER_OUT_DEBUG}/elfloader/elfloader
+	${C_PREFIX}objcopy -O binary ${SEL4TEST_WRAPPER_OUT_DEBUG}/elfloader/elfloader $@
 
 .PHONY:: sel4test
 .PHONY:: sel4test-debug

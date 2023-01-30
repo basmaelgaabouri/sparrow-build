@@ -51,8 +51,11 @@ sel4test-build-debug-prepare:: | $(SEL4TEST_OUT_DEBUG)
 sel4test-build-release-prepare:: | $(SEL4TEST_OUT_RELEASE)
 	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_OUT_RELEASE)/
 
-sel4test-build-wrapper-prepare:: | $(SEL4TEST_WRAPPER_OUT_RELEASE)
+sel4test-build-wrapper-release-prepare:: | $(SEL4TEST_WRAPPER_OUT_RELEASE)
 	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_WRAPPER_OUT_RELEASE)/
+
+sel4test-build-wrapper-debug-prepare:: | $(SEL4TEST_WRAPPER_OUT_DEBUG)
+	ln -sf $(CANTRIP_OUT_DIR)/opentitan-gen $(SEL4TEST_WRAPPER_OUT_DEBUG)/
 
 cantrip-gen-headers:: $(TIMER_HEADER) $(UART_HEADER)
 
