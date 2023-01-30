@@ -58,7 +58,7 @@ ${SEL4TEST_OUT_RELEASE}/build.ninja: ${SEL4TEST_SOURCES} sel4test-gen-headers \
 	cmake -B $(SEL4TEST_OUT_RELEASE) \
 		-DSEL4_CACHE_DIR=$(CACHE)/sel4test-release \
 		-DRELEASE=ON \
-		${CANTRIP_EXTRA_CMAKE_OPTS} \
+		${CANTRIP_EXTRA_CMAKE_OPTS_RELEASE} \
         ${SEL4TEST_CMAKE_ARGS}
 
 # Generates sel4test release kernel
@@ -80,7 +80,7 @@ ${SEL4TEST_OUT_DEBUG}/build.ninja: ${SEL4TEST_SOURCES} sel4test-gen-headers \
 	cmake -B $(SEL4TEST_OUT_DEBUG) \
 		-DSEL4_CACHE_DIR=$(CACHE)/sel4test-debug \
 		-DRELEASE=OFF \
-		${CANTRIP_EXTRA_CMAKE_OPTS} \
+		${CANTRIP_EXTRA_CMAKE_OPTS_DEBUG} \
         ${SEL4TEST_CMAKE_ARGS}
 
 # Generates sel4test debug kernel
