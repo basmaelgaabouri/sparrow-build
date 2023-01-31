@@ -70,7 +70,7 @@ sel4test-bundle-debug: $(SEL4TEST_ROOTSERVER_DEBUG)
 ## Generates both sel4test & sel4test+wrapper build artifacts
 # NB: shorthand for testing (sim targets depend on explicit pathnames)
 sel4test-bundles: sel4test-bundle-debug
-sel4test-bundles: sel4test+wrapper-bundle-debug
+sel4test-bundles: sel4test-wrapper-bundle-debug
 
 ## Cleans all sel4test artifacts
 sel4test-clean:
@@ -118,7 +118,7 @@ sel4test-wrapper-bundle-debug: $(SEL4TEST_WRAPPER_ROOTSERVER_DEBUG)
 
 .PHONY:: sel4test-clean
 .PHONY:: sel4test-bundle-debug
-.PHONY:: sel4test+wrapper-bundle-debug
+.PHONY:: sel4test-wrapper-bundle-debug
 .PHONY:: sel4test-build-debug-headers
 .PHONY:: sel4test-build-wrapper-debug-headers
 .PHONY:: sel4test-gen-headers
