@@ -98,11 +98,14 @@ $(SEL4TEST_WRAPPER_OUT_DEBUG):
 	mkdir -p $(SEL4TEST_WRAPPER_OUT_DEBUG)
 
 # seltest-wrapper configuration & build.ninja generation
+# NB: use a release build of the user-space code to workaround memory
+#   exhuastion; the kernel is still built debug to get any platform-specific
+#   configuration (e.g. on sparrow the debug memory config).
 ${SEL4TEST_WRAPPER_OUT_DEBUG}/build.ninja: ${SEL4TEST_SOURCES} \
 		sel4test-gen-headers sel4test-build-wrapper-debug-prepare | ${SEL4TEST_WRAPPER_OUT_DEBUG}
 	cmake -B $(SEL4TEST_WRAPPER_OUT_DEBUG) \
-		-DSEL4_CACHE_DIR=$(CACHE)/sel4test-debug \
-		-DRELEASE=OFF -DKernelDebugBuild=ON \
+		-DSEL4_CACHE_DIR=$(CACHE)/sel4test-wrapper-debug \
+		-DRELEASE=ON \
 		${CANTRIP_EXTRA_CMAKE_OPTS_DEBUG} \
         ${SEL4TEST_WRAPPER_CMAKE_ARGS}
 
