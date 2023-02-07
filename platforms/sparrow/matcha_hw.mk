@@ -81,7 +81,7 @@ $(MATCHA_TESTLOG_DIR):
 #
 matcha_hw_verilator_tests: verilator | $(MATCHA_TESTLOG_DIR)
 	cd $(MATCHA_SRC_DIR) && \
-		bazel test --test_output=streamed //sw/device/tests:verilator_test_suite
+		bazel test //sw/device/tests:verilator_test_suite
 	cd $(MATCHA_SRC_DIR) && cp -rf "bazel-testlogs/sw" "$(MATCHA_TESTLOG_DIR)"
 
 ## Clean Matcha HW artifact
