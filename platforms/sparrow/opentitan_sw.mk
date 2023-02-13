@@ -40,6 +40,9 @@ opentitan_sw_all: | $(OPENTITAN_BUILD_OUT_DIR) \
 		find "bazel-out/" -type f -wholename "*fastbuild-*/sw/device/tests*/*.bin" | \
 			sed 's/\.bin//g' | \
 			xargs -I {} cp -f {} "$(OPENTITAN_BUILD_SW_DEVICE_TESTS_DIR)/"
+	cd $(OPENTITAN_SRC_DIR) && \
+	  bazel build //hw/ip/otbn:all && \
+		cp -f bazel-bin/hw/ip/otbn/otbn_simple_smoke_test.elf "$(OPENTITAN_BUILD_SW_DEVICE_TESTS_DIR)/"
 
 $(OPENTITAN_BUILD_SW_DEVICE_DIR)/examples/hello_world: | $(OPENTITAN_BUILD_OUT_DIR)
 	@mkdir -p "$(OPENTITAN_BUILD_SW_DEVICE_DIR)/examples/hello_world"
