@@ -24,4 +24,4 @@ CANTRIP_APPS_DEBUG   := $(CANTRIP_OUT_C_APP_DEBUG)/hello/hello.app \
                         $(CANTRIP_OUT_RUST_APP_DEBUG)/panic/panic.app \
                         $(CANTRIP_OUT_RUST_APP_DEBUG)/timer/timer.app
 
-CANTRIP_SCRIPTS      := ${CANTRIP_SRC_DIR}/apps/repl/autostart.repl
+CANTRIP_SCRIPTS      := $(ROOTDIR)/build/platforms/$(PLATFORM)/autostart.repl

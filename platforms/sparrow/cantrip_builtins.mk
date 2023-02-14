@@ -31,3 +31,5 @@ CANTRIP_APPS_DEBUG    := $(CANTRIP_OUT_C_APP_DEBUG)/hello/hello.app \
                          $(CANTRIP_OUT_C_APP_DEBUG)/suicide/suicide.app \
                          $(CANTRIP_OUT_RUST_APP_DEBUG)/timer/timer.app
 CANTRIP_MODEL_DEBUG   := $(OUT)/springbok_iree/quant_models/mobilenet_v1_emitc_static.model
+
+CANTRIP_SCRIPTS       := $(ROOTDIR)/build/platforms/$(PLATFORM)/builtins.repl
