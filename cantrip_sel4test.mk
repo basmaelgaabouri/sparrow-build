@@ -38,7 +38,7 @@ SEL4TEST_SOURCES := $(shell find \
 	${SEL4TEST_SRC_DIR}/../seL4_libs \
 	${SEL4TEST_SRC_DIR}/../musllibc \
 	${SEL4TEST_SRC_DIR}/../util_libs \
-	-name \*.c -or -name \*.h -or -name \*.cpp -type f)
+	\( -name \*.c -or -name \*.h -or -name \*.cpp \) -type f)
 
 sel4test-gen-headers: cantrip-gen-headers
 

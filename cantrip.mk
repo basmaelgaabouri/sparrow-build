@@ -46,12 +46,12 @@ CANTRIP_KERNEL_RELEASE := $(CANTRIP_OUT_RELEASE)/kernel/kernel.elf
 CANTRIP_ROOTSERVER_DEBUG := $(CANTRIP_OUT_DEBUG)/capdl-loader
 CANTRIP_ROOTSERVER_RELEASE := $(CANTRIP_OUT_RELEASE)/capdl-loader
 
-CANTRIP_SOURCES := $(shell find $(ROOTDIR)/cantrip \
+CANTRIP_SOURCES := $(shell find $(ROOTDIR)/cantrip \(\
 	-name \*.rs -or \
 	-name \*.c -or \
 	-name \*.h -or \
 	-name \*.cpp \
-	-type f)
+	\) -type f)
 
 # Platform-specific aggregate targets
 
