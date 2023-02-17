@@ -60,7 +60,7 @@ export PATH="${OUT}/host/flatbuffers/bin:${PATH}"
 export PATH="${OUT}/host/verilator/bin:${PATH}"
 export PATH="${OUT}/host/verible/bin:${PATH}"
 
-export CANTRIP_RUST_VERSION=${CANTRIP_RUST_VERSION:-"nightly-2021-11-05"}
+export CANTRIP_RUST_VERSION=${CANTRIP_RUST_VERSION:-"nightly-2023-01-26"}
 export RENODE_PORT=1234
 
 export PYTHONPATH="${PYTHONPATH}:${ROOTDIR}/cicd/"
