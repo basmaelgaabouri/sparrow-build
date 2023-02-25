@@ -64,6 +64,7 @@ export CANTRIP_RUST_VERSION=${CANTRIP_RUST_VERSION:-"nightly-2023-01-26"}
 export RENODE_PORT=1234
 
 export PYTHONPATH="${PYTHONPATH}:${ROOTDIR}/cicd/"
+export PYTHON_SPARROW_ENV="${CACHE}/${PLATFORM}-venv"
 
 function renode
 {
@@ -283,10 +284,15 @@ fi
 
 set-platform ${PLATFORM}
 
+# Explicitly set the variables to run the venv python interpreter.
+export PATH="${PYTHON_SPARROW_ENV}/bin:${PATH}"
+export VIRTUAL_ENV="${PYTHON_SPARROW_ENV}"
+
 echo "========================================"
 echo ROOTDIR="${ROOTDIR}"
 echo OUT="${OUT}"
 echo PLATFORM="${PLATFORM}"
+echo PYTHON_SPARROW_ENV="${PYTHON_SPARROW_ENV}"
 echo "========================================"
 echo
 echo Type \'m \[target\]\' to build.
