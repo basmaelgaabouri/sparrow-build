@@ -1,25 +1,15 @@
-builtins
-install hello.app
+packages
 start hello
-install keyval.app
 start keyval
 bundles
-install logtest.app
 start logtest
-install panic.app
 start panic
-install timer.app
 start timer
 bundles
 mstats
 stop hello
-uninstall hello
 stop keyval
-uninstall keyval
 stop logtest
-uninstall logtest
 stop panic
-uninstall panic
 stop timer
-uninstall timer
 mstats

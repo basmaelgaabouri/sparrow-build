@@ -1,52 +1,36 @@
 builtins
-install hello.app
 start hello
 sleep 100
 stop hello
-uninstall hello
 
-install fibonacci.app
 start fibonacci
 sleep 1000
 stop fibonacci
-uninstall fibonacci
 
-install keyval.app
 start keyval
 sleep 100
 stop keyval
-uninstall keyval
 
-install logtest.app
 start logtest
 sleep 100
 stop logtest
-uninstall logtest
 
-install panic.app
 start panic
 sleep 100
 stop panic
-uninstall panic
 
-install timer.app
 start timer
 sleep 2500
 stop timer
-uninstall timer
 
 bundles
 mstats
 
 mstats
-install mobilenet_v1_emitc_static.model
-install mltest.app
 start mltest
 mstats
 sleep 10000
 stop mltest
-uninstall mltest
-uninstall mobilenet_v1_emitc_static
 
 bundles
 mstats
