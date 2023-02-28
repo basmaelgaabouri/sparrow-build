@@ -15,7 +15,7 @@
 # limitations under the License.
 
 export TARGET_PLATFORM="rpi3"
-export C_PREFIX="aarch64-none-linux-gnu-"
+export C_PREFIX="aarch64-linux-gnu-"
 export RUST_PREFIX="aarch64-unknown-none"
 export CANTRIP_TARGET_ARCH="aarch64-unknown-elf"
 

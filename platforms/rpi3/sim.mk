@@ -16,7 +16,7 @@ sim_configs::
 clean_sim_configs::
 
 QEMU := qemu-system-aarch64
-QEMU_CMD := ${QEMU} -machine raspi3b -nographic -serial null \
+QEMU_CMD := ${QEMU} -machine raspi3 -nographic -serial null \
 	-serial mon:stdio -m size=1024M
 
 ## Checks for qemu presence
