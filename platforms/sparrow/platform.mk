@@ -34,7 +34,7 @@ $(TIMER_HJSON): $(TIMER_JINJA) $(TIMER_TEMPLATE) | $(OPENTITAN_GEN_DIR)
 $(TIMER_HEADER): $(REGTOOL) $(TIMER_HJSON)
 	$(REGTOOL) -D -o $@ $(TIMER_HJSON)
 
-$(UART_HEADER): $(REGTOOL) $(UART_HJSON) | $(OPENTITAN_GEN)
+$(UART_HEADER): $(REGTOOL) $(UART_HJSON) | $(OPENTITAN_GEN_DIR)
 	$(REGTOOL) -D -o $@ $(UART_HJSON)
 
 # Targets to install the symlink to opentitan headers for each build
