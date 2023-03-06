@@ -201,6 +201,42 @@ function set-platform
     source "${ROOTDIR}/build/platforms/${platform}/setup.sh"
 }
 
+function kcargo
+{
+    # NB: sel4-config needs a path to the kernel build which could be
+    #     in debug or release (for our needs either works)
+    local SEL4_OUT_DIR="${OUT}/cantrip/${CANTRIP_TARGET_ARCH}/debug/kernel/"
+    if [[ ! -d "${SEL4_OUT_DIR}/gen_config" ]]; then
+        export SEL4_OUT_DIR="${OUT}/cantrip/${CANTRIP_TARGET_ARCH}/release/kernel/"
+        if [[ ! -d "${SEL4_OUT_DIR}/gen_config" ]]; then
+            echo "No kernel build found at \${SEL4_OUT_DIR}; build a kernel first"
+            set +x
+            return 1
+        fi
+    fi
+
+    local SEL4_PLATFORM=$(awk '/CONFIG_PLATFORM/{print $3}' "$ROOTDIR/build/platforms/$PLATFORM/cantrip.mk")
+    local RUST_TARGET=$(awk '/RUST_TARGET/{print $3}' "$ROOTDIR/build/platforms/$PLATFORM/cantrip_apps.mk")
+
+    local CARGO_CMD="cargo +${CANTRIP_RUST_VERSION}"
+    local CARGO_TARGET="--target ${RUST_TARGET} --features ${SEL4_PLATFORM}"
+    local CARGO_OPTS='-Z unstable-options -Z avoid-dev-deps'
+    # TODO(sleffler): maybe set --target-dir to avoid polluting the src tree
+
+    export RUSTFLAGS='-Z tls-model=local-exec'
+    export SEL4_OUT_DIR
+
+    cmd=${1:-build}
+    case "$1" in
+    fmt)
+          ${CARGO_CMD} $*;;
+    ""|-*)
+          ${CARGO_CMD} build ${CARGO_OPTS} ${CARGO_TARGET};;
+    *)
+          ${CARGO_CMD} $* ${CARGO_OPTS} ${CARGO_TARGET};;
+    esac
+}
+
 if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
     unset JUMP_TARGETS
     declare -Ax JUMP_TARGETS
