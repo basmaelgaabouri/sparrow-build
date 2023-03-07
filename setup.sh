@@ -203,11 +203,13 @@ function set-platform
 
 function kcargo
 {
+    local CANTRIP_OUT_DIR="${OUT}/cantrip/${CANTRIP_TARGET_ARCH}"
+
     # NB: sel4-config needs a path to the kernel build which could be
     #     in debug or release (for our needs either works)
-    local SEL4_OUT_DIR="${OUT}/cantrip/${CANTRIP_TARGET_ARCH}/debug/kernel/"
+    local SEL4_OUT_DIR="${CANTRIP_OUT_DIR}/debug/kernel/"
     if [[ ! -d "${SEL4_OUT_DIR}/gen_config" ]]; then
-        export SEL4_OUT_DIR="${OUT}/cantrip/${CANTRIP_TARGET_ARCH}/release/kernel/"
+        export SEL4_OUT_DIR="${CANTRIP_OUT_DIR}/release/kernel/"
         if [[ ! -d "${SEL4_OUT_DIR}/gen_config" ]]; then
             echo "No kernel build found at \${SEL4_OUT_DIR}; build a kernel first"
             set +x
@@ -232,6 +234,13 @@ function kcargo
           ${CARGO_CMD} $*;;
     ""|-*)
           ${CARGO_CMD} build ${CARGO_OPTS} ${CARGO_TARGET};;
+    clippy)
+          # NB: track preupload-clippy.sh
+          ${CARGO_CMD} clippy ${CARGO_OPTS} ${CARGO_TARGET} \
+              --target-dir ${CANTRIP_OUT_DIR}/clippy -- \
+              -D warnings \
+              -A clippy::uninlined_format_args
+          ;;
     *)
           ${CARGO_CMD} $* ${CARGO_OPTS} ${CARGO_TARGET};;
     esac
