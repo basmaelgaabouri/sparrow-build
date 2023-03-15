@@ -26,26 +26,18 @@ MATCHA_APP_RELEASE := $(OUT)/matcha/riscv32imc-unknown-none-elf/release/matcha_a
 MATCHA_BUNDLE_DEBUG   := $(OUT)/matcha-bundle-debug.elf
 MATCHA_BUNDLE_RELEASE := $(OUT)/matcha-bundle-release.elf
 
-MATCHA_PLIC_HJSON := $(ROOTDIR)/hw/matcha/hw/top_matcha/ip_autogen/rv_plic/data/rv_plic.hjson
-
-MATCHA_REGTOOL := $(ROOTDIR)/hw/opentitan-upstream/util/regtool.py
-
 ########################################
 
 $(RUSTDIR)/bin/elf2tab: | rust_presence_check
 	cargo install elf2tab --version 0.6.0
 
-$(MATCHA_APP_DEBUG): $(MATCHA_REGTOOL) $(MATCHA_PLIC_HJSON) | rust_presence_check
+$(MATCHA_APP_DEBUG): | rust_presence_check
 	export CARGO_NET_GIT_FETCH_WITH_CLI=true; \
-		export MATCHA_REGTOOL="$(MATCHA_REGTOOL)"; \
-		export MATCHA_PLIC_HJSON="$(MATCHA_PLIC_HJSON)"; \
 		cd $(MATCHA_PLATFORM_SRC_DIR); cargo -Z unstable-options --config 'build.rustflags = ["-C", "link-arg=-Tlayout_debug.ld"]' build
 	cd $(MATCHA_APP_SRC_DIR); PLATFORM=opentitan cargo -Z unstable-options --config 'build.rustflags = ["-C", "link-arg=-Tlayout_matcha_debug.ld",]' build
 
-$(MATCHA_APP_RELEASE): $(MATCHA_REGTOOL) $(MATCHA_PLIC_HJSON) | rust_presence_check
+$(MATCHA_APP_RELEASE): | rust_presence_check
 	export CARGO_NET_GIT_FETCH_WITH_CLI=true; \
-		export MATCHA_REGTOOL="$(MATCHA_REGTOOL)"; \
-		export MATCHA_PLIC_HJSON="$(MATCHA_PLIC_HJSON)"; \
 		cd $(MATCHA_PLATFORM_SRC_DIR); cargo -Z unstable-options --config 'build.rustflags = ["-C", "link-arg=-Tlayout.ld"]' build --release
 	cd $(MATCHA_APP_SRC_DIR); PLATFORM=opentitan cargo -Z unstable-options --config 'build.rustflags = ["-C", "link-arg=-Tlayout_matcha.ld",]' build --release
 

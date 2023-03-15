@@ -29,6 +29,18 @@ export CARGO_HOME="${RUSTDIR}"
 export RUSTUP_HOME="${RUSTDIR}"
 export PATH="${RUSTDIR}/bin:${PATH}"
 
+local cantrip_out_dir="${OUT}/cantrip/${CANTRIP_TARGET_ARCH}"
+local opentitan_gen_dir="${cantrip_out_dir}/opentitan-gen/include/opentitan"
+local opentitan_source="${ROOTDIR}/hw/opentitan-upstream"
+
+# Some build.rs files use the regtool crate which needs to know where to find
+# regtool.py.
+export REGTOOL="${opentitan_source}/util/regtool.py"
+# The following files are the input to regtool.py
+export MBOX_HJSON="${ROOTDIR}/hw/matcha/hw/top_matcha/ip/tlul_mailbox/data/tlul_mailbox.hjson"
+export TIMER_HJSON="${opentitan_gen_dir}/rv_timer.hjson"
+export UART_HJSON="${opentitan_source}/hw/ip/uart/data/uart.hjson"
+
 function parting_messages() {
     if [[ ! -d "${RUSTDIR}" ]] ||
        [[ ! -d "${ROOTDIR}/cache/toolchain" ]] ||

@@ -147,6 +147,8 @@ $(CANTRIP_KERNEL_DEBUG): $(CANTRIP_SOURCES) cantrip-gen-headers cantrip-build-de
 		-DCMAKE_C_FLAGS_DEBUG=-g \
 		${CANTRIP_EXTRA_CMAKE_OPTS_DEBUG} \
 	  $(CANTRIP_SRC_DIR)
+	# NB: ninja builds may require env vars set elsewhere, typically in
+	# platforms/${PLATFORM}/setup.sh.
 	SEL4_DIR=$(SEL4_KERNEL_DIR) \
 	SEL4_OUT_DIR=$(CANTRIP_OUT_DEBUG)/kernel \
 		ninja -C $(CANTRIP_OUT_DEBUG)
@@ -165,6 +167,8 @@ $(CANTRIP_KERNEL_RELEASE): $(CANTRIP_SOURCES) cantrip-gen-headers cantrip-build-
 		-DRUST_GLOBAL_FEATURES=${CONFIG_PLATFORM} \
 		${CANTRIP_EXTRA_CMAKE_OPTS_RELEASE} \
 	  $(CANTRIP_SRC_DIR)
+	# NB: ninja builds may require env vars set elsewhere, typically in
+	# platforms/${PLATFORM}/setup.sh.
 	SEL4_DIR=$(SEL4_KERNEL_DIR) \
 	SEL4_OUT_DIR=$(CANTRIP_OUT_RELEASE)/kernel \
 		ninja -C $(CANTRIP_OUT_RELEASE)
