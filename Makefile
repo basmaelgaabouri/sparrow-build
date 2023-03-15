@@ -43,7 +43,6 @@ include $(ROOTDIR)/build/cantrip_builtins.mk
 include $(ROOTDIR)/build/cantrip_sel4test.mk
 include $(ROOTDIR)/build/cantrip_tests.mk
 include $(ROOTDIR)/build/minisel.mk
-include $(ROOTDIR)/build/tock.mk
 include $(ROOTDIR)/build/iree.mk
 include $(ROOTDIR)/build/sparrow_boot_rom.mk
 include $(ROOTDIR)/build/riscv_tests.mk
