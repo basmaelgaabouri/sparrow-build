@@ -209,7 +209,7 @@ function kcargo
     #     in debug or release (for our needs either works)
     local SEL4_OUT_DIR="${CANTRIP_OUT_DIR}/debug/kernel/"
     if [[ ! -d "${SEL4_OUT_DIR}/gen_config" ]]; then
-        export SEL4_OUT_DIR="${CANTRIP_OUT_DIR}/release/kernel/"
+        SEL4_OUT_DIR="${CANTRIP_OUT_DIR}/release/kernel/"
         if [[ ! -d "${SEL4_OUT_DIR}/gen_config" ]]; then
             echo "No kernel build found at \${SEL4_OUT_DIR}; build a kernel first"
             set +x
@@ -225,25 +225,29 @@ function kcargo
     local CARGO_OPTS='-Z unstable-options -Z avoid-dev-deps'
     # TODO(sleffler): maybe set --target-dir to avoid polluting the src tree
 
-    export RUSTFLAGS='-Z tls-model=local-exec'
-    export SEL4_OUT_DIR
+    # NB: we don't want to export anything to the user's shell (in particular
+    # RUSTFLAGS), hence the subshell parenthesis.
+    (
+        export RUSTFLAGS='-Z tls-model=local-exec'
+        export SEL4_OUT_DIR="$SEL4_OUT_DIR"
 
-    cmd=${1:-build}
-    case "$1" in
-    fmt)
-          ${CARGO_CMD} $*;;
-    ""|-*)
-          ${CARGO_CMD} build ${CARGO_OPTS} ${CARGO_TARGET};;
-    clippy)
-          # NB: track preupload-clippy.sh
-          ${CARGO_CMD} clippy ${CARGO_OPTS} ${CARGO_TARGET} \
+        cmd=${1:-build}
+        case "$1" in
+          fmt)
+            ${CARGO_CMD} $*;;
+          ""|-*)
+            ${CARGO_CMD} build ${CARGO_OPTS} ${CARGO_TARGET};;
+          clippy)
+            # NB: track preupload-clippy.sh
+            ${CARGO_CMD} clippy ${CARGO_OPTS} ${CARGO_TARGET} \
               --target-dir ${CANTRIP_OUT_DIR}/clippy -- \
               -D warnings \
               -A clippy::uninlined_format_args
-          ;;
-    *)
-          ${CARGO_CMD} $* ${CARGO_OPTS} ${CARGO_TARGET};;
-    esac
+            ;;
+          *)
+            ${CARGO_CMD} $* ${CARGO_OPTS} ${CARGO_TARGET};;
+        esac
+    )
 }
 
 if [[ "${BASH_VERSINFO[0]}" -ge 4 ]]; then
