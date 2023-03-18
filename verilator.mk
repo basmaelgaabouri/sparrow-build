@@ -16,10 +16,15 @@ VERILATOR_SRC_DIR   := $(ROOTDIR)/sim/verilator
 VERILATOR_BUILD_DIR := $(OUT)/tmp/verilator
 VERILATOR_OUT_DIR   := $(OUT)/host/verilator
 VERILATOR_BIN       := $(VERILATOR_OUT_DIR)/bin/verilator_bin
+VERILATOR_BUILTIN   := $(shell which verilator)
 
 $(VERILATOR_BUILD_DIR):
 	mkdir -p $(VERILATOR_BUILD_DIR)
 
+ifeq ($(VERILATOR_BUILTIN), /usr/src/verilator/bin/verilator)
+$(VERILATOR_BIN):
+	@echo "Verilator exists at $(VERILATOR_BUILTIN)"
+else
 $(VERILATOR_BIN): | $(VERILATOR_SRC_DIR) $(VERILATOR_BUILD_DIR)
 	cd $(VERILATOR_BUILD_DIR) && \
 		autoconf -o $(VERILATOR_BUILD_DIR)/configure $(VERILATOR_SRC_DIR)/configure.ac
@@ -29,6 +34,7 @@ $(VERILATOR_BIN): | $(VERILATOR_SRC_DIR) $(VERILATOR_BUILD_DIR)
 		--prefix=$(VERILATOR_OUT_DIR)
 	$(MAKE) -C $(VERILATOR_BUILD_DIR)
 	$(MAKE) -C $(VERILATOR_BUILD_DIR) install
+endif
 
 ## Removes only the Verilator build artifacts from out/
 verilator_clean:
