@@ -77,6 +77,15 @@ matcha_hw_fpga_v6: | $(MATCHA_OUT_DIR)
 $(MATCHA_TESTLOG_DIR):
 	mkdir -p $(MATCHA_TESTLOG_DIR)
 
+## Build Matcha sw artifacts
+#
+# Checks the matcha sw code integrity for targets not covered by the verilator
+# tests.
+#
+matcha_sw_all: verilator
+	cd $(MATCHA_SRC_DIR) && \
+	  bazel build --define DISABLE_VERILATOR_BUILD=true //sw/...
+
 ## Build and run matcha verilator test suite
 #
 matcha_hw_verilator_tests: verilator | $(MATCHA_TESTLOG_DIR)
@@ -91,4 +100,5 @@ matcha_hw_clean:
 		bazel clean --expunge
 
 .PHONY:: matcha_hw_verilator_sim matcha_hw_clean matcha_hw_verilator_tests
+.PHONY:: matcha_sw_all
 .PHONY:: matcha_hw_fpga_nexus matcha_hw_fpga_v6
