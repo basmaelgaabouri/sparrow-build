@@ -82,7 +82,7 @@ $(MATCHA_TESTLOG_DIR):
 # Checks the matcha sw code integrity for targets not covered by the verilator
 # tests.
 #
-matcha_sw_all: verilator
+matcha_sw_all:
 	cd $(MATCHA_SRC_DIR) && \
 	  bazel build --define DISABLE_VERILATOR_BUILD=true //sw/...
 
