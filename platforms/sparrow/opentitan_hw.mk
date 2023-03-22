@@ -20,7 +20,8 @@ earlgrey_hw_verilator_smoketests: | $(VERILATOR_BIN) $(OPENTITAN_BUILD_LOG_DIR)
 			| grep "_smoketest" \
 			| xargs bazel test  --test_tag_filters=verilator,-broken \
 					--action_env=BITSTREAM=d20fe23d160fea56980790b8d43a73c80e25855c \
-					--test_output=streamed
+					--test_timeout=180,600,1800,3600 \
+					--test_output=errors
 	cd $(OPENTITAN_SRC_DIR) && \
 		cp -rf "bazel-testlogs/sw/device" "$(OPENTITAN_BUILD_LOG_SW_DIR)"
 
@@ -33,7 +34,8 @@ earlgrey_hw_verilator_tests_all: | $(VERILATOR_BIN) $(OPENTITAN_BUILD_LOG_DIR)
 		bazel query "kind(test, //sw/device/tests:all)" \
 			| xargs bazel test  --test_tag_filters=verilator,-broken \
 					--action_env=BITSTREAM=d20fe23d160fea56980790b8d43a73c80e25855c \
-					--test_output=streamed
+					--test_timeout=180,600,1800,3600 \
+					--test_output=errors
 	cd $(OPENTITAN_SRC_DIR) && \
 		cp -rf "bazel-testlogs/sw/device" "$(OPENTITAN_BUILD_LOG_SW_DIR)"
 
